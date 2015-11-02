@@ -161,10 +161,17 @@ object Simulador {
     
   }
   
-  case object onda extends Movimiento {
+  case class onda(energiaNecesaria: Int) extends Movimiento {
     
     def apply(combatientes: (Guerrero, Guerrero)) = {
-      ???
+      if (combatientes._1.energia > energiaNecesaria)
+        combatientes._2.especie match {
+          case Androide => (combatientes._1.disminuiKi(energiaNecesaria), combatientes._2.aumentarKi(energiaNecesaria * 2))
+          case Monstruo(_) => (combatientes._1.disminuiKi(energiaNecesaria), combatientes._2.disminuiKi(energiaNecesaria / 2))
+          case _ => (combatientes._1.disminuiKi(energiaNecesaria), combatientes._2.disminuiKi(energiaNecesaria))
+      }
+      else
+        throw new RuntimeException("No posee energia suficiente para lanzar la onda")
     }
     
   }
