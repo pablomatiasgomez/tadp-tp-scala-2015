@@ -11,4 +11,6 @@ case class Saiyajing(
   ) extends Especie
 case object Androide extends Especie
 case object Namekusein extends Especie
-case object Monstruo extends Especie
+case class Monstruo(
+  comer : Function1[Guerrero, Guerrero]
+  )extends Especie

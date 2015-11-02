@@ -29,26 +29,16 @@ object Simulador {
   }  
   
   def usarItem(item : Item, combatientes : (Guerrero, Guerrero)) = {
-    val (oponente, guerrero) = item match {
-      case Arma(tipo) =>
-        tipo match {
-          case Roma => 
-            (combatientes._2.especie, combatientes._2.energia) match {
-              case (Androide, _) => (combatientes._1, combatientes._2)
-              case (_, energia) if energia < 300 => (combatientes._1, combatientes._2) //TODO: Dejar Inconsciente
-              case _ => (combatientes._1, combatientes._2)
-            }
-          case Filosa =>  combatientes._2.especie match {
-            case Saiyajing(_, cola) if cola => (combatientes._1, combatientes._2. copy(energia = 1, especie = Saiyajing(0,false)))
-            case _ => (combatientes._1, combatientes._2.disminuiKi(combatientes._1.energia / 100))
-          }
-          case Fuego => combatientes._2.especie match {
-            case Humano =>(combatientes._1, combatientes._2.disminuiKi(20))
-            case Namekusein =>(combatientes._1, combatientes._2.disminuiKi(10)) //TODO: Solo si esta inconsciente
-            case _ =>(combatientes._1, combatientes._2)
-          }
-        }
-      case SemillaDelEmitaño => (combatientes._1.aumentarKi(combatientes._1.energiaMaxima), combatientes._2)
+    val (oponente, guerrero) = (item, combatientes._2.especie) match {
+      case (Arma(Roma), Androide) => (combatientes._1, combatientes._2)
+      case (Arma(Roma), _) if combatientes._2.energia < 300 => (combatientes._1, combatientes._2) //TODO: Dejar inconsciente
+      case (Arma(Filosa), Saiyajing(_, cola)) 
+          if cola => (combatientes._1, combatientes._2. copy(energia = 1, especie = Saiyajing(0,false)))
+      case (Arma(Filosa), _) => (combatientes._1, combatientes._2.disminuiKi(combatientes._1.energia / 100))
+      case (Arma(Fuego),Humano) => (combatientes._1, combatientes._2.disminuiKi(20))
+      case (Arma(Fuego), Namekusein) =>(combatientes._1, combatientes._2.disminuiKi(10)) //TODO: Solo si esta inconsciente
+      case (SemillaDelEmitaño, _) => (combatientes._1.aumentarKi(combatientes._1.energiaMaxima), combatientes._2)
+      case _ => (combatientes._1, combatientes._2)
     }
   }
   
