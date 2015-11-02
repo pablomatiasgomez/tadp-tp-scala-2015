@@ -133,5 +133,41 @@ object Simulador {
     
   }
   
+  case object muchosGolpesNinja extends Movimiento {
+    
+    def apply(combatientes: (Guerrero, Guerrero)) = {
+      (combatientes._1.especie, combatientes._2.especie) match {
+        case (Humano, Androide) => (combatientes._1.disminuiKi(10), combatientes._2)
+        case _ if combatientes._1.energia < combatientes._2.energia => (combatientes._1.disminuiKi(20), combatientes._2)
+        case _ if combatientes._1.energia > combatientes._2.energia => (combatientes._1, combatientes._2.disminuiKi(20))
+      }
+    }
+    
+  }
+  
+  case object explotar extends Movimiento {
+    
+    def apply(combatientes: (Guerrero, Guerrero)) = {
+      ???
+    }
+    
+  }
+  
+  case object onda extends Movimiento {
+    
+    def apply(combatientes: (Guerrero, Guerrero)) = {
+      ???
+    }
+    
+  }
+  
+  case object genkidama extends Movimiento {
+    
+    def apply(combatientes: (Guerrero, Guerrero)) = {
+      ???
+    }
+    
+  }
+
 
 }
