@@ -148,7 +148,15 @@ object Simulador {
   case object explotar extends Movimiento {
     
     def apply(combatientes: (Guerrero, Guerrero)) = {
-      ???
+      (combatientes._1.especie, combatientes._2.especie) match { //TODO: Devolver Muerto al primero
+        case (Androide, Namekusein) if combatientes._1.energia * 3 > combatientes._2.energia => 
+          (combatientes._1, combatientes._2.copy(energia = 1))
+        case (Monstruo(_), Namekusein) if combatientes._1.energia * 2 > combatientes._2.energia => 
+          (combatientes._1, combatientes._2.copy(energia = 1))
+        case (Androide, _) => (combatientes._1, combatientes._2.disminuiKi(combatientes._1.energia * 3))
+        case (Monstruo(_), _) => (combatientes._1, combatientes._2.disminuiKi(combatientes._1.energia * 2))
+        case _ => throw new RuntimeException("Sólo los monstruos y los androides pueden explotar")
+      }
     }
     
   }
