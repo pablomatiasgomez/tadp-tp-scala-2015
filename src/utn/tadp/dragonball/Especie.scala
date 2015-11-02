@@ -12,6 +12,6 @@ case class Saiyajing(
 case object Androide extends Especie
 case object Namekusein extends Especie
 case class Monstruo(
-  comer : Function1[Guerrero, Guerrero]
+  digerir : Function1[Guerrero, Guerrero]
   )extends Especie
 case class  Fusion(miembros:(Guerrero,Guerrero)) extends Especie
