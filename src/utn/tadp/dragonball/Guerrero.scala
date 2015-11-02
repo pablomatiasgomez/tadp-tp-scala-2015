@@ -1,5 +1,5 @@
 package utn.tadp.dragonball
-
+//
 case class Guerrero(
       nombre: String,
       inventario: List[Item],
