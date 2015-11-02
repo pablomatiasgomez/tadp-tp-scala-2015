@@ -57,6 +57,17 @@ object Simulador {
     
   }
   
+  case object comerseAlOponente extends Movimiento {
+    
+    def apply(combatientes: (Guerrero, Guerrero)) = {
+      combatientes._1.especie match {
+        case Monstruo(digerir) => (digerir(combatientes), combatientes._2)
+        case _ => combatientes
+      }
+    }
+    
+  }
+  
   case class fusion(aliado: Guerrero) extends Movimiento {
     
     def apply(combatientes: (Guerrero, Guerrero)) = {
