@@ -6,7 +6,8 @@ abstract class Especie(){
 
 case object Humano extends Especie
 case class Saiyajing(
-  nivel : Int  
+  nivel : Int,
+  cola : Boolean
   ) extends Especie
 case object Androide extends Especie
 case object Namekusein extends Especie
