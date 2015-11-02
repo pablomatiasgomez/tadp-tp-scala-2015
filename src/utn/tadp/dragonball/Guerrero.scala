@@ -29,7 +29,7 @@ object Simulador {
     
     def apply(combatientes: (Guerrero, Guerrero)) = {
       combatientes._1.especie match {
-        case Saiyajing(SuperSaiyajing(nivel), _) => (combatientes._1.aumentarKi(150* nivel), combatientes._2) 
+        case Saiyajing(SuperSaiyajing(nivel, _), _) => (combatientes._1.aumentarKi(150* nivel), combatientes._2) 
         case Androide => combatientes
         case _ => (combatientes._1.aumentarKi(100), combatientes._2)
       }  
@@ -43,8 +43,10 @@ object Simulador {
       (item, combatientes._2.especie) match {
         case (Arma(Roma), Androide) => combatientes
         case (Arma(Roma), _) if combatientes._2.energia < 300 => (combatientes._1, combatientes._2) //TODO: Dejar inconsciente
-        case (Arma(Filosa), Saiyajing(MonoGigante, cola)) 
-            if cola => (combatientes._1, combatientes._2.copy(energia = 1, especie = Saiyajing(Normal,false))) //TODO: Dejar inconsciente
+        case (Arma(Filosa), Saiyajing(MonoGigante(energiaNormal), cola)) 
+            if cola => (combatientes._1, combatientes._2.copy(energia = 1, 
+                                                              especie = Saiyajing(Normal,false),
+                                                              energiaMaxima = energiaNormal)) //TODO: Dejar inconsciente
         case (Arma(Filosa), Saiyajing(_, cola)) 
             if cola => (combatientes._1, combatientes._2.copy(energia = 1, especie = Saiyajing(Normal,false)))
         case (Arma(Filosa), _) => (combatientes._1, combatientes._2.disminuiKi(combatientes._1.energia / 100))
@@ -61,7 +63,45 @@ object Simulador {
     
     def apply(combatientes: (Guerrero, Guerrero)) = {
       combatientes._1.especie match {
-        case Monstruo(digerir) => (digerir(combatientes), combatientes._2)
+        case Monstruo(digerir) => (digerir(combatientes), combatientes._2) //TODO: Devolver al segundo muerto?
+        case _ => combatientes
+      }
+    }
+    
+  }
+  
+  case object convertirseEnMono extends Movimiento {
+    //XXX: El manejo de las energias maximas no me convence. Hay algo de la inmutabilidad que no estamos aprovechando
+    def apply (combatientes: (Guerrero, Guerrero)) = {
+      combatientes._1.especie match {  
+        case Saiyajing(MonoGigante(_), _) => combatientes
+        case Saiyajing(estadoSaiyajing, cola) if (cola && combatientes._1.inventario.contains(FotoDeLaLuna)) => {
+            val energiaOriginal = estadoSaiyajing match {
+              case Normal => combatientes._1.energiaMaxima
+              case SuperSaiyajing(_, energiaO) => energiaO
+            }
+            (combatientes._1.copy(especie = Saiyajing(MonoGigante(energiaOriginal), true), 
+                                energia = combatientes._1.energiaMaxima * 3,
+                                energiaMaxima = combatientes._1.energiaMaxima * 3),
+            combatientes._2)    
+         } 
+        case _ => combatientes
+      }
+    }
+    
+  }
+  
+  case object convertirseEnSaiyajing extends Movimiento {
+    
+    def apply (combatientes: (Guerrero, Guerrero)) = {
+      combatientes._1.especie match {
+        case Saiyajing(Normal, cola) => (combatientes._1.copy(especie = Saiyajing(SuperSaiyajing(1, combatientes._1.energiaMaxima), cola),
+                                                           energiaMaxima = combatientes._1.energiaMaxima * 5),
+                                      combatientes._2)
+        case Saiyajing(SuperSaiyajing(nivel, energiaOriginal), cola) =>
+          (combatientes._1.copy(especie = Saiyajing(SuperSaiyajing(nivel + 1, energiaOriginal), cola),
+                                                    energiaMaxima = energiaOriginal * nivel * 5),
+                                      combatientes._2)
         case _ => combatientes
       }
     }

@@ -21,5 +21,5 @@ abstract class EstadoSaiyajing(){
 }
 
 case object Normal extends EstadoSaiyajing
-case class SuperSaiyajing(nivel: Int) extends EstadoSaiyajing
-case object MonoGigante extends EstadoSaiyajing
+case class SuperSaiyajing(nivel: Int, energiaNormal: Int) extends EstadoSaiyajing
+case class MonoGigante(energiaNormal: Int) extends EstadoSaiyajing
