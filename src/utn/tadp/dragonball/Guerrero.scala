@@ -122,7 +122,16 @@ object Simulador {
     
   }
  
-  
+  case class magia(cambioDeEstado: Function1[(Guerrero, Guerrero), (Guerrero, Guerrero)]) extends Movimiento {
+    
+    def apply (combatientes: (Guerrero, Guerrero)) = {
+      if ((combatientes._1.inventario.count { item => item.isInstanceOf[EsferaDelDragon] }) == 7)  
+        cambioDeEstado(combatientes)
+      else
+        combatientes
+    }
+    
+  }
   
 
 }
