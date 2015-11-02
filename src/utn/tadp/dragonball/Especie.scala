@@ -1,10 +1,10 @@
 package utn.tadp.dragonball
 
-abstract class Especie(){
+abstract class Especie(val fusionable:Boolean=false){
   
 }
 
-case object Humano extends Especie
+case object Humano extends Especie(true)
 case class Saiyajing(
   nivel : Int,
   cola : Boolean
@@ -14,3 +14,4 @@ case object Namekusein extends Especie
 case class Monstruo(
   comer : Function1[Guerrero, Guerrero]
   )extends Especie
+case class  Fusion(miembros:(Guerrero,Guerrero)) extends Especie
