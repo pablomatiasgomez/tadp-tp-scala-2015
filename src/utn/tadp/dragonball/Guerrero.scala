@@ -29,7 +29,7 @@ object Simulador {
     
     def apply(combatientes: (Guerrero, Guerrero)) = {
       combatientes._1.especie match {
-        case Saiyajing(nivel, _) if nivel > 0 => (combatientes._1.aumentarKi(150* nivel), combatientes._2) 
+        case Saiyajing(SuperSaiyajing(nivel), _) => (combatientes._1.aumentarKi(150* nivel), combatientes._2) 
         case Androide => combatientes
         case _ => (combatientes._1.aumentarKi(100), combatientes._2)
       }  
@@ -43,8 +43,10 @@ object Simulador {
       (item, combatientes._2.especie) match {
         case (Arma(Roma), Androide) => combatientes
         case (Arma(Roma), _) if combatientes._2.energia < 300 => (combatientes._1, combatientes._2) //TODO: Dejar inconsciente
+        case (Arma(Filosa), Saiyajing(MonoGigante, cola)) 
+            if cola => (combatientes._1, combatientes._2.copy(energia = 1, especie = Saiyajing(Normal,false))) //TODO: Dejar inconsciente
         case (Arma(Filosa), Saiyajing(_, cola)) 
-            if cola => (combatientes._1, combatientes._2.copy(energia = 1, especie = Saiyajing(0,false)))
+            if cola => (combatientes._1, combatientes._2.copy(energia = 1, especie = Saiyajing(Normal,false)))
         case (Arma(Filosa), _) => (combatientes._1, combatientes._2.disminuiKi(combatientes._1.energia / 100))
         case (Arma(Fuego),Humano) => (combatientes._1, combatientes._2.disminuiKi(20))
         case (Arma(Fuego), Namekusein) =>(combatientes._1, combatientes._2.disminuiKi(10)) //TODO: Solo si esta inconsciente
