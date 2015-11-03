@@ -1,4 +1,5 @@
 package utn.tadp.dragonball
+import utn.tadp.dragonball.Simulador._
 
 case class Guerrero(
       nombre: String,
@@ -7,7 +8,7 @@ case class Guerrero(
       energia: Int,
       especie: Especie,
       estado: EstadoDeLucha,
-      movimientos: List[Simulador.Movimiento]
+      movimientos: List[Movimiento]
       ) {
   
   def tuEnergiaEs(nuevaEnergia: Int) = copy (energia = nuevaEnergia)
@@ -37,9 +38,9 @@ case class Guerrero(
   
   def puedeFusionarse = especie.fusionable
   
-  type CriterioDeCombate = Simulador.Combatientes => Int
+  type CriterioDeCombate = Combatientes => Int
   
-  def movimientoMasEfectivoContra(oponente: Guerrero)(criterio: CriterioDeCombate) : Simulador.Movimiento = {
+  def movimientoMasEfectivoContra(oponente: Guerrero)(criterio: CriterioDeCombate) : Movimiento = {
     
     val mejorMovimiento = movimientos.maxBy { movimiento => criterio(movimiento((this, oponente))) }
     if(criterio(mejorMovimiento((this, oponente))) > 0)
@@ -49,26 +50,29 @@ case class Guerrero(
     
   }
   
-  def mayorVentajaDeKi(combatientes: Simulador.Combatientes) = {
+  def mayorVentajaDeKi(combatientes: Combatientes) = {
     combatientes._2. energia - combatientes._1.energia
   }
   
-  def pelearUnRound(movimiento: Simulador.Movimiento)(oponente: Guerrero) : Simulador.Combatientes = {
+  def pelearUnRound(movimiento: Movimiento)(oponente: Guerrero) : Combatientes = {
     
     val oponenteFajado = movimiento((this, oponente))._2
     (oponenteFajado.movimientoMasEfectivoContra(this)(mayorVentajaDeKi)((oponenteFajado, this))._2, oponenteFajado)
   
   }
   
-  def planDeAtaque(oponente: Guerrero, rounds: Int)(criterio: CriterioDeCombate) : List[Simulador.Movimiento] = {
-    //XXX Mutabilidad AAGGGHHHHH
-    var plan = List(movimientoMasEfectivoContra(oponente)(criterio))
-    var peleando = movimientoMasEfectivoContra(oponente)(criterio)(this,oponente)
-    for(round <- 1 to rounds){
-      plan = plan++List(movimientoMasEfectivoContra(peleando._2)(criterio))
-      peleando = movimientoMasEfectivoContra(oponente)(criterio)(peleando)
-    }
-    plan
+  def planDeAtaque(oponente: Guerrero, rounds: Int)(criterio: CriterioDeCombate) : List[Movimiento] = {
+    
+    val (plan, combatientes) : (List[Movimiento], Combatientes)  = 
+      (List(movimientoMasEfectivoContra(oponente)(criterio)),
+       movimientoMasEfectivoContra(oponente)(criterio)(this,oponente)) 
+    
+    (1 to (rounds-1)).reverse.foldLeft((plan, combatientes))((semilla, _) => {
+        val (p, (a, o)) = semilla
+        (p++List(a.movimientoMasEfectivoContra(o)(criterio)),
+        a.movimientoMasEfectivoContra(oponente)(criterio)(a, o))
+      })._1
+      
   }
   
 }
