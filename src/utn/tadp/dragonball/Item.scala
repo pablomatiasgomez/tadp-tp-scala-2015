@@ -8,6 +8,8 @@ abstract class TipoArma(){
   
 }
 
+
+
 case object Roma extends TipoArma
 case object Filosa extends TipoArma
 case object Fuego extends TipoArma

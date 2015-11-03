@@ -1,5 +1,7 @@
 package utn.tadp.dragonball
 
+import Simulador._
+
 abstract class Especie(val fusionable:Boolean=false){
 
 }
