@@ -37,7 +37,9 @@ case class Guerrero(
   
   def puedeFusionarse = especie.fusionable
   
-  def movimientoMasEfectivoContra(oponente: Guerrero)(criterio: Simulador.Combatientes => Int) = {
+  type CriterioDeCombate = Simulador.Combatientes => Int
+  
+  def movimientoMasEfectivoContra(oponente: Guerrero)(criterio: CriterioDeCombate) : Simulador.Movimiento = {
     
     val mejorMovimiento = movimientos.maxBy { movimiento => criterio(movimiento((this, oponente))) }
     if(criterio(mejorMovimiento((this, oponente))) > 0)
@@ -56,6 +58,17 @@ case class Guerrero(
     val oponenteFajado = movimiento((this, oponente))._2
     (oponenteFajado.movimientoMasEfectivoContra(this)(mayorVentajaDeKi)((oponenteFajado, this))._2, oponenteFajado)
   
+  }
+  
+  def planDeAtaque(oponente: Guerrero, rounds: Int)(criterio: CriterioDeCombate) : List[Simulador.Movimiento] = {
+    //XXX Mutabilidad AAGGGHHHHH
+    var plan = List(movimientoMasEfectivoContra(oponente)(criterio))
+    var peleando = movimientoMasEfectivoContra(oponente)(criterio)(this,oponente)
+    for(round <- 1 to rounds){
+      plan = plan++List(movimientoMasEfectivoContra(peleando._2)(criterio))
+      peleando = movimientoMasEfectivoContra(oponente)(criterio)(peleando)
+    }
+    plan
   }
   
 }
