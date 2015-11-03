@@ -65,14 +65,16 @@ object Simulador {
     val(atacante, oponente) = combatientes
     (item, oponente.especie) match {
       case (Arma(Roma), Androide) => combatientes
-      case (Arma(Roma), _) if oponente.energia < 300 => (atacante, oponente) //TODO: Dejar inconsciente oponente
-      case (Arma(Filosa), Saiyajing(MonoGigante(energiaNormal), true)) => (atacante, oponente.copy(energia = 1, 
-                                                                           especie = Saiyajing(Normal,false),
-                                                                           energiaMaxima = energiaNormal)) //TODO: Dejar inconsciente oponente
+      case (Arma(Roma), _) if oponente.energia < 300 => (atacante, oponente.estas(Inconsciente))
+      case (Arma(Filosa), Saiyajing(MonoGigante(energiaNormal), true)) => (atacante, 
+                                                                           oponente.copy(energia = 1, 
+                                                                                         especie = Saiyajing(Normal,false),
+                                                                                         energiaMaxima = energiaNormal)
+                                                                                         .estas(Inconsciente))
       case (Arma(Filosa), Saiyajing(_, true)) => (atacante, oponente.copy(energia = 1, especie = Saiyajing(Normal,false)))
       case (Arma(Filosa), _) => (atacante, oponente.disminuiKi(atacante.energia / 100))
       case (Arma(Fuego),Humano) => (atacante, oponente.disminuiKi(20))
-      case (Arma(Fuego), Namekusein) =>(atacante, oponente.disminuiKi(10)) //TODO: Solo si esta inconsciente
+      case (Arma(Fuego), Namekusein) if (oponente.estado == Inconsciente) => (atacante, oponente.disminuiKi(10))
       case (SemillaDelErmitaño, _) => (atacante.aumentarKi(atacante.energiaMaxima), oponente)
       case _ => combatientes
       }  
@@ -83,7 +85,7 @@ object Simulador {
   
     val(atacante, oponente) = combatientes
     atacante.especie match {
-      case Monstruo(digerir) => (digerir(combatientes), oponente) //TODO: Devolver al segundo muerto?
+      case Monstruo(digerir) => (digerir(combatientes), oponente.estas(Muerto)) //XXX: Oponente deberia estar muerto?
       case _ => combatientes
     }
     
@@ -163,8 +165,8 @@ object Simulador {
   
   case object Explotar extends Movimiento ((combatientes: Combatientes) => {
       
-    val(atacante, oponente) = combatientes
-    (atacante.especie, oponente.especie) match { //TODO: Devolver Muerto al primero
+    val(atacante, oponente) = (combatientes._1.estas(Muerto), combatientes._2)
+    (atacante.especie, oponente.especie) match {
       case (Androide, Namekusein) if atacante.energia * 3 > oponente.energia => 
           (atacante, oponente.copy(energia = 1))
       case (Monstruo(_), Namekusein) if atacante.energia * 2 > oponente.energia => 
