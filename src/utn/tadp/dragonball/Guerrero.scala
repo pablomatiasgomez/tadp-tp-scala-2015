@@ -8,13 +8,27 @@ case class Guerrero(
       especie: Especie,
       estado: EstadoDeLucha
       ) {
-  def aumentarKi(ki: Int) = copy(energia = (energia + ki).min(energiaMaxima))
   
-  def disminuiKi(ki: Int) = copy(energia = (energia - ki).max(0))
+  def tuEnergiaEs(nuevaEnergia: Int) = copy (energia = nuevaEnergia)
+  
+  def tuEnergiaMaximaEs(nuevoMaximo: Int) = copy (energiaMaxima = nuevoMaximo)
+  
+  def aumentaEnergia(aumento: Int) = copy(energia = (energia + aumento).min(energiaMaxima))
+  
+  def disminuiEnergia(disminucion: Int) = {
+    if (energia > disminucion)
+      copy(energia = (energia - disminucion))
+    else
+      copy(energia = 0).estas(Muerto)
+  }
 
-  def puedeFusionarse = especie.fusionable
+  def transformateEn(transformacion: Especie) = copy(especie = transformacion)
   
   def estas(nuevoEstado: EstadoDeLucha) = copy(estado = nuevoEstado)
+  
+  def sumaAInventario(agregados: List[Item]) = copy(inventario = inventario++agregados)
+  
+  def puedeFusionarse = especie.fusionable
   
 }
 
@@ -53,9 +67,9 @@ object Simulador {
       
     val(atacante, oponente) = combatientes
     atacante.especie match {
-      case Saiyajing(SuperSaiyajing(nivel, _), _) => (atacante.aumentarKi(150* nivel), oponente) 
+      case Saiyajing(SuperSaiyajing(nivel, _), _) => (atacante.aumentaEnergia(150* nivel), oponente) 
       case Androide => combatientes
-      case _ => (atacante.aumentarKi(100), oponente)
+      case _ => (atacante.aumentaEnergia(100), oponente)
     }
     
   } ) 
@@ -67,15 +81,16 @@ object Simulador {
       case (Arma(Roma), Androide) => combatientes
       case (Arma(Roma), _) if oponente.energia < 300 => (atacante, oponente.estas(Inconsciente))
       case (Arma(Filosa), Saiyajing(MonoGigante(energiaNormal), true)) => (atacante, 
-                                                                           oponente.copy(energia = 1, 
-                                                                                         especie = Saiyajing(Normal,false),
-                                                                                         energiaMaxima = energiaNormal)
-                                                                                         .estas(Inconsciente))
-      case (Arma(Filosa), Saiyajing(_, true)) => (atacante, oponente.copy(energia = 1, especie = Saiyajing(Normal,false)))
-      case (Arma(Filosa), _) => (atacante, oponente.disminuiKi(atacante.energia / 100))
-      case (Arma(Fuego),Humano) => (atacante, oponente.disminuiKi(20))
-      case (Arma(Fuego), Namekusein) if (oponente.estado == Inconsciente) => (atacante, oponente.disminuiKi(10))
-      case (SemillaDelErmitaño, _) => (atacante.aumentarKi(atacante.energiaMaxima), oponente)
+                                                                           oponente.tuEnergiaEs(1)
+                                                                                   .tuEnergiaMaximaEs(energiaNormal)
+                                                                                   .transformateEn(Saiyajing(Normal,false))
+                                                                                   .estas(Inconsciente))
+      case (Arma(Filosa), Saiyajing(_, true)) => (atacante, oponente.tuEnergiaEs(1)
+                                                                    .transformateEn(Saiyajing(Normal,false)))
+      case (Arma(Filosa), _) => (atacante, oponente.disminuiEnergia(atacante.energia / 100))
+      case (Arma(Fuego),Humano) => (atacante, oponente.disminuiEnergia(20))
+      case (Arma(Fuego), Namekusein) if (oponente.estado == Inconsciente) => (atacante, oponente.disminuiEnergia(10))
+      case (SemillaDelErmitaño, _) => (atacante.aumentaEnergia(atacante.energiaMaxima), oponente)
       case _ => combatientes
       }  
     
@@ -101,9 +116,9 @@ object Simulador {
           case Normal => atacante.energiaMaxima
           case SuperSaiyajing(_, energiaO) => energiaO
           }
-        (atacante.copy(especie = Saiyajing(MonoGigante(energiaOriginal), true), 
-                       energia = atacante.energiaMaxima * 3,
-                       energiaMaxima = atacante.energiaMaxima * 3),
+        (atacante.tuEnergiaEs(atacante.energiaMaxima * 3)
+                 .tuEnergiaMaximaEs(atacante.energiaMaxima * 3)
+                 .transformateEn(Saiyajing(MonoGigante(energiaOriginal), true)),
         oponente)    
       } 
       case _ => combatientes
@@ -116,12 +131,12 @@ object Simulador {
     val(atacante, oponente) = combatientes
     atacante.especie match {
       case Saiyajing(Normal, cola) => 
-          (atacante.copy(especie = Saiyajing(SuperSaiyajing(1, atacante.energiaMaxima), cola),
-                         energiaMaxima = atacante.energiaMaxima * 5),
+          (atacante.transformateEn(Saiyajing(SuperSaiyajing(1, atacante.energiaMaxima), cola))
+                   .tuEnergiaMaximaEs(atacante.energiaMaxima * 5),
             oponente)
       case Saiyajing(SuperSaiyajing(nivel, energiaOriginal), cola) =>
-          (atacante.copy(especie = Saiyajing(SuperSaiyajing(nivel + 1, energiaOriginal), cola),
-                         energiaMaxima = energiaOriginal * nivel * 5),
+          (atacante.transformateEn(Saiyajing(SuperSaiyajing(nivel + 1, energiaOriginal), cola))
+                   .tuEnergiaMaximaEs(atacante.energiaMaxima * 5),
            oponente)
       case _ => combatientes
     
@@ -133,9 +148,10 @@ object Simulador {
       
     val(atacante, oponente) = combatientes
     if(List(aliado, atacante).forall(_.puedeFusionarse))
-      (atacante.copy(  inventario = atacante.inventario++aliado.inventario,
-                        energia = atacante.energia + aliado.energia,
-                        especie = Fusionado((atacante, aliado))),
+      (atacante.sumaAInventario(aliado.inventario)
+               .tuEnergiaMaximaEs(atacante.energia + aliado.energia)
+               .aumentaEnergia(aliado.energia)
+               .transformateEn(Fusionado(atacante, aliado)),
       oponente)
     else combatientes 
         
@@ -156,9 +172,9 @@ object Simulador {
       
     val(atacante, oponente) = combatientes
     (atacante.especie, oponente.especie) match {
-      case (Humano, Androide) => (atacante.disminuiKi(10), oponente)
-      case _ if atacante.energia < oponente.energia => (atacante.disminuiKi(20), oponente)
-      case _  => (atacante, oponente.disminuiKi(20))
+      case (Humano, Androide) => (atacante.disminuiEnergia(10), oponente)
+      case _ if atacante.energia < oponente.energia => (atacante.disminuiEnergia(20), oponente)
+      case _  => (atacante, oponente.disminuiEnergia(20))
     }
     
   } )
@@ -168,11 +184,11 @@ object Simulador {
     val(atacante, oponente) = (combatientes._1.estas(Muerto), combatientes._2)
     (atacante.especie, oponente.especie) match {
       case (Androide, Namekusein) if atacante.energia * 3 > oponente.energia => 
-          (atacante, oponente.copy(energia = 1))
+          (atacante, oponente.tuEnergiaEs(1))
       case (Monstruo(_), Namekusein) if atacante.energia * 2 > oponente.energia => 
-          (atacante, oponente.copy(energia = 1))
-      case (Androide, _) => (atacante, oponente.disminuiKi(atacante.energia * 3))
-      case (Monstruo(_), _) => (atacante, oponente.disminuiKi(atacante.energia * 2))
+          (atacante, oponente.tuEnergiaEs(1))
+      case (Androide, _) => (atacante, oponente.disminuiEnergia(atacante.energia * 3))
+      case (Monstruo(_), _) => (atacante, oponente.disminuiEnergia(atacante.energia * 2))
       case _ => combatientes
     }
     
@@ -183,9 +199,9 @@ object Simulador {
     val(atacante, oponente) = combatientes
     if (atacante.energia > energiaNecesaria)
       oponente.especie match {
-        case Androide => (atacante.disminuiKi(energiaNecesaria), oponente.aumentarKi(energiaNecesaria * 2))
-        case Monstruo(_) => (atacante.disminuiKi(energiaNecesaria), oponente.disminuiKi(energiaNecesaria / 2))
-        case _ => (atacante.disminuiKi(energiaNecesaria), oponente.disminuiKi(energiaNecesaria))
+        case Androide => (atacante.disminuiEnergia(energiaNecesaria), oponente.aumentaEnergia(energiaNecesaria * 2))
+        case Monstruo(_) => (atacante.disminuiEnergia(energiaNecesaria), oponente.disminuiEnergia(energiaNecesaria / 2))
+        case _ => (atacante.disminuiEnergia(energiaNecesaria), oponente.disminuiEnergia(energiaNecesaria))
       }
      else
       combatientes
@@ -196,7 +212,7 @@ object Simulador {
     
     val(atacante, oponente) = combatientes
     atacante.estado match {
-      case Fajado(rounds) => (atacante.estas(Luchando), oponente.disminuiKi(10^rounds))
+      case Fajado(rounds) => (atacante.estas(Luchando), oponente.disminuiEnergia(10^rounds))
       case _ => combatientes
     }
     
