@@ -47,7 +47,7 @@ object Simulador {
       case (Arma(Filosa), Saiyajing(_, true)) => (atacante, oponente.tuEnergiaEs(1)
                                                                     .transformateEn(Saiyajing(Normal,false)))
       case (Arma(Filosa), _) => (atacante, oponente.disminuiEnergia(atacante.energia / 100))
-      case (Arma(Fuego),Humano) => (atacante, oponente.disminuiEnergia(20))
+      case (Arma(Fuego),Humano) => (atacante, oponente.disminuiEnergia(20)) //TODO: Controlar el tema de las balas
       case (Arma(Fuego), Namekusein) if (oponente.estado == Inconsciente) => (atacante, oponente.disminuiEnergia(10))
       case (SemillaDelErmitaño, _) => (atacante.aumentaEnergia(atacante.energiaMaxima), oponente)
       case _ => combatientes
@@ -56,7 +56,7 @@ object Simulador {
   })
   
   case object ComerseAlOponente extends Movimiento ((combatientes: Combatientes) => {
-  
+    //XXX Como implementariamos Majin Buu? Deberiamos revisar cuales son los poderes adquiridos y cuales no.
     val(atacante, oponente) = combatientes
     atacante.especie match {
       case Monstruo(digerir) => (digerir(combatientes), oponente.estas(Muerto)) //XXX: Oponente deberia estar muerto?
