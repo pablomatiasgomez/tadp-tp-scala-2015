@@ -137,7 +137,7 @@ object Simulador {
                         energia = atacante.energia + aliado.energia,
                         especie = Fusionado((atacante, aliado))),
       oponente)
-    else throw new RuntimeException("No se pueden fusionar")  
+    else combatientes 
         
   } )
  
@@ -173,7 +173,7 @@ object Simulador {
           (atacante, oponente.copy(energia = 1))
       case (Androide, _) => (atacante, oponente.disminuiKi(atacante.energia * 3))
       case (Monstruo(_), _) => (atacante, oponente.disminuiKi(atacante.energia * 2))
-      case _ => throw new RuntimeException("Sólo los monstruos y los androides pueden explotar")
+      case _ => combatientes
     }
     
   } )
@@ -188,7 +188,7 @@ object Simulador {
         case _ => (atacante.disminuiKi(energiaNecesaria), oponente.disminuiKi(energiaNecesaria))
       }
      else
-      throw new RuntimeException("No posee energia suficiente para lanzar la onda")
+      combatientes
     
   } )
   
