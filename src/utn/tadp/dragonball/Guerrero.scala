@@ -17,17 +17,19 @@ case class Guerrero(
 
 object Simulador {
  
-  type Movimiento = Function[(Guerrero, Guerrero), (Guerrero, Guerrero)]
+  type Combatientes = (Guerrero, Guerrero)
+  
+  type Movimiento = Function[Combatientes , Combatientes ]
   
   case object dejarseFajar extends Movimiento {
   
-    def apply(combatientes: (Guerrero, Guerrero)) = combatientes
+    def apply(combatientes: Combatientes) = combatientes
   
   }
   
   case object cargarKi extends Movimiento {
     
-    def apply(combatientes: (Guerrero, Guerrero)) = {
+    def apply(combatientes: Combatientes) = {
       val(atacante, oponente) = combatientes
       atacante.especie match {
         case Saiyajing(SuperSaiyajing(nivel, _), _) => (atacante.aumentarKi(150* nivel), oponente) 
@@ -40,7 +42,7 @@ object Simulador {
   
   case class usarItem(item: Item) extends Movimiento {
     
-    def apply(combatientes: (Guerrero, Guerrero)) = {
+    def apply(combatientes: Combatientes) = {
       val(atacante, oponente) = combatientes
       (item, oponente.especie) match {
         case (Arma(Roma), Androide) => combatientes
@@ -63,7 +65,7 @@ object Simulador {
   
   case object comerseAlOponente extends Movimiento {
 
-    def apply(combatientes: (Guerrero, Guerrero)) = {
+    def apply(combatientes: Combatientes) = {
       val(atacante, oponente) = combatientes
       atacante.especie match {
         case Monstruo(digerir) => (digerir(combatientes), oponente) //TODO: Devolver al segundo muerto?
@@ -75,7 +77,7 @@ object Simulador {
   
   case object convertirseEnMono extends Movimiento {
     //XXX: El manejo de las energias maximas no me convence. Hay algo de la inmutabilidad que no estamos aprovechando
-    def apply (combatientes: (Guerrero, Guerrero)) = {
+    def apply (combatientes: Combatientes) = {
       val(atacante, oponente) = combatientes
       atacante.especie match {  
         case Saiyajing(MonoGigante(_), _) => combatientes
@@ -97,7 +99,7 @@ object Simulador {
   
   case object convertirseEnSaiyajing extends Movimiento {
     
-    def apply (combatientes: (Guerrero, Guerrero)) = {
+    def apply (combatientes: Combatientes) = {
       val(atacante, oponente) = combatientes
       atacante.especie match {
         case Saiyajing(Normal, cola) => (atacante.copy(especie = Saiyajing(SuperSaiyajing(1, atacante.energiaMaxima), cola),
@@ -105,8 +107,8 @@ object Simulador {
                                       oponente)
         case Saiyajing(SuperSaiyajing(nivel, energiaOriginal), cola) =>
           (atacante.copy(especie = Saiyajing(SuperSaiyajing(nivel + 1, energiaOriginal), cola),
-                                                    energiaMaxima = energiaOriginal * nivel * 5),
-                                      oponente)
+                         energiaMaxima = energiaOriginal * nivel * 5),
+           oponente)
         case _ => combatientes
       }
     }
@@ -115,7 +117,7 @@ object Simulador {
   
   case class fusion(aliado: Guerrero) extends Movimiento {
     
-    def apply(combatientes: (Guerrero, Guerrero)) = {
+    def apply(combatientes: Combatientes) = {
       val(atacante, oponente) = combatientes
       if(List(aliado, atacante).forall(_.puedeFusionarse))
        (atacante.copy(  inventario = atacante.inventario++aliado.inventario,
@@ -127,9 +129,9 @@ object Simulador {
     
   }
  
-  case class magia(cambioDeEstado: Function1[(Guerrero, Guerrero), (Guerrero, Guerrero)]) extends Movimiento {
+  case class magia(cambioDeEstado: Function1[Combatientes, Combatientes]) extends Movimiento {
     
-    def apply (combatientes: (Guerrero, Guerrero)) = {
+    def apply (combatientes: Combatientes) = {
       val(atacante, oponente) = combatientes
       if ((atacante.inventario.count { item => item.isInstanceOf[EsferaDelDragon] }) == 7)  
         cambioDeEstado(combatientes)
@@ -141,7 +143,7 @@ object Simulador {
   
   case object muchosGolpesNinja extends Movimiento {
     
-    def apply(combatientes: (Guerrero, Guerrero)) = {
+    def apply(combatientes: Combatientes) = {
       val(atacante, oponente) = combatientes
       (atacante.especie, oponente.especie) match {
         case (Humano, Androide) => (atacante.disminuiKi(10), oponente)
@@ -154,7 +156,7 @@ object Simulador {
   
   case object explotar extends Movimiento {
     
-    def apply(combatientes: (Guerrero, Guerrero)) = {
+    def apply(combatientes: Combatientes) = {
       val(atacante, oponente) = combatientes
       (atacante.especie, oponente.especie) match { //TODO: Devolver Muerto al primero
         case (Androide, Namekusein) if atacante.energia * 3 > oponente.energia => 
@@ -171,7 +173,7 @@ object Simulador {
   
   case class onda(energiaNecesaria: Int) extends Movimiento {
     
-    def apply(combatientes: (Guerrero, Guerrero)) = {
+    def apply(combatientes: Combatientes) = {
       val(atacante, oponente) = combatientes
       if (atacante.energia > energiaNecesaria)
         oponente.especie match {
@@ -187,7 +189,7 @@ object Simulador {
   
   case object genkidama extends Movimiento {
     
-    def apply(combatientes: (Guerrero, Guerrero)) = {
+    def apply(combatientes: Combatientes) = {
       ???
     }
     
