@@ -23,7 +23,7 @@ object Simulador {
   abstract class AutoMovimiento(autoMovimiento: (Guerrero => Guerrero)) 
                    extends Movimiento({case (self,otro) => (autoMovimiento(self),otro)})
   
-  case object DejarseFajar extends Movimiento((combatientes: Combatientes) => combatientes)
+  case object DejarseFajar extends AutoMovimiento((guerrero: Guerrero) => guerrero)
   
   case object CargarKi extends AutoMovimiento ((guerrero: Guerrero) => {
     
@@ -120,16 +120,14 @@ object Simulador {
     
   } )
   
-  case object MuchosGolpesNinja extends Movimiento ((combatientes: Combatientes) => {
+  case object MuchosGolpesNinja extends Movimiento ({case (atacante,oponente) => {
     
-      
-    val(atacante, oponente) = combatientes
     (atacante.especie, oponente.especie) match {
       case (Humano, Androide) => (atacante.disminuiEnergia(10), oponente)
       case _ if atacante.energia < oponente.energia => (atacante.disminuiEnergia(20), oponente)
       case _  => (atacante, oponente.disminuiEnergia(20))
     }
-    
+  }
   } )
   
   case object Explotar extends Movimiento ((combatientes: Combatientes) => {
