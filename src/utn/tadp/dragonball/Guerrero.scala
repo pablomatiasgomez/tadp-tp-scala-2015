@@ -38,11 +38,24 @@ case class Guerrero(
   def puedeFusionarse = especie.fusionable
   
   def movimientoMasEfectivoContra(oponente: Guerrero)(criterio: Simulador.Combatientes => Int) = {
+    
     val mejorMovimiento = movimientos.maxBy { movimiento => criterio(movimiento((this, oponente))) }
     if(criterio(mejorMovimiento((this, oponente))) > 0)
       mejorMovimiento
     else
       throw new RuntimeException("No hay un movimiento satisfactorio")
+    
+  }
+  
+  def mayorVentajaDeKi(combatientes: Simulador.Combatientes) = {
+    combatientes._2. energia - combatientes._1.energia
+  }
+  
+  def pelearUnRound(movimiento: Simulador.Movimiento)(oponente: Guerrero) : Simulador.Combatientes = {
+    
+    val oponenteFajado = movimiento((this, oponente))._2
+    (oponenteFajado.movimientoMasEfectivoContra(this)(mayorVentajaDeKi)((oponenteFajado, this))._2, oponenteFajado)
+  
   }
   
 }
