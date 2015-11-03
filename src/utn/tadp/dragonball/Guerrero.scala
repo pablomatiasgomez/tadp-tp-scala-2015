@@ -1,4 +1,5 @@
 package utn.tadp.dragonball
+import utn.tadp.dragonball.Simulador._
 
 case class Guerrero(
       nombre: String,
@@ -7,7 +8,7 @@ case class Guerrero(
       energia: Int,
       especie: Especie,
       estado: EstadoDeLucha,
-      movimientos: List[Simulador.Movimiento]
+      movimientos: List[Movimiento]
       ) {
   
   def tuEnergiaEs(nuevaEnergia: Int) = copy (energia = nuevaEnergia)
@@ -25,7 +26,7 @@ case class Guerrero(
 
   def transformateEn(transformacion: Especie) = copy(especie = transformacion)
   
-  def estas(nuevoEstado: EstadoDeLucha) : Guerrero = {
+  def estas(nuevoEstado: EstadoDeLucha): Guerrero = {
     (nuevoEstado, especie) match {
       case (Muerto, Fusionado((original, _))) => original.estas(Muerto)
       case (Inconsciente, Fusionado((original, _))) => original.estas(Inconsciente)
@@ -37,7 +38,9 @@ case class Guerrero(
   
   def puedeFusionarse = especie.fusionable
   
-  def movimientoMasEfectivoContra(oponente: Guerrero)(criterio: Simulador.Combatientes => Int) = {
+  type CriterioDeCombate = Combatientes => Int
+  
+  def movimientoMasEfectivoContra(oponente: Guerrero)(criterio: CriterioDeCombate): Movimiento = {
     
     val mejorMovimiento = movimientos.maxBy { movimiento => criterio(movimiento((this, oponente))) }
     if(criterio(mejorMovimiento((this, oponente))) > 0)
@@ -47,15 +50,63 @@ case class Guerrero(
     
   }
   
-  def mayorVentajaDeKi(combatientes: Simulador.Combatientes) = {
+  def mayorVentajaDeKi(combatientes: Combatientes) = {
     combatientes._2. energia - combatientes._1.energia
   }
   
-  def pelearUnRound(movimiento: Simulador.Movimiento)(oponente: Guerrero) : Simulador.Combatientes = {
+  def pelearUnRound(movimiento: Movimiento)(oponente: Guerrero): Combatientes = {
     
     val oponenteFajado = movimiento((this, oponente))._2
     (oponenteFajado.movimientoMasEfectivoContra(this)(mayorVentajaDeKi)((oponenteFajado, this))._2, oponenteFajado)
   
+  }
+  
+  def planDeAtaque(oponente: Guerrero, rounds: Int)(criterio: CriterioDeCombate): List[Movimiento] = {
+    
+    val (plan, combatientes) : (List[Movimiento], Combatientes)  = 
+      (List(movimientoMasEfectivoContra(oponente)(criterio)),
+       movimientoMasEfectivoContra(oponente)(criterio)(this,oponente)) 
+    
+    (1 to (rounds-1)).reverse.foldLeft((plan, combatientes))((semilla, _) => {
+        val (p, (a, o)) = semilla
+        (p++List(a.movimientoMasEfectivoContra(o)(criterio)),
+        a.movimientoMasEfectivoContra(oponente)(criterio)(a, o))
+      })._1
+      
+  }
+  
+  
+  trait ResultadoPelea {
+    
+    def map(f: (Combatientes => Combatientes)): ResultadoPelea
+    
+  }
+  
+  case class Ganador(guerrero: Guerrero) extends ResultadoPelea {
+    
+    def map(f: (Combatientes => Combatientes)) = Ganador(guerrero)
+    
+  }
+  case class PeleaEnCurso(combatientes: Combatientes) extends ResultadoPelea {
+    def map(f: (Combatientes => Combatientes)) = definirResultado(f(combatientes))
+  }
+  
+  def definirResultado(combatientes: Combatientes) = {
+    
+    val (atacanteFinal, oponenteFinal) = combatientes
+    (atacanteFinal.estado,oponenteFinal.estado) match {
+        case (Muerto, _) => Ganador(oponenteFinal)
+        case (_, Muerto) => Ganador(atacanteFinal)
+        case (_, _) => PeleaEnCurso((atacanteFinal, oponenteFinal))
+      }   
+    
+  }
+  
+  def pelearContra(oponente: Guerrero)(plan: List[Movimiento]): ResultadoPelea = {
+    
+    val peleaEnCurso : ResultadoPelea = definirResultado((this, oponente))
+    plan.foldLeft(peleaEnCurso)((pelea, movimiento) => { pelea.map(movimiento) } )
+    
   }
   
 }
