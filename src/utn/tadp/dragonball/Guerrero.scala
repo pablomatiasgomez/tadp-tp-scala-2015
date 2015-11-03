@@ -194,7 +194,11 @@ object Simulador {
   
   case object Genkidama extends Movimiento ((combatientes: Combatientes) => {
     
-    ???
+    val(atacante, oponente) = combatientes
+    atacante.estado match {
+      case Fajado(rounds) => (atacante.estas(Luchando), oponente.disminuiKi(10^rounds))
+      case _ => combatientes
+    }
     
   } )
 
