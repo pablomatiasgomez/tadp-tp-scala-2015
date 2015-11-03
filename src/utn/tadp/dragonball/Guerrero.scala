@@ -24,7 +24,13 @@ case class Guerrero(
 
   def transformateEn(transformacion: Especie) = copy(especie = transformacion)
   
-  def estas(nuevoEstado: EstadoDeLucha) = copy(estado = nuevoEstado)
+  def estas(nuevoEstado: EstadoDeLucha) : Guerrero = {
+    (nuevoEstado, especie) match {
+      case (Muerto, Fusionado((original, _))) => original.estas(Muerto)
+      case (Inconsciente, Fusionado((original, _))) => original.estas(Inconsciente)
+      case _ => copy(estado = nuevoEstado)
+    }
+  }
   
   def sumaAInventario(agregados: List[Item]) = copy(inventario = inventario++agregados)
   
