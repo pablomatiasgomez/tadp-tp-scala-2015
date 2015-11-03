@@ -50,23 +50,26 @@ case class Guerrero(
     else throw new RuntimeException
         }
   
+
   def pelearUnRound(movimiento:Movimiento)(oponente:Guerrero) = {
     def criterioContraAtaque(combatientes:Combatientes) = combatientes._1.energia-combatientes._1.energia
     val resultadoAtaque = movimiento(this,oponente)
     val resultadoContraAtaque = oponente.movimientoMasEfectivoContra(this)(criterioContraAtaque)(oponente,this)
   }
   
+
+    def apply(combatientes: Combatientes) = combatientes
   
   }
-
-
+  
 case object dejarseFajar extends Movimiento((combatientes:Combatientes) => combatientes) 
 
 
 case object cargarKi extends Movimiento((combatientes:Combatientes) => {
   
+
   val (atacante,atacado) = combatientes
-    
+
     (atacante.especie match {
       case Saiyajing(SuperSaiyajing(nivel,_),_) => atacante.aumentarKi(nivel*150)
       case Androide => atacante
