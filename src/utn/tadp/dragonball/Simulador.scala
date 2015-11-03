@@ -20,18 +20,20 @@ object Simulador {
     
   }
   
-  case object DejarseFajar extends Movimiento((combatientes: Combatientes) => combatientes)
+  abstract class AutoMovimiento(autoMovimiento: (Guerrero => Guerrero)) 
+                   extends Movimiento({case (self,otro) => (autoMovimiento(self),otro)})
   
-  case object CargarKi extends Movimiento ((combatientes: Combatientes) => {
-      
-    val(atacante, oponente) = combatientes
-    atacante.especie match {
-      case Saiyajing(SuperSaiyajing(nivel, _), _) => (atacante.aumentaEnergia(150* nivel), oponente) 
-      case Androide => combatientes
-      case _ => (atacante.aumentaEnergia(100), oponente)
-    }
+  case object DejarseFajar extends AutoMovimiento((guerrero: Guerrero) => guerrero)
+  
+  case object CargarKi extends AutoMovimiento ((guerrero: Guerrero) => {
     
-  } ) 
+    guerrero.especie match {
+      case Saiyajing(SuperSaiyajing(nivel, _), _) => guerrero.aumentaEnergia(150* nivel) 
+      case Androide => guerrero
+      case _ => guerrero.aumentaEnergia(100)
+      }
+    }
+  ) 
   
   case class UsarItem(item: Item) extends Movimiento ((combatientes: Combatientes) => {
     
@@ -65,54 +67,46 @@ object Simulador {
     
   })
   
-  case object ConvertirseEnMono extends Movimiento ((combatientes: Combatientes) => {
+  case object ConvertirseEnMono extends AutoMovimiento ((guerrero: Guerrero) => {
     //XXX: El manejo de las energias maximas no me convence. Hay algo de la inmutabilidad que no estamos aprovechando  
-    val(atacante, oponente) = combatientes
-    atacante.especie match {  
-      case Saiyajing(MonoGigante(_), _) => combatientes
-      case Saiyajing(estadoSaiyajing, true) if (atacante.inventario.contains(FotoDeLaLuna)) => {
+    guerrero.especie match {  
+      case Saiyajing(MonoGigante(_), _) => guerrero
+      case Saiyajing(estadoSaiyajing, true) if (guerrero.inventario.contains(FotoDeLaLuna)) => {
         val energiaOriginal = estadoSaiyajing match {
-          case Normal => atacante.energiaMaxima
+          case Normal => guerrero.energiaMaxima
           case SuperSaiyajing(_, energiaO) => energiaO
           }
-        (atacante.tuEnergiaEs(atacante.energiaMaxima * 3)
-                 .tuEnergiaMaximaEs(atacante.energiaMaxima * 3)
-                 .transformateEn(Saiyajing(MonoGigante(energiaOriginal), true)),
-        oponente)    
+        guerrero.tuEnergiaEs(guerrero.energiaMaxima * 3) //Esto funca?, no es un estado invalido un guerrero
+                 .tuEnergiaMaximaEs(guerrero.energiaMaxima * 3)//con energia mayor a su energia maxima?
+                 .transformateEn(Saiyajing(MonoGigante(energiaOriginal), true))    
       } 
-      case _ => combatientes
+      case _ => guerrero
     }
     
   } )
   
-  case object ConvertirseEnSaiyajing extends Movimiento ((combatientes: Combatientes) => {
+  case object ConvertirseEnSaiyajing extends AutoMovimiento ((guerrero: Guerrero) => {
       
-    val(atacante, oponente) = combatientes
-    atacante.especie match {
+    guerrero.especie match {
       case Saiyajing(Normal, cola) => 
-          (atacante.transformateEn(Saiyajing(SuperSaiyajing(1, atacante.energiaMaxima), cola))
-                   .tuEnergiaMaximaEs(atacante.energiaMaxima * 5),
-            oponente)
+          guerrero.transformateEn(Saiyajing(SuperSaiyajing(1, guerrero.energiaMaxima), cola))
+                   .tuEnergiaMaximaEs(guerrero.energiaMaxima * 5)
       case Saiyajing(SuperSaiyajing(nivel, energiaOriginal), cola) =>
-          (atacante.transformateEn(Saiyajing(SuperSaiyajing(nivel + 1, energiaOriginal), cola))
-                   .tuEnergiaMaximaEs(atacante.energiaMaxima * 5),
-           oponente)
-      case _ => combatientes
-    
-    }
-    
-  } )
+          guerrero.transformateEn(Saiyajing(SuperSaiyajing(nivel + 1, energiaOriginal), cola))
+                   .tuEnergiaMaximaEs(guerrero.energiaMaxima * 5)
+      case _ => guerrero
+      }
+    } 
+  )
   
-  case class Fusion(aliado: Guerrero) extends Movimiento ((combatientes: Combatientes) => {
+  case class Fusion(aliado: Guerrero) extends AutoMovimiento ((guerrero: Guerrero) => {
       
-    val(atacante, oponente) = combatientes
-    if(List(aliado, atacante).forall(_.puedeFusionarse))
-      (atacante.sumaAInventario(aliado.inventario)
-               .tuEnergiaMaximaEs(atacante.energia + aliado.energia)
+    if(List(aliado, guerrero).forall(_.puedeFusionarse))
+      guerrero.sumaAInventario(aliado.inventario)
+               .tuEnergiaMaximaEs(guerrero.energia + aliado.energia)
                .aumentaEnergia(aliado.energia)
-               .transformateEn(Fusionado(atacante, aliado)),
-      oponente)
-    else combatientes 
+               .transformateEn(Fusionado(guerrero, aliado))
+    else guerrero
         
   } )
  
@@ -126,16 +120,14 @@ object Simulador {
     
   } )
   
-  case object MuchosGolpesNinja extends Movimiento ((combatientes: Combatientes) => {
+  case object MuchosGolpesNinja extends Movimiento ({case (atacante,oponente) => {
     
-      
-    val(atacante, oponente) = combatientes
     (atacante.especie, oponente.especie) match {
       case (Humano, Androide) => (atacante.disminuiEnergia(10), oponente)
       case _ if atacante.energia < oponente.energia => (atacante.disminuiEnergia(20), oponente)
       case _  => (atacante, oponente.disminuiEnergia(20))
     }
-    
+  }
   } )
   
   case object Explotar extends Movimiento ((combatientes: Combatientes) => {
