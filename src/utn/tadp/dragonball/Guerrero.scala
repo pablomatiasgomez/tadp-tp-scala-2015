@@ -18,10 +18,14 @@ case class Guerrero(
   def aumentaEnergia(aumento: Int) = copy(energia = (energia + aumento).min(energiaMaxima))
   
   def disminuiEnergia(disminucion: Int) = {
-    if (energia > disminucion)
+    /*if (energia > disminucion)
       copy(energia = (energia - disminucion))
     else
-      copy(energia = 0).estas(Muerto)
+      copy(energia = 0).estas(Muerto)*/
+      (energia-disminucion).max(0) match {
+      case 0 => tuEnergiaEs(0).estas(Muerto)
+      case n => tuEnergiaEs(n)
+    }
   }
 
   def transformateEn(transformacion: Especie) = copy(especie = transformacion)
