@@ -29,7 +29,7 @@ class Simulador_Test {
   val cell: Guerrero = new Guerrero("Cell", List(), 500, 250, Monstruo(digerirCell), Luchando, todosSaben++List(Explotar, ComerseAlOponente))
   val mono : Guerrero = new Guerrero("Mono", List(), 3000, 3000, Saiyajin(MonoGigante(1000), true), Luchando, todosSaben)
   val goku : Guerrero = new Guerrero("Goku", List(SemillaDelErmitaño, FotoDeLaLuna), 2500, 1300, Saiyajin(SuperSaiyajin(1, 500), true), Luchando, todosSaben++List(Onda(99), Genkidama))
-  val vegeta : Guerrero = new Guerrero("Vegeta", List(), 1001, 801, Saiyajin(Normal, false), Luchando, todosSaben++List(Onda(100)))
+  val vegeta : Guerrero = new Guerrero("Vegeta", List(), 1001, 801, Saiyajin(Normal, false), Luchando, todosSaben++List(Onda(100), Fusion(goku)))
 
   @Test
   def krilinSeDejaFajarTest() = {
@@ -321,6 +321,36 @@ class Simulador_Test {
     assertEquals(500, g energiaMaxima)
     assertEquals(Saiyajin(Normal, true), g especie)
     assertEquals(vegeta, v)
+  }
+  
+  @Test
+  def krilinSeFusionaConPiccolo(){
+    val (f, v) = Fusion(krilin)(piccolo, vegeta)
+    
+    assertEquals(piccolo.inventario++krilin.inventario, f.inventario)
+    assertEquals(piccolo.energia+krilin.energia, f.energia)
+    assertEquals(piccolo.energiaMaxima+krilin.energiaMaxima, f.energiaMaxima)
+    assertEquals(Fusionado(piccolo, krilin), f.especie)
+    assertEquals(vegeta, v)
+  }
+  
+  @Test
+  def vegetaSeFusionaConGoku(){
+    val (f, m) = Fusion(goku)(vegeta, majinBuu)
+    
+    assertEquals(vegeta.inventario++goku.inventario, f.inventario)
+    assertEquals(vegeta.energia+goku.energia, f.energia)
+    assertEquals(vegeta.energiaMaxima+goku.energiaMaxima, f.energiaMaxima)
+    assertEquals(Fusionado(vegeta, goku), f.especie)
+    assertEquals(majinBuu, m)
+  }
+  
+  @Test
+  def noTodosPuedenFusionarse(){
+    val (k, c) = Fusion(numero18)(krilin, cell)
+    
+    assertEquals(krilin, k)
+    assertEquals(cell, c)
   }
   
 }

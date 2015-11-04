@@ -107,7 +107,7 @@ object Simulador {
     guerrero.transformOnTrue(
         List(aliado, guerrero) forall ( _.puedeFusionarse ))(
             _ sumaAInventario (aliado.inventario)
-            variarEnergiaMaxima (aliado.energia+)
+            variarEnergiaMaxima (aliado.energiaMaxima+)
             aumentaEnergia (aliado.energia)
             transformateEn (Fusionado(guerrero, aliado)))
         
