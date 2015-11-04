@@ -12,7 +12,7 @@ object Simulador {
       val(atacante, oponente) = combatientes
       (atacante.estado, movimiento) match {
         case (Muerto, _) => combatientes
-        case (Inconsciente, UsarItem(SemillaDelErmitaño)) => combatientes
+        case (Inconsciente, UsarItem(SemillaDelErmitaño)) => movimiento(combatientes)
         case (Inconsciente, _) => combatientes
         case (Luchando, _) => movimiento(combatientes)
         case (Fajado(rounds), DejarseFajar) => movimiento((atacante.estas(Fajado(rounds+1)), oponente))
@@ -40,22 +40,26 @@ object Simulador {
   case class UsarItem(item: Item) extends Movimiento ((combatientes: Combatientes) => {
       
     val(atacante, oponente) = combatientes
-    (item, oponente.especie) match {
-      case (Arma(Roma), Androide) => combatientes
-      case (Arma(Roma), _) if oponente.energia < 300 => (atacante, oponente.estas(Inconsciente))
-      case (Arma(Filosa), Saiyajing(MonoGigante(energiaNormal), true)) => (atacante, 
-                                                                           oponente.tuEnergiaEs(1)
-                                                                                   .tuEnergiaMaximaEs(energiaNormal)
-                                                                                   .transformateEn(Saiyajing(Normal,false))
-                                                                                   .estas(Inconsciente))
-      case (Arma(Filosa), Saiyajing(fase, true)) => (atacante, oponente.tuEnergiaEs(1)
-                                                                       .transformateEn(Saiyajing(fase,false)))
-      case (Arma(Filosa), _) => (atacante, oponente.disminuiEnergia(atacante.energia / 100))
-      case (Arma(Fuego),Humano) => (atacante, oponente.disminuiEnergia(20)) //TODO: Controlar el tema de las balas
-      case (Arma(Fuego), Namekusein) if (oponente.estado == Inconsciente) => (atacante, oponente.disminuiEnergia(10))
-      case (SemillaDelErmitaño, _) => (atacante.tuEnergiaEs(atacante.energiaMaxima), oponente)
-      case _ => combatientes
-      }  
+    if(atacante.inventario.contains(item))
+      (item, oponente.especie) match {
+        case (Arma(Roma), Androide) => combatientes
+        case (Arma(Roma), _) if oponente.energia < 300 => (atacante, oponente.estas(Inconsciente))
+        case (Arma(Filosa), Saiyajing(MonoGigante(energiaNormal), true)) => (atacante, 
+                                                                             oponente.tuEnergiaEs(1)
+                                                                                     .tuEnergiaMaximaEs(energiaNormal)
+                                                                                     .transformateEn(Saiyajing(Normal,false))
+                                                                                     .estas(Inconsciente))
+        case (Arma(Filosa), Saiyajing(fase, true)) => (atacante, oponente.tuEnergiaEs(1)
+                                                                         .transformateEn(Saiyajing(fase,false)))
+        case (Arma(Filosa), _) => (atacante, oponente.disminuiEnergia(atacante.energia / 100))
+        case (Arma(Fuego),Humano) => (atacante, oponente.disminuiEnergia(20)) //TODO: Controlar el tema de las balas
+        case (Arma(Fuego), Namekusein) if (oponente.estado == Inconsciente) => (atacante, oponente.disminuiEnergia(10))
+        case (SemillaDelErmitaño, _) => (atacante.tuEnergiaEs(atacante.energiaMaxima), oponente)
+        case _ => combatientes
+        }    
+    else
+      combatientes
+      
     
   })
   
