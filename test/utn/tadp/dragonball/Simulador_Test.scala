@@ -13,7 +13,7 @@ class Simulador_Test {
   
   //Guerrero(nombre, inventario, energiaMaxima, energia, especie, estado, movimientos)
   val todosSaben: List[Movimiento] = List(DejarseFajar, CargarKi, MuchosGolpesNinja, Onda(10))
-  val esferasDelDragon: List[Item] = List(EsferaDelDragon(1), EsferaDelDragon(2), EsferaDelDragon(3), EsferaDelDragon(4), EsferaDelDragon(5), EsferaDelDragon(6), EsferaDelDragon(7))
+  val esferasDelDragon: List[Item] = List(EsferaDelDragon, EsferaDelDragon, EsferaDelDragon, EsferaDelDragon, EsferaDelDragon, EsferaDelDragon, EsferaDelDragon)
   val dejarInconsciente: Function1[Combatientes, Combatientes] = { case (atacante, oponente) => (atacante, oponente.estas(Inconsciente)) }
   
   val krilin: Guerrero = new Guerrero("Krilin", List(Arma(Roma)), 100, 50, Humano, Luchando, todosSaben++List(UsarItem(Arma(Roma))))
