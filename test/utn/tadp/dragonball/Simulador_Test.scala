@@ -28,8 +28,8 @@ class Simulador_Test {
   val majinBuu: Guerrero = new Guerrero("Majin Buu", List(Arma(Filosa)), 700, 300, Monstruo(digerirMajinBuu), Luchando, todosSaben++List(UsarItem(Arma(Filosa)), ComerseAlOponente))
   val cell: Guerrero = new Guerrero("Cell", List(), 500, 250, Monstruo(digerirCell), Luchando, todosSaben++List(Explotar, ComerseAlOponente))
   val mono : Guerrero = new Guerrero("Mono", List(), 3000, 3000, Saiyajing(MonoGigante(1000), true), Luchando, todosSaben)
-  val goku : Guerrero = new Guerrero("Goku", List(SemillaDelErmitaño, FotoDeLaLuna), 2500, 800, Saiyajing(SuperSaiyajing(1, 500), true), Luchando, todosSaben++List(Onda(99), Genkidama))
-  val vegeta : Guerrero = new Guerrero("Vegeta", List(), 1000, 801, Saiyajing(Normal, false), Luchando, todosSaben++List(Onda(100)))
+  val goku : Guerrero = new Guerrero("Goku", List(SemillaDelErmitaño, FotoDeLaLuna), 2500, 1300, Saiyajing(SuperSaiyajing(1, 500), true), Luchando, todosSaben++List(Onda(99), Genkidama))
+  val vegeta : Guerrero = new Guerrero("Vegeta", List(), 1001, 801, Saiyajing(Normal, false), Luchando, todosSaben++List(Onda(100)))
 
   @Test
   def krilinSeDejaFajarTest() = {
@@ -43,7 +43,7 @@ class Simulador_Test {
   def superSaiyajingCargaKiTest() ={
     val(g, k) = CargarKi(goku, krilin)
     
-    assertEquals(950, g.energia)
+    assertEquals(1450, g.energia)
     assertEquals(krilin, k)
   }
   
@@ -262,6 +262,48 @@ class Simulador_Test {
     assertEquals(g.energiaMaxima, g.energia)
     assertEquals(krilin, k)
     
+  }
+  
+  @Test
+  def vegetaSeConvierteEnSSJTest(){
+    val (v, g) = ConvertirseEnSuperSaiyajing(vegeta, goku)
+    
+    assertEquals(5005, v.energiaMaxima)
+    assertEquals(Saiyajing(SuperSaiyajing(1, 1001), false), v.especie)
+    assertEquals(goku, g)
+  }
+  
+  @Test
+  def vegetaNoSeConvierteEnSSJConPocoKiTest(){
+    val (v, g) = ConvertirseEnSuperSaiyajing(vegeta.disminuiEnergia(500), goku)
+    
+    assertEquals(v, vegeta.disminuiEnergia(500))
+    assertEquals(goku, g)
+  }
+  
+  @Test
+  def gokuSeConvierteEnSSJ2Test(){
+    val (g, v) = ConvertirseEnSuperSaiyajing(goku, vegeta)
+    
+    assertEquals(5000, g.energiaMaxima)
+    assertEquals(Saiyajing(SuperSaiyajing(2, 500), true), g.especie)
+    assertEquals(vegeta, v)
+  }
+  
+  @Test
+  def monoNoSeConvierteEnSSJTest(){
+    val (m, v) = ConvertirseEnSuperSaiyajing(mono, vegeta)
+    
+    assertEquals(mono, m)
+    assertEquals(vegeta, v)
+  }
+  
+  @Test
+  def krilinNoSeConvierteEnSSJTest(){
+    val (k, v) = ConvertirseEnSuperSaiyajing(krilin, vegeta)
+    
+    assertEquals(krilin, k)
+    assertEquals(vegeta, v)    
   }
   
 }

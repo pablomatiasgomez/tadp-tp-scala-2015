@@ -90,12 +90,13 @@ object Simulador {
     
   } )
   
-  case object ConvertirseEnSaiyajing extends AutoMovimiento (guerrero => {
+  case object ConvertirseEnSuperSaiyajing extends AutoMovimiento (guerrero => {
     (guerrero.especie,guerrero.energia,guerrero.energiaMaxima) match {
+      case (Saiyajing(MonoGigante(_), _),_, _) => guerrero
       case (Saiyajing(fase, cola), ki, kiMaximo) if (ki > kiMaximo/2) => 
                                     val (nivel, energiaOriginal) = (fase.proxNivelSSJ, fase.energiaOriginal(guerrero))
                                     (guerrero transformateEn Saiyajing(SuperSaiyajing(nivel,energiaOriginal),cola)
-                                              variarEnergiaMaxima (5*nivel*))
+                                              tuEnergiaMaximaEs (5 * nivel * energiaOriginal))
       case _ => guerrero
       }
     } 
