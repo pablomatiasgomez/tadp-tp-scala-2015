@@ -106,12 +106,12 @@ object Simulador {
   
   case class Fusion(aliado: Guerrero) extends AutoMovimiento (guerrero => {
       
-    if(List(aliado, guerrero) forall (_.puedeFusionarse))
-      (guerrero sumaAInventario (aliado.inventario)
-                variarEnergiaMaxima (aliado.energia+)
-                aumentaEnergia (aliado.energia)
-                transformateEn (Fusionado(guerrero, aliado)))
-    else guerrero
+    guerrero.transformOnTrue(
+        List(aliado, guerrero) forall ( _.puedeFusionarse ))(
+            _ sumaAInventario (aliado.inventario)
+            variarEnergiaMaxima (aliado.energia+)
+            aumentaEnergia (aliado.energia)
+            transformateEn (Fusionado(guerrero, aliado)))
         
   } )
  
