@@ -105,12 +105,15 @@ object Simulador {
   } )
  
   case class Magia(cambioDeEstado: Function1[Combatientes, Combatientes]) extends Movimiento ((combatientes: Combatientes) => {
-  
+    
     val(atacante, oponente) = combatientes
-    if ((atacante.inventario.count(_.isInstanceOf[EsferaDelDragon])) == 7)  
-      cambioDeEstado(combatientes)
-    else
-      combatientes
+    atacante.especie match{
+      case Namekusein => cambioDeEstado(combatientes)
+      case Monstruo(_) => cambioDeEstado(combatientes)
+      case _ if (atacante.inventario.count( EsferaDelDragon.equals ) == 7) => 
+                              cambioDeEstado(atacante.gastarItems(List.fill(7)(EsferaDelDragon)), oponente)
+      case _ => combatientes
+    }
     
   } )
   
