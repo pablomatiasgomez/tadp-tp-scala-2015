@@ -1,6 +1,7 @@
 package utn.tadp.dragonball
 import utn.tadp.dragonball.Simulador._
 
+
 case class Guerrero(
       nombre: String,
       inventario: List[Item],
@@ -13,18 +14,21 @@ case class Guerrero(
   
   def agregaMovimientos(agregados: List[Movimiento]) = copy(movimientos = movimientos++agregados)
       
-  def tuEnergiaEs(nuevaEnergia: Int) = copy (energia = nuevaEnergia)
-  
-  def tuEnergiaMaximaEs(nuevoMaximo: Int) = copy (energiaMaxima = nuevoMaximo)
-  
-  def aumentaEnergia(aumento: Int) = copy(energia = (energia + aumento).min(energiaMaxima))
-  
-  def disminuiEnergia(disminucion: Int) = {
-    if (energia > disminucion)
-      copy(energia = (energia - disminucion))
-    else
-      copy(energia = 0).estas(Muerto)
+  def variarEnergia(f:(Int=>Int)) = {
+    val guerreroAfectado = copy(energia = f(energia).max(0).min(energiaMaxima))
+    if(guerreroAfectado.energia == 0) guerreroAfectado.estas(Muerto)
+    else guerreroAfectado
   }
+  
+  def tuEnergiaEs(nuevaEnergia: Int) = variarEnergia( _ => nuevaEnergia )
+  
+  def variarEnergiaMaxima(f:(Int=>Int)) = copy(energiaMaxima = f(energiaMaxima))
+  
+  def tuEnergiaMaximaEs(nuevoMaximo: Int) = variarEnergiaMaxima ( _ => nuevoMaximo)
+  
+  def aumentaEnergia(aumento: Int) = variarEnergia( _ + aumento )
+  
+  def disminuiEnergia(disminucion: Int) = aumentaEnergia( -disminucion )
 
   def transformateEn(transformacion: Especie) = copy(especie = transformacion)
   

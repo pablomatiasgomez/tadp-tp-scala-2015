@@ -16,4 +16,4 @@ case object Fuego extends TipoArma
 case class Arma(tipo : TipoArma) extends Item
 case object SemillaDelErmitaño extends Item
 case object FotoDeLaLuna extends Item
-case class EsferaDelDragon() extends Item
+case class EsferaDelDragon(numero:Int) extends Item
