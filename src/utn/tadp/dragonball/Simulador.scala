@@ -46,12 +46,12 @@ object Simulador {
                                                                                    .tuEnergiaMaximaEs(energiaNormal)
                                                                                    .transformateEn(Saiyajing(Normal,false))
                                                                                    .estas(Inconsciente))
-      case (Arma(Filosa), Saiyajing(_, true)) => (atacante, oponente.tuEnergiaEs(1)
-                                                                    .transformateEn(Saiyajing(Normal,false)))
+      case (Arma(Filosa), Saiyajing(fase, true)) => (atacante, oponente.tuEnergiaEs(1)
+                                                                       .transformateEn(Saiyajing(fase,false)))
       case (Arma(Filosa), _) => (atacante, oponente.disminuiEnergia(atacante.energia / 100))
       case (Arma(Fuego),Humano) => (atacante, oponente.disminuiEnergia(20)) //TODO: Controlar el tema de las balas
       case (Arma(Fuego), Namekusein) if (oponente.estado == Inconsciente) => (atacante, oponente.disminuiEnergia(10))
-      case (SemillaDelErmitaño, _) => (atacante.aumentaEnergia(atacante.energiaMaxima), oponente)
+      case (SemillaDelErmitaño, _) => (atacante.tuEnergiaEs(atacante.energiaMaxima), oponente)
       case _ => combatientes
       }  
     
