@@ -27,9 +27,9 @@ class Simulador_Test {
   val piccolo : Guerrero = new Guerrero("Piccolo", esferasDelDragon, 500, 200, Namekusein, Luchando, todosSaben++List(Fusion(krilin), Magia(dejarInconsciente), Onda(40)))
   val majinBuu: Guerrero = new Guerrero("Majin Buu", List(Arma(Filosa)), 700, 300, Monstruo(digerirMajinBuu), Luchando, todosSaben++List(UsarItem(Arma(Filosa)), ComerseAlOponente))
   val cell: Guerrero = new Guerrero("Cell", List(), 500, 250, Monstruo(digerirCell), Luchando, todosSaben++List(Explotar, ComerseAlOponente))
-  val mono : Guerrero = new Guerrero("Mono", List(), 3000, 3000, Saiyajing(MonoGigante(1000), true), Luchando, todosSaben)
-  val goku : Guerrero = new Guerrero("Goku", List(SemillaDelErmitaño, FotoDeLaLuna), 2500, 1300, Saiyajing(SuperSaiyajing(1, 500), true), Luchando, todosSaben++List(Onda(99), Genkidama))
-  val vegeta : Guerrero = new Guerrero("Vegeta", List(), 1001, 801, Saiyajing(Normal, false), Luchando, todosSaben++List(Onda(100)))
+  val mono : Guerrero = new Guerrero("Mono", List(), 3000, 3000, Saiyajin(MonoGigante(1000), true), Luchando, todosSaben)
+  val goku : Guerrero = new Guerrero("Goku", List(SemillaDelErmitaño, FotoDeLaLuna), 2500, 1300, Saiyajin(SuperSaiyajin(1, 500), true), Luchando, todosSaben++List(Onda(99), Genkidama))
+  val vegeta : Guerrero = new Guerrero("Vegeta", List(), 1001, 801, Saiyajin(Normal, false), Luchando, todosSaben++List(Onda(100)))
 
   @Test
   def krilinSeDejaFajarTest() = {
@@ -102,7 +102,7 @@ class Simulador_Test {
     assertEquals(majinBuu, buu)
     assertEquals(Inconsciente, m.estado)
     assertEquals(1, m.energia)
-    assertEquals(Saiyajing(Normal, false), m.especie)
+    assertEquals(Saiyajin(Normal, false), m.especie)
     
   }
   
@@ -112,7 +112,7 @@ class Simulador_Test {
     
     assertEquals(majinBuu, buu)
     assertEquals(1, g.energia)
-    assertEquals(Saiyajing(SuperSaiyajing(1, 500), false), g.especie)
+    assertEquals(Saiyajin(SuperSaiyajin(1, 500), false), g.especie)
     
   }
   
@@ -122,7 +122,7 @@ class Simulador_Test {
     
     assertEquals(majinBuu, buu)
     assertEquals(798, v.energia)
-    assertEquals(Saiyajing(Normal, false), v.especie)
+    assertEquals(Saiyajin(Normal, false), v.especie)
     
   }
   
@@ -257,7 +257,7 @@ class Simulador_Test {
   def gokuSeTransformaEnMonoTest() ={
     val(g, k) = ConvertirseEnMono(goku, krilin)
     
-    assertEquals(Saiyajing(MonoGigante(500),true), g.especie)
+    assertEquals(Saiyajin(MonoGigante(500),true), g.especie)
     assertEquals(1500, g.energia)
     assertEquals(g.energiaMaxima, g.energia)
     assertEquals(krilin, k)
@@ -269,7 +269,7 @@ class Simulador_Test {
     val (v, g) = ConvertirseEnSuperSaiyajing(vegeta, goku)
     
     assertEquals(5005, v.energiaMaxima)
-    assertEquals(Saiyajing(SuperSaiyajing(1, 1001), false), v.especie)
+    assertEquals(Saiyajin(SuperSaiyajin(1, 1001), false), v.especie)
     assertEquals(goku, g)
   }
   
@@ -286,7 +286,7 @@ class Simulador_Test {
     val (g, v) = ConvertirseEnSuperSaiyajing(goku, vegeta)
     
     assertEquals(5000, g.energiaMaxima)
-    assertEquals(Saiyajing(SuperSaiyajing(2, 500), true), g.especie)
+    assertEquals(Saiyajin(SuperSaiyajin(2, 500), true), g.especie)
     assertEquals(vegeta, v)
   }
   
