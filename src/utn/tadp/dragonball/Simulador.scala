@@ -14,6 +14,7 @@ object Simulador {
         case (Muerto, _) => combatientes
         case (Inconsciente, UsarItem(SemillaDelErmitaño)) => movimiento(combatientes)
         case (Inconsciente, _) => combatientes
+        case (Luchando, DejarseFajar) => movimiento(atacante.estas(Fajado(1)), oponente)
         case (Luchando, _) => movimiento(combatientes)
         case (Fajado(rounds), DejarseFajar) => movimiento((atacante.estas(Fajado(rounds+1)), oponente))
         case (Fajado(_), _) => movimiento((atacante.estas(Luchando), oponente))
