@@ -22,9 +22,9 @@ class Simulador_Test {
                                                                          else
                                                                            a} }
       
-  val krilin: Guerrero = new Guerrero("Krilin", List(Arma(Roma)), 100, 50, Humano, Luchando, todosSaben++List(UsarItem(Arma(Roma))))
+  val krilin: Guerrero = new Guerrero("Krilin", List(Arma(Roma))++esferasDelDragon, 100, 50, Humano, Luchando, todosSaben++List(UsarItem(Arma(Roma))))
   val numero18: Guerrero = new Guerrero("N18", List(Arma(Fuego(Ak47)), Municion(Ak47)), 300, 100, Androide, Luchando, todosSaben++List(Explotar, UsarItem(Arma(Fuego(Ak47)))))
-  val piccolo : Guerrero = new Guerrero("Piccolo", esferasDelDragon, 500, 200, Namekusein, Luchando, todosSaben++List(Fusion(krilin), Magia(dejarInconsciente), Onda(40)))
+  val piccolo : Guerrero = new Guerrero("Piccolo", List(), 500, 200, Namekusein, Luchando, todosSaben++List(Fusion(krilin), Magia(dejarInconsciente), Onda(40)))
   val majinBuu: Guerrero = new Guerrero("Majin Buu", List(Arma(Filosa)), 700, 300, Monstruo(digerirMajinBuu), Luchando, todosSaben++List(UsarItem(Arma(Filosa)), ComerseAlOponente))
   val cell: Guerrero = new Guerrero("Cell", List(), 500, 250, Monstruo(digerirCell), Luchando, todosSaben++List(Explotar, ComerseAlOponente))
   val mono : Guerrero = new Guerrero("Mono", List(), 3000, 3000, Saiyajin(MonoGigante(1000), true), Luchando, todosSaben)
@@ -169,6 +169,14 @@ class Simulador_Test {
     assertEquals(goku energiaMaxima, g energia)
     assertEquals(piccolo, p)
     
+  }
+  
+  @Test
+  def usarUnaEsferaDelDragonSolaNoHaceNadaTest(){
+    val(k, n18) = UsarItem(EsferaDelDragon)(krilin, numero18)
+    
+    assertEquals(krilin, k)
+    assertEquals(numero18, n18)
   }
   
   @Test
