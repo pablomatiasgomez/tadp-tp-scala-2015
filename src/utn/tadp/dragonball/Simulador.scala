@@ -68,17 +68,11 @@ object Simulador {
   })
   
   case object ConvertirseEnMono extends AutoMovimiento ((guerrero: Guerrero) => {
-    //XXX: El manejo de las energias maximas no me convence. Hay algo de la inmutabilidad que no estamos aprovechando
-    
-    val energiaOriginal:((EstadoSaiyajing,Int)=>Int) = {
-      case (Normal,energiaMaxima) => energiaMaxima
-      case (SuperSaiyajing(_,energiaOriginal),_) => energiaOriginal
-      }
-    
+
     (guerrero.especie,guerrero.energiaMaxima) match {  
       case (Saiyajing(MonoGigante(_), _),_) => guerrero
       case (Saiyajing(fase, true),energiaMaxima) if (guerrero.inventario.contains(FotoDeLaLuna)) =>
-                                  val energiaO=energiaOriginal(fase,energiaMaxima)
+                                  val energiaO=fase.energiaOriginal(guerrero)
                                   guerrero.tuEnergiaMaximaEs(3*energiaO)
                                           .cargarAlMaximo
                                           .transformateEn(Saiyajing(MonoGigante(energiaO),true))
@@ -88,14 +82,11 @@ object Simulador {
   } )
   
   case object ConvertirseEnSaiyajing extends AutoMovimiento ((guerrero: Guerrero) => {
-      
-    guerrero.especie match {
-      case Saiyajing(Normal, cola) => 
-          guerrero.transformateEn(Saiyajing(SuperSaiyajing(1, guerrero.energiaMaxima), cola))
-                   .tuEnergiaMaximaEs(guerrero.energiaMaxima * 5)
-      case Saiyajing(SuperSaiyajing(nivel, energiaOriginal), cola) =>
-          guerrero.transformateEn(Saiyajing(SuperSaiyajing(nivel + 1, energiaOriginal), cola))
-                   .tuEnergiaMaximaEs(guerrero.energiaMaxima * 5)
+    (guerrero.especie,guerrero.energia,guerrero.energiaMaxima) match {
+      case (Saiyajing(fase, cola),ki,kiMaximo) if (ki > kiMaximo/2) => 
+                                    val (nivel,energiaOriginal) = (fase.proxNivelSJJ,fase.energiaOriginal(guerrero))
+                                    guerrero.transformateEn(Saiyajing(SuperSaiyajing(nivel,energiaOriginal),cola))
+                                            .variarEnergiaMaxima(5*nivel*)
       case _ => guerrero
       }
     } 

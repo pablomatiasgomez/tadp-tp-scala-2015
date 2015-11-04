@@ -16,10 +16,18 @@ case class Saiyajing(
   cola : Boolean
   ) extends Especie
 
-abstract class EstadoSaiyajing(){
-  
+abstract class EstadoSaiyajing{
+  def energiaOriginal(guerrero:Guerrero):Int
+  def proxNivelSJJ = 1
 }
 
-case object Normal extends EstadoSaiyajing
-case class SuperSaiyajing(nivel: Int, energiaNormal: Int) extends EstadoSaiyajing
-case class MonoGigante(energiaNormal: Int) extends EstadoSaiyajing
+case object Normal extends EstadoSaiyajing{
+  def energiaOriginal(guerrero:Guerrero) = guerrero.energiaMaxima
+}
+case class SuperSaiyajing(nivel: Int, energiaNormal: Int) extends EstadoSaiyajing{
+  override def proxNivelSSJ = nivel + 1
+  def energiaOriginal(guerrero:Guerrero) = energiaNormal
+}
+case class MonoGigante(energiaNormal: Int) extends EstadoSaiyajing{
+  def energiaOriginal(guerrero:Guerrero) = energiaNormal
+}
