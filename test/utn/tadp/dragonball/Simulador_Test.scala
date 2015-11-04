@@ -175,7 +175,7 @@ class Simulador_Test {
   def usaSemillaDelErmitañoAunEstandoInconscienteTest() ={
     val(g, p) = UsarItem(SemillaDelErmitaño)(goku.estas(Inconsciente), piccolo)
     
-    assertEquals(goku.energiaMaxima, g.energia)
+    assertEquals(g.energiaMaxima, g.energia)
     assertEquals(piccolo, p)
     
   }

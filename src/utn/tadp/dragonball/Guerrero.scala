@@ -38,10 +38,11 @@ case class Guerrero(
   
   def estas(nuevoEstado: EstadoDeLucha): Guerrero = {
     (nuevoEstado, especie) match {
-      case (Muerto, Fusionado((original, _))) => original.estas(Muerto)
-      case (Inconsciente, Fusionado((original, _))) => original.estas(Inconsciente)
+      case (Muerto, Fusionado((original, _))) => original estas Muerto
+      case (Inconsciente, Fusionado((original, _))) => original estas Inconsciente
       case (Inconsciente, Saiyajin(SuperSaiyajin(_, energiaOriginal), cola)) => (this transformateEn Saiyajin(Normal, cola)
-                                                                                        tuEnergiaMaximaEs energiaOriginal)
+                                                                                      tuEnergiaMaximaEs energiaOriginal
+                                                                                      estas Inconsciente)
       case _ => copy(estado = nuevoEstado)
     }
   }
