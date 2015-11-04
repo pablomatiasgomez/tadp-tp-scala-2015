@@ -40,6 +40,8 @@ case class Guerrero(
     (nuevoEstado, especie) match {
       case (Muerto, Fusionado((original, _))) => original.estas(Muerto)
       case (Inconsciente, Fusionado((original, _))) => original.estas(Inconsciente)
+      case (Inconsciente, Saiyajing(SuperSaiyajing(_, energiaOriginal), cola)) => (this transformateEn Saiyajing(Normal, cola)
+                                                                                        tuEnergiaMaximaEs energiaOriginal)
       case _ => copy(estado = nuevoEstado)
     }
   }
