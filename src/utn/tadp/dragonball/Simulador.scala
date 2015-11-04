@@ -30,7 +30,7 @@ object Simulador {
   
   case object CargarKi extends AutoMovimiento ( guerrero => {
     guerrero.especie match {
-      case Saiyajing(SuperSaiyajing(nivel, _), _) => guerrero aumentaEnergia (150* nivel) 
+      case Saiyajin(SuperSaiyajin(nivel, _), _) => guerrero aumentaEnergia (150* nivel) 
       case Androide => guerrero
       case _ => guerrero aumentaEnergia 100
       }
@@ -49,13 +49,13 @@ object Simulador {
       (item, oponente.especie) match {
         case (Arma(Roma), Androide) => combatientes
         case (Arma(Roma), _) if oponente.energia < 300 => (atacante, oponente estas Inconsciente) 
-        case (Arma(Filosa), Saiyajing(MonoGigante(energiaNormal), true)) => (atacante, 
+        case (Arma(Filosa), Saiyajin(MonoGigante(energiaNormal), true)) => (atacante, 
                                                                              oponente tuEnergiaEs 1
                                                                                       tuEnergiaMaximaEs energiaNormal
-                                                                                      transformateEn Saiyajing(Normal,false)
+                                                                                      transformateEn Saiyajin(Normal,false)
                                                                                       estas Inconsciente)
-        case (Arma(Filosa), Saiyajing(fase, true)) => (atacante, oponente tuEnergiaEs 1
-                                                                          transformateEn Saiyajing(fase,false))
+        case (Arma(Filosa), Saiyajin(fase, true)) => (atacante, oponente tuEnergiaEs 1
+                                                                          transformateEn Saiyajin(fase,false))
         case (Arma(Filosa), _) => (atacante, oponente disminuiEnergia (atacante.energia / 100))
         case (Arma(Fuego(tipo)), especieAtacado) if atacante.inventario.contains( Municion(tipo) ) =>
           (atacante gastarItems (List( Municion(tipo) )), disparado(especieAtacado)(oponente))
@@ -79,10 +79,10 @@ object Simulador {
   case object ConvertirseEnMono extends AutoMovimiento (guerrero => {
 
     (guerrero.especie,guerrero.energiaMaxima) match {  
-      case (Saiyajing(MonoGigante(_), _),_) => guerrero
-      case (Saiyajing(fase, true),energiaMaxima) if (guerrero.inventario contains FotoDeLaLuna) =>
+      case (Saiyajin(MonoGigante(_), _),_) => guerrero
+      case (Saiyajin(fase, true),energiaMaxima) if (guerrero.inventario contains FotoDeLaLuna) =>
                                   val energiaO = fase.energiaOriginal(guerrero)
-                                  (guerrero transformateEn Saiyajing(MonoGigante(energiaO), true)
+                                  (guerrero transformateEn Saiyajin(MonoGigante(energiaO), true)
                                             tuEnergiaMaximaEs (3*energiaO)
                                             cargarAlMaximo)
       case _ => guerrero
@@ -90,12 +90,13 @@ object Simulador {
     
   } )
   
-  case object ConvertirseEnSaiyajing extends AutoMovimiento (guerrero => {
+  case object ConvertirseEnSuperSaiyajing extends AutoMovimiento (guerrero => {
     (guerrero.especie,guerrero.energia,guerrero.energiaMaxima) match {
-      case (Saiyajing(fase, cola), ki, kiMaximo) if (ki > kiMaximo/2) => 
+      case (Saiyajin(MonoGigante(_), _),_, _) => guerrero
+      case (Saiyajin(fase, cola), ki, kiMaximo) if (ki > kiMaximo/2) => 
                                     val (nivel, energiaOriginal) = (fase.proxNivelSSJ, fase.energiaOriginal(guerrero))
-                                    (guerrero transformateEn Saiyajing(SuperSaiyajing(nivel,energiaOriginal),cola)
-                                              variarEnergiaMaxima (5*nivel*))
+                                    (guerrero transformateEn Saiyajin(SuperSaiyajin(nivel,energiaOriginal),cola)
+                                              tuEnergiaMaximaEs (5 * nivel * energiaOriginal))
       case _ => guerrero
       }
     } 
@@ -106,7 +107,7 @@ object Simulador {
     guerrero.transformOnTrue(
         List(aliado, guerrero) forall ( _.puedeFusionarse ))(
             _ sumaAInventario (aliado.inventario)
-            variarEnergiaMaxima (aliado.energia+)
+            variarEnergiaMaxima (aliado.energiaMaxima+)
             aumentaEnergia (aliado.energia)
             transformateEn (Fusionado(guerrero, aliado)))
         
