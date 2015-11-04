@@ -73,9 +73,10 @@ object Simulador {
       case (Saiyajing(MonoGigante(_), _),_) => guerrero
       case (Saiyajing(fase, true),energiaMaxima) if (guerrero.inventario.contains(FotoDeLaLuna)) =>
                                   val energiaO=fase.energiaOriginal(guerrero)
-                                  guerrero.tuEnergiaMaximaEs(3*energiaO)
+                                  guerrero.transformateEn(Saiyajing(MonoGigante(energiaO),true))
+                                          .tuEnergiaMaximaEs(3*energiaO)
                                           .cargarAlMaximo
-                                          .transformateEn(Saiyajing(MonoGigante(energiaO),true))
+                                          
       case _ => guerrero
     }
     
