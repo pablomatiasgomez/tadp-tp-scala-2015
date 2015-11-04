@@ -1,5 +1,7 @@
 package utn.tadp.dragonball
 
+import utn.tadp.dragonball.BlackMagic._
+
 object Simulador {
  
   type Combatientes = (Guerrero, Guerrero)
@@ -110,7 +112,7 @@ object Simulador {
     atacante.especie match{
       case Namekusein => cambioDeEstado(combatientes)
       case Monstruo(_) => cambioDeEstado(combatientes)
-      case _ if (atacante.inventario.count( EsferaDelDragon.equals ) == 7) => 
+      case _ if (atacante.inventario.count(EsferaDelDragon,7)) => 
                               cambioDeEstado(atacante.gastarItems(List.fill(7)(EsferaDelDragon)), oponente)
       case _ => combatientes
     }
