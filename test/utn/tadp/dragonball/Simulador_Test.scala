@@ -29,7 +29,7 @@ class Simulador_Test {
   def krilinSeDejaFajarTest() = {
     val (k, p) = DejarseFajar(krilin, piccolo)
     
-    assertEquals(krilin, k)
+    assertEquals(krilin.estas(Fajado(1)), k)
     assertEquals(piccolo, p)
   }
   
