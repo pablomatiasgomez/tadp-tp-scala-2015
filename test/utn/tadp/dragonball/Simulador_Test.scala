@@ -326,7 +326,7 @@ class Simulador_Test {
   }
   
   @Test
-  def krilinSeFusionaConPiccolo(){
+  def krilinSeFusionaConPiccoloTest(){
     val (f, v) = Fusion(krilin)(piccolo, vegeta)
     
     assertEquals(piccolo.inventario++krilin.inventario, f inventario)
@@ -337,7 +337,7 @@ class Simulador_Test {
   }
   
   @Test
-  def vegetaSeFusionaConGoku(){
+  def vegetaSeFusionaConGokuTest(){
     val (f, m) = Fusion(goku)(vegeta, majinBuu)
     
     assertEquals(vegeta.inventario++goku.inventario, f inventario)
@@ -348,7 +348,7 @@ class Simulador_Test {
   }
   
   @Test
-  def noTodosPuedenFusionarse(){
+  def noTodosPuedenFusionarseTest(){
     val (k, c) = Fusion(numero18)(krilin, cell)
     
     assertEquals(krilin, k)
@@ -356,7 +356,7 @@ class Simulador_Test {
   }
   
   @Test
-  def vegetaSeFusionaConGokuYMuere(){
+  def vegetaSeFusionaConGokuYMuereTest(){
     val (f, m) = Fusion(goku)(vegeta, majinBuu)
     
     
@@ -365,7 +365,7 @@ class Simulador_Test {
   }
   
   @Test
-  def vegetaSeFusionaConGokuYQuedaInconsciente(){
+  def vegetaSeFusionaConGokuYQuedaInconscienteTest(){
     val (f, m) = Fusion(goku)(vegeta, majinBuu)
     
     
@@ -374,7 +374,7 @@ class Simulador_Test {
   }
   
   @Test
-  def piccoloUsaMagia(){
+  def piccoloUsaMagiaTest(){
     val (p, g) = Magia(dejarInconsciente)(piccolo, goku)
     
     assertEquals(piccolo, p)
@@ -382,7 +382,7 @@ class Simulador_Test {
   }
   
   @Test
-  def majinBuuUsaMagia(){
+  def majinBuuUsaMagiaTest(){
     val (m, g) = Magia(dejarInconsciente)(majinBuu, goku)
     
     assertEquals(majinBuu, m)
@@ -390,19 +390,46 @@ class Simulador_Test {
   }
   
   @Test
-  def numero18NoUsaMagia(){
+  def numero18NoUsaMagiaTest(){
     val (n18, g) = Magia(convertirEnHumano)(numero18, numero18)
     
     assertEquals(numero18, n18)
   }
   
   @Test
-  def krilinUsaMagia(){
+  def krilinUsaMagiaTest(){
     val (k, n18) = Magia(convertirEnHumano)(krilin, numero18)
     
     assertEquals(krilin.inventario diff esferasDelDragon, k.inventario)
     assertEquals(numero18 transformateEn Humano, n18)
   }
+  
+  @Test
+  def krilinSePeleaConNumero18YSeLastmiaLosDeditosTest(){
+    val (k, n18) = MuchosGolpesNinja(krilin, numero18)
+    
+    assertEquals(krilin disminuiEnergia 10, k)
+    assertEquals(numero18, n18)
+  }
+  
+  @Test
+  def numero18SePeleaConKrilinYLoLastimaTest(){
+    val (n18, k) = MuchosGolpesNinja(numero18, krilin)
+    
+    assertEquals(krilin disminuiEnergia 20, k)
+    assertEquals(numero18, n18)
+  }
+  
+  @Test
+  def piccoloMataAVegetaAGolpesTest(){
+    val (p, v) = MuchosGolpesNinja(piccolo,vegeta tuEnergiaEs(1))
+    
+    assertEquals(0, v energia)
+    assertEquals(Muerto, v estado)
+    assertEquals(piccolo, p)
+  }
+  
+  
   
   
 }
