@@ -12,6 +12,8 @@ case class Guerrero(
       movimientos: List[Movimiento]
       ) {
   
+  def tusMovimientos(agregados: List[Movimiento]) = copy(movimientos = agregados)
+  
   def agregaMovimientos(agregados: List[Movimiento]) = copy(movimientos = movimientos++agregados)
       
   def variarEnergia(f:(Int=>Int)) = {
