@@ -174,20 +174,20 @@ class Simulador_Test {
   }
   
   @Test
-  def usarUnaEsferaDelDragonSolaNoHaceNadaTest(){
-    val(k, n18) = UsarItem(EsferaDelDragon)(krilin, numero18)
-    
-    assertEquals(krilin, k)
-    assertEquals(numero18, n18)
-  }
-  
-  @Test
   def usaSemillaDelErmitañoAunEstandoInconscienteTest() ={
     val(g, p) = UsarItem(SemillaDelErmitaño)(goku estas Inconsciente, piccolo)
     
     assertEquals(g energiaMaxima, g energia)
     assertEquals(piccolo, p)
     
+  }
+  
+  @Test
+  def usarUnaEsferaDelDragonSolaNoHaceNadaTest(){
+    val(k, n18) = UsarItem(EsferaDelDragon)(krilin, numero18)
+    
+    assertEquals(krilin, k)
+    assertEquals(numero18, n18)
   }
   
   @Test
@@ -548,6 +548,19 @@ class Simulador_Test {
     
     assertEquals(goku, g)
     assertEquals(krilin disminuiEnergia 10, k)
+    
+  }
+  
+  @Test
+  def gokuTiraUnaGenkidamaDejandonseFajar1TurnoTestYCuraANumero18(){
+    val(gokuFajado, n18) = DejarseFajar(goku, numero18)
+    
+    assertEquals(Fajado(1), gokuFajado estado)
+    
+    val (g, nro18) = Genkidama(gokuFajado, n18)
+    
+    assertEquals(goku, g)
+    assertEquals(numero18 aumentaEnergia 10, nro18)
     
   }
   
