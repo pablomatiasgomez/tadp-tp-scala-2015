@@ -74,7 +74,7 @@ object Simulador {
     
   })
   
-  case object ConvertirseEnMono extends AutoMovimiento ((guerrero: Guerrero) => {
+  case object ConvertirseEnMono extends AutoMovimiento (guerrero => {
 
     (guerrero.especie,guerrero.energiaMaxima) match {  
       case (Saiyajing(MonoGigante(_), _),_) => guerrero
@@ -88,7 +88,7 @@ object Simulador {
     
   } )
   
-  case object ConvertirseEnSaiyajing extends AutoMovimiento ((guerrero: Guerrero) => {
+  case object ConvertirseEnSaiyajing extends AutoMovimiento (guerrero => {
     (guerrero.especie,guerrero.energia,guerrero.energiaMaxima) match {
       case (Saiyajing(fase, cola), ki, kiMaximo) if (ki > kiMaximo/2) => 
                                     val (nivel, energiaOriginal) = (fase.proxNivelSSJ, fase.energiaOriginal(guerrero))
@@ -99,7 +99,7 @@ object Simulador {
     } 
   )
   
-  case class Fusion(aliado: Guerrero) extends AutoMovimiento ((guerrero: Guerrero) => {
+  case class Fusion(aliado: Guerrero) extends AutoMovimiento (guerrero => {
       
     if(List(aliado, guerrero) forall (_.puedeFusionarse))
       (guerrero sumaAInventario (aliado.inventario)
@@ -110,7 +110,7 @@ object Simulador {
         
   } )
  
-  case class Magia(cambioDeEstado: Function1[Combatientes, Combatientes]) extends Movimiento ((combatientes: Combatientes) => {
+  case class Magia(cambioDeEstado: Function1[Combatientes, Combatientes]) extends Movimiento (combatientes => {
     
     val(atacante, oponente) = combatientes
     atacante.especie match{
@@ -153,9 +153,9 @@ object Simulador {
     if(atacante.energia > energiaNecesaria)
       (atacante disminuiEnergia energiaNecesaria,
        oponente disminuiEnergia (oponente.especie match {
-                                 case Androide => -energiaNecesaria * 2
+                                 case Androide => - energiaNecesaria * 2
                                  case Monstruo(_) => energiaNecesaria / 2
-                                 case _ => energiaNecesaria*2})
+                                 case _ => energiaNecesaria*2 })
       )
      else
       (atacante, oponente)
