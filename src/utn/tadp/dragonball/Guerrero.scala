@@ -12,6 +12,10 @@ case class Guerrero(
       movimientos: List[Movimiento]
       ) {
   
+  def tusMovimientos(agregados: List[Movimiento]) = copy(movimientos = agregados)
+  
+  def agregaMovimientos(agregados: List[Movimiento]) = copy(movimientos = movimientos++agregados)
+    
   def variarEnergia(f:(Int=>Int)) = {
     val guerreroAfectado = copy(energia = f(energia).max(0).min(energiaMaxima))
     if(guerreroAfectado.energia == 0) guerreroAfectado.estas(Muerto)
