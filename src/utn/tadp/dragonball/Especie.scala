@@ -18,7 +18,7 @@ case class Saiyajing(
 
 abstract class EstadoSaiyajing{
   def energiaOriginal(guerrero:Guerrero):Int
-  def proxNivelSJJ = 1
+  def proxNivelSSJ = 1
 }
 
 case object Normal extends EstadoSaiyajing{

@@ -85,7 +85,7 @@ object Simulador {
   case object ConvertirseEnSaiyajing extends AutoMovimiento ((guerrero: Guerrero) => {
     (guerrero.especie,guerrero.energia,guerrero.energiaMaxima) match {
       case (Saiyajing(fase, cola),ki,kiMaximo) if (ki > kiMaximo/2) => 
-                                    val (nivel,energiaOriginal) = (fase.proxNivelSJJ,fase.energiaOriginal(guerrero))
+                                    val (nivel,energiaOriginal) = (fase.proxNivelSSJ,fase.energiaOriginal(guerrero))
                                     guerrero.transformateEn(Saiyajing(SuperSaiyajing(nivel,energiaOriginal),cola))
                                             .variarEnergiaMaxima(5*nivel*)
       case _ => guerrero
@@ -97,7 +97,7 @@ object Simulador {
       
     if(List(aliado, guerrero).forall(_.puedeFusionarse))
       guerrero.sumaAInventario(aliado.inventario)
-               .tuEnergiaMaximaEs(guerrero.energia + aliado.energia)
+               .variarEnergiaMaxima(aliado.energia+)
                .aumentaEnergia(aliado.energia)
                .transformateEn(Fusionado(guerrero, aliado))
     else guerrero
