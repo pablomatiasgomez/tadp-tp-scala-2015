@@ -58,10 +58,7 @@ object Simulador {
                                                                           transformateEn Saiyajing(fase,false))
         case (Arma(Filosa), _) => (atacante, oponente disminuiEnergia (atacante.energia / 100))
         case (Arma(Fuego(tipo)), especieAtacado) if atacante.inventario.contains( Municion(tipo) ) =>
-                                                           (atacante gastarItems (List( Municion(tipo) )),
-                                                            disparado(especieAtacado)(oponente))
-        case (Arma(Fuego(tipo)), Humano) => (atacante, oponente disminuiEnergia 20) //TODO: Controlar el tema de las balas
-        case (Arma(Fuego(tipo)), Namekusein) if (oponente.estado == Inconsciente) => (atacante, oponente disminuiEnergia 10)
+          (atacante gastarItems (List( Municion(tipo) )), disparado(especieAtacado)(oponente))
         case (SemillaDelErmitaño, _) => (atacante tuEnergiaEs (atacante.energiaMaxima), oponente)
         case _ => combatientes
         }    )   
