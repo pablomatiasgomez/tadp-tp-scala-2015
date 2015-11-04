@@ -429,7 +429,68 @@ class Simulador_Test {
     assertEquals(piccolo, p)
   }
   
+  @Test
+  def numero18ExplotaYMataAKrilinTest(){
+    val (n18, k) = Explotar(numero18, krilin)
+    
+    assertEquals(0, n18 energia)
+    assertEquals(Muerto, n18 estado)
+    assertEquals(0, k energia)
+    assertEquals(Muerto, k estado)
+    
+  }
   
+  @Test
+  def majinBuuExplotaYDañaAMonoTest(){
+    val (m, mo) = Explotar(majinBuu, mono)
+    
+    assertEquals(0, m energia)
+    assertEquals(Muerto, m estado)
+    assertEquals(mono.energia - majinBuu.energia * 2, mo energia)
+    assertEquals(Luchando, mo estado)
+    
+  }
   
+  @Test
+  def numero18ExplotaYDañaAMonoTest(){
+    val (n18, mo) = Explotar(numero18, mono)
+    
+    assertEquals(0, n18 energia)
+    assertEquals(Muerto, n18 estado)
+    assertEquals(mono.energia - numero18.energia * 3, mo energia)
+    assertEquals(Luchando, mo estado)
+    
+  }
+  
+  @Test
+  def cellExplotaYNoMataAPiccoloTest(){
+    val (c, p) = Explotar(cell, piccolo)
+    
+    assertEquals(0, c energia)
+    assertEquals(Muerto, c estado)
+    assertEquals(1, p energia)
+    assertEquals(Luchando, p estado)
+    
+  }
+  
+  @Test
+  def numero18ExplotaYNoMataAPiccoloTest(){
+    val (n18, p) = Explotar(numero18, piccolo)
+    
+    assertEquals(0, n18 energia)
+    assertEquals(Muerto, n18 estado)
+    assertEquals(1, p energia)
+    assertEquals(Luchando, p estado)
+    
+  }
+  
+  @Test
+  def krilinNoExplotaTest(){
+    val (k, v) = Explotar(krilin, vegeta)
+    
+    assertEquals(krilin, k)
+    assertEquals(vegeta, v)
+    
+  }
   
 }

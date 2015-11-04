@@ -141,11 +141,11 @@ object Simulador {
     val(atacante, oponente) = combatientes onFst ( _ estas Muerto)
     (atacante.especie, oponente.especie) match {
       case (Androide, Namekusein) if atacante.energia * 3 > oponente.energia => 
-          (atacante, oponente tuEnergiaEs 1)
+          (atacante tuEnergiaEs(0), oponente tuEnergiaEs 1)
       case (Monstruo(_), Namekusein) if atacante.energia * 2 > oponente.energia => 
-          (atacante, oponente tuEnergiaEs 1)
-      case (Androide, _) => (atacante, oponente disminuiEnergia (atacante.energia * 3))
-      case (Monstruo(_), _) => (atacante, oponente disminuiEnergia (atacante.energia * 2))
+          (atacante tuEnergiaEs(0), oponente tuEnergiaEs 1)
+      case (Androide, _) => (atacante tuEnergiaEs(0), oponente disminuiEnergia (atacante.energia * 3))
+      case (Monstruo(_), _) => (atacante tuEnergiaEs(0), oponente disminuiEnergia (atacante.energia * 2))
       case _ => combatientes
     }
     
