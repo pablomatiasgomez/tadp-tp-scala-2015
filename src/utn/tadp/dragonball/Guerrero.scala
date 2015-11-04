@@ -30,6 +30,8 @@ case class Guerrero(
 
   def transformateEn(transformacion: Especie) = copy(especie = transformacion)
   
+  def cargarAlMaximo = tuEnergiaEs(energiaMaxima)
+  
   def estas(nuevoEstado: EstadoDeLucha): Guerrero = {
     (nuevoEstado, especie) match {
       case (Muerto, Fusionado((original, _))) => original.estas(Muerto)

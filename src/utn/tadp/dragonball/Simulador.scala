@@ -68,18 +68,20 @@ object Simulador {
   })
   
   case object ConvertirseEnMono extends AutoMovimiento ((guerrero: Guerrero) => {
-    //XXX: El manejo de las energias maximas no me convence. Hay algo de la inmutabilidad que no estamos aprovechando  
-    guerrero.especie match {  
-      case Saiyajing(MonoGigante(_), _) => guerrero
-      case Saiyajing(estadoSaiyajing, true) if (guerrero.inventario.contains(FotoDeLaLuna)) => {
-        val energiaOriginal = estadoSaiyajing match {
-          case Normal => guerrero.energiaMaxima
-          case SuperSaiyajing(_, energiaO) => energiaO
-          }
-        guerrero.tuEnergiaEs(guerrero.energiaMaxima * 3) //Esto funca?, no es un estado invalido un guerrero
-                 .tuEnergiaMaximaEs(guerrero.energiaMaxima * 3)//con energia mayor a su energia maxima?
-                 .transformateEn(Saiyajing(MonoGigante(energiaOriginal), true))    
-      } 
+    //XXX: El manejo de las energias maximas no me convence. Hay algo de la inmutabilidad que no estamos aprovechando
+    
+    val energiaOriginal:((EstadoSaiyajing,Int)=>Int) = {
+      case (Normal,energiaMaxima) => energiaMaxima
+      case (SuperSaiyajing(_,energiaOriginal),_) => energiaOriginal
+      }
+    
+    (guerrero.especie,guerrero.energiaMaxima) match {  
+      case (Saiyajing(MonoGigante(_), _),_) => guerrero
+      case (Saiyajing(fase, true),energiaMaxima) if (guerrero.inventario.contains(FotoDeLaLuna)) =>
+                                  val energiaO=energiaOriginal(fase,energiaMaxima)
+                                  guerrero.tuEnergiaMaximaEs(3*energiaO)
+                                          .cargarAlMaximo
+                                          .transformateEn(Saiyajing(MonoGigante(energiaO),true))
       case _ => guerrero
     }
     
