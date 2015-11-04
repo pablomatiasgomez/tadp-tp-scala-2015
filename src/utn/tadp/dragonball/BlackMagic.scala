@@ -24,9 +24,9 @@ object BlackMagic {
    implicit class MagicBool[T,U](algo:T){
      def transformOnTrue(criterio:T=>Boolean)(f:T=>T):T = if(criterio(algo)) f(algo)
                                                            else algo
-     def transformOnTrue(condicion:Boolean)(f:T=>T):T = algo.transformOnTrue( _ => condicion)(f)
+     def transformOnTrue(condicion:Boolean)(f:T=>T):T = algo.transformOnTrue( _ => condicion)( f)
      def becomeOnTrue(criterio:T=>Boolean)(otraCosa:T):T = algo.transformOnTrue(criterio)( _ => otraCosa )
-     def becomeOnTrue(condicion:Boolean)(otraCosa:T):T = algo.transformOnTrue(condicion) ( _ => otraCosa )
+     def becomeOnTrue(condicion:Boolean)(otraCosa:T):T = algo.transformOnTrue(condicion)( _ => otraCosa )
    }
    
 }

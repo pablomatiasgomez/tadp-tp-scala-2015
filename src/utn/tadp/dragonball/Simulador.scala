@@ -155,15 +155,13 @@ object Simulador {
   
   case class Onda(energiaNecesaria: Int) extends Movimiento ({case (atacante, oponente)=> {
     
-    if(atacante.energia > energiaNecesaria)
+    (atacante,oponente).becomeOnTrue(atacante.energia > energiaNecesaria)(
       (atacante disminuiEnergia energiaNecesaria,
        oponente disminuiEnergia (oponente.especie match {
                                  case Androide => - energiaNecesaria * 2
                                  case Monstruo(_) => energiaNecesaria / 2
                                  case _ => energiaNecesaria*2 })
-      )
-     else
-      (atacante, oponente)
+      ))
     
   } })
   
