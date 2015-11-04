@@ -63,6 +63,7 @@ object Simulador {
     
   })
   
+
   case object ComerseAlOponente extends Movimiento (combatientes => {
     //XXX Como implementariamos Majin Buu? Deberiamos revisar cuales son los poderes adquiridos y cuales no.
     val(atacante, oponente) = combatientes

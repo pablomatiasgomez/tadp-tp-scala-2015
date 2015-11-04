@@ -14,15 +14,21 @@ class Simulador_Test {
   //Guerrero(nombre, inventario, energiaMaxima, energia, especie, estado, movimientos)
   val todosSaben: List[Movimiento] = List(DejarseFajar, CargarKi, MuchosGolpesNinja, Onda(10))
   val esferasDelDragon: List[Item] = List(EsferaDelDragon, EsferaDelDragon, EsferaDelDragon, EsferaDelDragon, EsferaDelDragon, EsferaDelDragon, EsferaDelDragon)
-  val dejarInconsciente: Function1[Combatientes, Combatientes] = { case (atacante, oponente) => (atacante, oponente.estas(Inconsciente)) }
   
+  val dejarInconsciente: Function1[Combatientes, Combatientes] = { case (atacante, oponente) => (atacante, oponente.estas(Inconsciente)) }
+  val digerirMajinBuu: Function1[Combatientes, Guerrero] = {case (a, o) => {a.tusMovimientos(o.movimientos)} }
+  val digerirCell: Function1[Combatientes, Guerrero] = {case (a, o) => { if(o.especie == Androide)
+                                                                           a.agregaMovimientos(o.movimientos)
+                                                                         else
+                                                                           a} }
+      
   val krilin: Guerrero = new Guerrero("Krilin", List(Arma(Roma)), 100, 50, Humano, Luchando, todosSaben++List(UsarItem(Arma(Roma))))
   val numero18: Guerrero = new Guerrero("N18", List(Arma(Fuego)), 300, 100, Androide, Luchando, todosSaben++List(Explotar, UsarItem(Arma(Fuego))))
   val piccolo : Guerrero = new Guerrero("Piccolo", esferasDelDragon, 500, 200, Namekusein, Luchando, todosSaben++List(Fusion(krilin), Magia(dejarInconsciente), Onda(40)))
-  val majinBuu: Guerrero = new Guerrero("Majin Buu", List(Arma(Filosa)), 700, 300, Monstruo({case (a, o) => {a.tusMovimientos(o.movimientos)} }), Luchando, todosSaben++List(UsarItem(Arma(Filosa)), ComerseAlOponente))
-  val cell: Guerrero = new Guerrero("Cell", List(), 500, 250, Monstruo({case (a, o) => {a.agregaMovimientos(o.movimientos)} }), Luchando, todosSaben++List(Explotar, ComerseAlOponente))
+  val majinBuu: Guerrero = new Guerrero("Majin Buu", List(Arma(Filosa)), 700, 300, Monstruo(digerirMajinBuu), Luchando, todosSaben++List(UsarItem(Arma(Filosa)), ComerseAlOponente))
+  val cell: Guerrero = new Guerrero("Cell", List(), 500, 250, Monstruo(digerirCell), Luchando, todosSaben++List(Explotar, ComerseAlOponente))
   val mono : Guerrero = new Guerrero("Mono", List(), 3000, 3000, Saiyajing(MonoGigante(1000), true), Luchando, todosSaben)
-  val goku : Guerrero = new Guerrero("Goku", List(SemillaDelErmitaño), 2500, 800, Saiyajing(SuperSaiyajing(1, 500), true), Luchando, todosSaben++List(Onda(99), Genkidama))
+  val goku : Guerrero = new Guerrero("Goku", List(SemillaDelErmitaño, FotoDeLaLuna), 2500, 800, Saiyajing(SuperSaiyajing(1, 500), true), Luchando, todosSaben++List(Onda(99), Genkidama))
   val vegeta : Guerrero = new Guerrero("Vegeta", List(), 1000, 801, Saiyajing(Normal, false), Luchando, todosSaben++List(Onda(100)))
 
   @Test
@@ -174,5 +180,88 @@ class Simulador_Test {
     
   }
   
+  @Test
+  def majinBuuSeComeAGokuTest() ={
+    val(m, g) = ComerseAlOponente(majinBuu, goku)
+    
+    assertEquals(goku.estas(Muerto), g)
+    assertEquals(goku.movimientos, m.movimientos)
+    
+  }
+  
+  @Test
+  def cellIntentaComerseAGokuSinEfectoTest() ={
+    val(c, g) = ComerseAlOponente(cell, goku)
+    
+    assertEquals(goku.estas(Muerto), g)
+    assertEquals(cell, c)
+    
+  }
+  
+  @Test
+  def cellSeComeANumero18Test() ={
+    val(c, n18) = ComerseAlOponente(cell, numero18)
+    
+    assertEquals(numero18.estas(Muerto), n18)
+    assertEquals(cell.movimientos++numero18.movimientos, c.movimientos)
+    
+  }
+  
+  @Test
+  def unNoMonstruoIntentaComerseAlOponentePeroSinSurgirEfectoTest() ={
+    val(g, p) = ComerseAlOponente(goku, piccolo)
+    
+    assertEquals(goku, g)
+    assertEquals(piccolo, p)
+    
+  }
+  
+  @Test
+  def unMonoConvirtiendoseEnMonoMonoQuedaTest() ={
+    val(m, k) = ConvertirseEnMono(mono, krilin)
+    
+    assertEquals(mono, m)
+    assertEquals(krilin, k)
+    
+  }
+  
+  @Test
+  def sinColaNoHayMonoTest() ={
+    val(v, k) = ConvertirseEnMono(vegeta, krilin)
+    
+    assertEquals(vegeta, v)
+    assertEquals(krilin, k)
+    
+  }
+  
+  @Test
+  def sinSaiyajingNoHayMonoTest() ={
+    val(p, k) = ConvertirseEnMono(piccolo, krilin)
+    
+    assertEquals(piccolo, p)
+    assertEquals(krilin, k)
+    
+  }
+  
+  @Test
+  def sinFotoDeLaLunaNoHayMonoTest() ={
+    val(g, k) = ConvertirseEnMono(goku.copy(inventario = List()), krilin)
+    
+    
+    assertEquals(goku.copy(inventario = List()), g)
+    assertEquals(krilin, k)
+    
+  }
+  
+  @Test
+  def gokuSeTransformaEnMonoTest() ={
+    val(g, k) = ConvertirseEnMono(goku, krilin)
+    
+    assertEquals(Saiyajing(MonoGigante(500),true), g.especie)
+    assertEquals(1500, g.energia)
+    assertEquals(g.energiaMaxima, g.energia)
+    assertEquals(krilin, k)
+    
+  }
   
 }
