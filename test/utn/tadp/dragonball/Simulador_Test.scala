@@ -529,4 +529,55 @@ class Simulador_Test {
     
   }
   
+  @Test
+  def gokuTiraUnaGenkidamaSinDejarseFajarYNoHaceNadaTest(){
+    val (g, k) = Genkidama(goku, krilin)
+    
+    assertEquals(goku, g)
+    assertEquals(krilin, k)
+    
+  }
+  
+  @Test
+  def gokuTiraUnaGenkidamaDejandonseFajar1TurnoTest(){
+    val(gokuFajado, kr) = DejarseFajar(goku, krilin)
+    
+    assertEquals(Fajado(1), gokuFajado estado)
+    
+    val (g, k) = Genkidama(gokuFajado, kr)
+    
+    assertEquals(goku, g)
+    assertEquals(krilin disminuiEnergia 10, k)
+    
+  }
+  
+  @Test
+  def gokuTiraUnaGenkidamaDejandonseFajar2TurnoTest(){
+    val(gokuFajado, kr) = DejarseFajar(DejarseFajar(goku, krilin))
+    
+    assertEquals(Fajado(2), gokuFajado estado)
+    
+    val (g, k) = Genkidama(gokuFajado, kr)
+    
+    assertEquals(goku, g)
+    assertEquals(0, k energia)
+    assertEquals(Muerto, k estado)
+    
+    
+  }
+  
+  @Test
+  def gokuTiraUnaGenkidamaDejandonseFajar3TurnoTest(){
+    val(gokuFajado, mo) = DejarseFajar(DejarseFajar(DejarseFajar(goku, mono)))
+    
+    assertEquals(Fajado(3), gokuFajado estado)
+    
+    val (g, m) = Genkidama(gokuFajado, mo)
+    
+    assertEquals(goku, g)
+    assertEquals(mono disminuiEnergia 1000, m)
+    
+  }
+  
+  
 }
