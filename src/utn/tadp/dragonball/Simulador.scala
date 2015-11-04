@@ -65,10 +65,10 @@ object Simulador {
   })
   
   case object ComerseAlOponente extends Movimiento ((combatientes: Combatientes) => {
-    //XXX Como implementariamos Majin Buu? Deberiamos revisar cuales son los poderes adquiridos y cuales no.
+    
     val(atacante, oponente) = combatientes
     atacante.especie match {
-      case Monstruo(digerir) => (digerir(combatientes), oponente.estas(Muerto)) //XXX: Oponente deberia estar muerto?
+      case Monstruo(digerir) => (digerir(combatientes), oponente.estas(Muerto))
       case _ => combatientes
     }
     
