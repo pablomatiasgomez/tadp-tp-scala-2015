@@ -24,12 +24,11 @@ object Simulador {
   }
   
   abstract class AutoMovimiento(autoMovimiento: (Guerrero => Guerrero)) 
-                   extends Movimiento({case (self,otro) => (autoMovimiento(self), otro)})
+                   extends Movimiento( _ onFst autoMovimiento)
   
-  case object DejarseFajar extends AutoMovimiento((guerrero: Guerrero) => guerrero)
+  case object DejarseFajar extends AutoMovimiento( guerrero => guerrero )
   
-  case object CargarKi extends AutoMovimiento ((guerrero: Guerrero) => {
-    
+  case object CargarKi extends AutoMovimiento ( guerrero => {
     guerrero.especie match {
       case Saiyajing(SuperSaiyajing(nivel, _), _) => guerrero aumentaEnergia (150* nivel) 
       case Androide => guerrero
@@ -38,13 +37,13 @@ object Simulador {
     }
   ) 
 
-  case class UsarItem(item: Item) extends Movimiento ((combatientes: Combatientes) => {
+  case class UsarItem(item: Item) extends Movimiento ( combatientes => {
       
     val(atacante, oponente) = combatientes
     if(atacante.inventario contains item)
       (item, oponente.especie) match {
         case (Arma(Roma), Androide) => combatientes
-        case (Arma(Roma), _) if oponente.energia < 300 => (atacante, oponente estas Inconsciente)
+        case (Arma(Roma), _) if oponente.energia < 300 => (atacante, oponente estas Inconsciente) 
         case (Arma(Filosa), Saiyajing(MonoGigante(energiaNormal), true)) => (atacante, 
                                                                              oponente tuEnergiaEs 1
                                                                                       tuEnergiaMaximaEs energiaNormal
@@ -64,7 +63,7 @@ object Simulador {
     
   })
   
-  case object ComerseAlOponente extends Movimiento ((combatientes: Combatientes) => {
+  case object ComerseAlOponente extends Movimiento (combatientes => {
     //XXX Como implementariamos Majin Buu? Deberiamos revisar cuales son los poderes adquiridos y cuales no.
     val(atacante, oponente) = combatientes
     atacante.especie match {
@@ -133,9 +132,9 @@ object Simulador {
   }
   } )
   
-  case object Explotar extends Movimiento ((combatientes: Combatientes) => {
+  case object Explotar extends Movimiento (combatientes => {
       
-    val(atacante, oponente) = (combatientes._1.estas(Muerto), combatientes._2)
+    val(atacante, oponente) = combatientes onFst ( _ estas Muerto)
     (atacante.especie, oponente.especie) match {
       case (Androide, Namekusein) if atacante.energia * 3 > oponente.energia => 
           (atacante, oponente tuEnergiaEs 1)
@@ -148,9 +147,8 @@ object Simulador {
     
   } )
   
-  case class Onda(energiaNecesaria: Int) extends Movimiento ((combatientes: Combatientes) => {
+  case class Onda(energiaNecesaria: Int) extends Movimiento ({case (atacante, oponente)=> {
     
-    val(atacante, oponente) = combatientes
     if (atacante.energia > energiaNecesaria)
       oponente.especie match {
         case Androide => (atacante disminuiEnergia energiaNecesaria,
@@ -161,18 +159,17 @@ object Simulador {
                    oponente disminuiEnergia (energiaNecesaria*2))
       }
      else
-      combatientes
+      (atacante, oponente)
     
-  } )
+  } })
   
-  case object Genkidama extends Movimiento ((combatientes: Combatientes) => {
+  case object Genkidama extends Movimiento ({case (atacante,oponente) => {
     
-    val(atacante, oponente) = combatientes
     atacante.estado match {
       case Fajado(rounds) => (atacante estas Luchando, oponente disminuiEnergia (10 ^^ rounds))
-      case _ => combatientes
+      case _ => (atacante, oponente)
     }
     
-  } )
+  } })
 
 }
