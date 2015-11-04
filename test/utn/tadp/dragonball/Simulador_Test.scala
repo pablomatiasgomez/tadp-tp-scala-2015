@@ -17,7 +17,7 @@ class Simulador_Test {
   
   val dejarInconsciente: Function1[Combatientes, Combatientes] = { case (atacante, oponente) => (atacante, oponente estas Inconsciente) }
   val digerirMajinBuu: Function1[Combatientes, Guerrero] = {case (a, o) => {a tusMovimientos(o movimientos)} }
-  val digerirCell: Function1[Combatientes, Guerrero] = {case (a, o) => { if(o especie == Androide)
+  val digerirCell: Function1[Combatientes, Guerrero] = {case (a, o) => { if(o.especie == Androide)
                                                                            a agregaMovimientos(o.movimientos)
                                                                          else
                                                                            a} }
@@ -304,6 +304,15 @@ class Simulador_Test {
     
     assertEquals(krilin, k)
     assertEquals(vegeta, v)    
+  }
+  
+  @Test
+  def ssjSeVuelveNormalAlQuedarInconscienteTest(){
+    val (g, v) = (goku estas Inconsciente, vegeta)
+    
+    assertEquals(500, g energiaMaxima)
+    assertEquals(Saiyajin(Normal, true), g especie)
+    assertEquals(vegeta, v)
   }
   
 }
