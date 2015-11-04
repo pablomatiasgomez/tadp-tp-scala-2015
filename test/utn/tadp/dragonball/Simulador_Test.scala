@@ -493,4 +493,40 @@ class Simulador_Test {
     
   }
   
+  @Test
+  def piccoloTiraOndaAVegetaTest(){
+    val (p, v) = Onda(40)(piccolo,vegeta)
+    
+    assertEquals(piccolo disminuiEnergia 40, p)
+    assertEquals(vegeta disminuiEnergia 80, v)
+    
+  }
+  
+  @Test
+  def numero18TiraOndaACellTest(){
+    val (n18, c) = Onda(40)(numero18, cell)
+    
+    assertEquals(numero18 disminuiEnergia 40, n18)
+    assertEquals(cell disminuiEnergia 20, c)
+    
+  }
+  
+  @Test
+  def krilinTiraOndaANumero18Test(){
+    val (k, n18) = Onda(40)(krilin, numero18)
+    
+    assertEquals(krilin disminuiEnergia 40, k)
+    assertEquals(numero18 aumentaEnergia 80, n18)
+    
+  }
+  
+  @Test
+  def krilinNoPuedeTirarOndaAVegetaTest(){
+    val (k, v) = Onda(100)(krilin,vegeta)
+    
+    assertEquals(krilin, k)
+    assertEquals(vegeta, v)
+    
+  }
+  
 }
