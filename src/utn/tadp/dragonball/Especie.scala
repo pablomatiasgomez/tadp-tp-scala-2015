@@ -4,9 +4,9 @@ abstract class Especie(val fusionable:Boolean=false){
 
 }
 
-case object Humano extends Especie(true)
+case object Humano extends Especie(fusionable=true)
 case object Androide extends Especie
-case object Namekusein extends Especie
+case object Namekusein extends Especie(fusionable=true)
 case class  Fusionado(miembros:(Guerrero,Guerrero)) extends Especie
 case class Monstruo(
   digerir : Function1[(Guerrero, Guerrero), Guerrero]
@@ -14,7 +14,7 @@ case class Monstruo(
 case class Saiyajing(
   estado : EstadoSaiyajing,
   cola : Boolean
-  ) extends Especie
+  ) extends Especie(fusionable=true)
 
 abstract class EstadoSaiyajing{
   def energiaOriginal(guerrero:Guerrero):Int

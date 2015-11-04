@@ -12,10 +12,6 @@ case class Guerrero(
       movimientos: List[Movimiento]
       ) {
   
-  def tusMovimientos(agregados: List[Movimiento]) = copy(movimientos = agregados)
-  
-  def agregaMovimientos(agregados: List[Movimiento]) = copy(movimientos = movimientos++agregados)
-      
   def variarEnergia(f:(Int=>Int)) = {
     val guerreroAfectado = copy(energia = f(energia).max(0).min(energiaMaxima))
     if(guerreroAfectado.energia == 0) guerreroAfectado.estas(Muerto)
@@ -43,8 +39,11 @@ case class Guerrero(
       case _ => copy(estado = nuevoEstado)
     }
   }
+  def variarInventario(f:(List[Item]=>List[Item])) = copy(inventario = f(inventario))
   
-  def sumaAInventario(agregados: List[Item]) = copy(inventario = inventario++agregados)
+  def gastarItems(itemsUsados: List[Item]) = variarInventario( _ diff itemsUsados)
+  
+  def sumaAInventario(agregados: List[Item]) = variarInventario( _ ++ agregados )
   
   def puedeFusionarse = especie.fusionable
   
