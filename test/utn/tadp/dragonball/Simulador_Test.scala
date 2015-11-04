@@ -327,10 +327,10 @@ class Simulador_Test {
   def krilinSeFusionaConPiccolo(){
     val (f, v) = Fusion(krilin)(piccolo, vegeta)
     
-    assertEquals(piccolo.inventario++krilin.inventario, f.inventario)
-    assertEquals(piccolo.energia+krilin.energia, f.energia)
-    assertEquals(piccolo.energiaMaxima+krilin.energiaMaxima, f.energiaMaxima)
-    assertEquals(Fusionado(piccolo, krilin), f.especie)
+    assertEquals(piccolo.inventario++krilin.inventario, f inventario)
+    assertEquals(piccolo.energia + krilin.energia, f energia)
+    assertEquals(piccolo.energiaMaxima + krilin.energiaMaxima, f energiaMaxima)
+    assertEquals(Fusionado(piccolo, krilin), f especie)
     assertEquals(vegeta, v)
   }
   
@@ -338,10 +338,10 @@ class Simulador_Test {
   def vegetaSeFusionaConGoku(){
     val (f, m) = Fusion(goku)(vegeta, majinBuu)
     
-    assertEquals(vegeta.inventario++goku.inventario, f.inventario)
-    assertEquals(vegeta.energia+goku.energia, f.energia)
-    assertEquals(vegeta.energiaMaxima+goku.energiaMaxima, f.energiaMaxima)
-    assertEquals(Fusionado(vegeta, goku), f.especie)
+    assertEquals(vegeta.inventario++goku.inventario, f inventario)
+    assertEquals(vegeta.energia + goku.energia, f energia)
+    assertEquals(vegeta.energiaMaxima + goku.energiaMaxima, f energiaMaxima)
+    assertEquals(Fusionado(vegeta, goku), f especie)
     assertEquals(majinBuu, m)
   }
   
@@ -351,6 +351,24 @@ class Simulador_Test {
     
     assertEquals(krilin, k)
     assertEquals(cell, c)
+  }
+  
+  @Test
+  def vegetaSeFusionaConGokuYMuere(){
+    val (f, m) = Fusion(goku)(vegeta, majinBuu)
+    
+    
+    assertEquals(vegeta estas Muerto, f estas Muerto)
+    assertEquals(majinBuu, m)
+  }
+  
+  @Test
+  def vegetaSeFusionaConGokuYQuedaInconsciente(){
+    val (f, m) = Fusion(goku)(vegeta, majinBuu)
+    
+    
+    assertEquals(vegeta estas Inconsciente, f estas Inconsciente)
+    assertEquals(majinBuu, m)
   }
   
 }
