@@ -16,13 +16,15 @@ class Simulador_Test {
   val esferasDelDragon: List[Item] = List(EsferaDelDragon, EsferaDelDragon, EsferaDelDragon, EsferaDelDragon, EsferaDelDragon, EsferaDelDragon, EsferaDelDragon)
   
   val dejarInconsciente: Function1[Combatientes, Combatientes] = { case (atacante, oponente) => (atacante, oponente estas Inconsciente) }
+  val convertirEnHumano: Function1[Combatientes, Combatientes] = { case (atacante, oponente) => (atacante, oponente transformateEn Humano) }
+  
   val digerirMajinBuu: Function1[Combatientes, Guerrero] = {case (a, o) => {a tusMovimientos(o movimientos)} }
   val digerirCell: Function1[Combatientes, Guerrero] = {case (a, o) => { if(o.especie == Androide)
                                                                            a agregaMovimientos(o.movimientos)
                                                                          else
                                                                            a} }
       
-  val krilin: Guerrero = new Guerrero("Krilin", List(Arma(Roma))++esferasDelDragon, 100, 50, Humano, Luchando, todosSaben++List(UsarItem(Arma(Roma))))
+  val krilin: Guerrero = new Guerrero("Krilin", List(Arma(Roma))++esferasDelDragon, 100, 50, Humano, Luchando, todosSaben++List(UsarItem(Arma(Roma)), Magia(convertirEnHumano)))
   val numero18: Guerrero = new Guerrero("N18", List(Arma(Fuego(Ak47)), Municion(Ak47)), 300, 100, Androide, Luchando, todosSaben++List(Explotar, UsarItem(Arma(Fuego(Ak47)))))
   val piccolo : Guerrero = new Guerrero("Piccolo", List(), 500, 200, Namekusein, Luchando, todosSaben++List(Fusion(krilin), Magia(dejarInconsciente), Onda(40)))
   val majinBuu: Guerrero = new Guerrero("Majin Buu", List(Arma(Filosa)), 700, 300, Monstruo(digerirMajinBuu), Luchando, todosSaben++List(UsarItem(Arma(Filosa)), ComerseAlOponente))
@@ -370,5 +372,37 @@ class Simulador_Test {
     assertEquals(vegeta estas Inconsciente, f estas Inconsciente)
     assertEquals(majinBuu, m)
   }
+  
+  @Test
+  def piccoloUsaMagia(){
+    val (p, g) = Magia(dejarInconsciente)(piccolo, goku)
+    
+    assertEquals(piccolo, p)
+    assertEquals(goku estas Inconsciente, g)
+  }
+  
+  @Test
+  def majinBuuUsaMagia(){
+    val (m, g) = Magia(dejarInconsciente)(majinBuu, goku)
+    
+    assertEquals(majinBuu, m)
+    assertEquals(goku estas Inconsciente, g)
+  }
+  
+  @Test
+  def numero18NoUsaMagia(){
+    val (n18, g) = Magia(convertirEnHumano)(numero18, numero18)
+    
+    assertEquals(numero18, n18)
+  }
+  
+  @Test
+  def krilinUsaMagia(){
+    val (k, n18) = Magia(convertirEnHumano)(krilin, numero18)
+    
+    assertEquals(krilin.inventario diff esferasDelDragon, k.inventario)
+    assertEquals(numero18 transformateEn Humano, n18)
+  }
+  
   
 }
