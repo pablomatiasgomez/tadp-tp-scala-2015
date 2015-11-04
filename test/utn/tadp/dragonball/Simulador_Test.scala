@@ -28,7 +28,7 @@ class Simulador_Test {
   val majinBuu: Guerrero = new Guerrero("Majin Buu", List(Arma(Filosa)), 700, 300, Monstruo(digerirMajinBuu), Luchando, todosSaben++List(UsarItem(Arma(Filosa)), ComerseAlOponente))
   val cell: Guerrero = new Guerrero("Cell", List(), 500, 250, Monstruo(digerirCell), Luchando, todosSaben++List(Explotar, ComerseAlOponente))
   val mono : Guerrero = new Guerrero("Mono", List(), 3000, 3000, Saiyajing(MonoGigante(1000), true), Luchando, todosSaben)
-  val goku : Guerrero = new Guerrero("Goku", List(SemillaDelErmitaño), 2500, 800, Saiyajing(SuperSaiyajing(1, 500), true), Luchando, todosSaben++List(Onda(99), Genkidama))
+  val goku : Guerrero = new Guerrero("Goku", List(SemillaDelErmitaño, FotoDeLaLuna), 2500, 800, Saiyajing(SuperSaiyajing(1, 500), true), Luchando, todosSaben++List(Onda(99), Genkidama))
   val vegeta : Guerrero = new Guerrero("Vegeta", List(), 1000, 801, Saiyajing(Normal, false), Luchando, todosSaben++List(Onda(100)))
 
   @Test
@@ -213,6 +213,54 @@ class Simulador_Test {
     
     assertEquals(goku, g)
     assertEquals(piccolo, p)
+    
+  }
+  
+  @Test
+  def unMonoConvirtiendoseEnMonoMonoQuedaTest() ={
+    val(m, k) = ConvertirseEnMono(mono, krilin)
+    
+    assertEquals(mono, m)
+    assertEquals(krilin, k)
+    
+  }
+  
+  @Test
+  def sinColaNoHayMonoTest() ={
+    val(v, k) = ConvertirseEnMono(vegeta, krilin)
+    
+    assertEquals(vegeta, v)
+    assertEquals(krilin, k)
+    
+  }
+  
+  @Test
+  def sinSaiyajingNoHayMonoTest() ={
+    val(p, k) = ConvertirseEnMono(piccolo, krilin)
+    
+    assertEquals(piccolo, p)
+    assertEquals(krilin, k)
+    
+  }
+  
+  @Test
+  def sinFotoDeLaLunaNoHayMonoTest() ={
+    val(g, k) = ConvertirseEnMono(goku.copy(inventario = List()), krilin)
+    
+    
+    assertEquals(goku.copy(inventario = List()), g)
+    assertEquals(krilin, k)
+    
+  }
+  
+  @Test
+  def gokuSeTransformaEnMonoTest() ={
+    val(g, k) = ConvertirseEnMono(goku, krilin)
+    
+    assertEquals(Saiyajing(MonoGigante(500),true), g.especie)
+    assertEquals(7500, g.energia)
+    assertEquals(g.energiaMaxima, g.energia)
+    assertEquals(krilin, k)
     
   }
   

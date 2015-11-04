@@ -81,7 +81,7 @@ object Simulador {
       case (Saiyajing(fase, true),energiaMaxima) if (guerrero.inventario.contains(FotoDeLaLuna)) =>
                                   val energiaO=fase.energiaOriginal(guerrero)
                                   guerrero.transformateEn(Saiyajing(MonoGigante(energiaO),true))
-                                          .tuEnergiaMaximaEs(3*energiaO)
+                                          .tuEnergiaMaximaEs(3*energiaMaxima)//XXX Deberia ser la original? Creo que no
                                           .cargarAlMaximo
                                           
       case _ => guerrero
