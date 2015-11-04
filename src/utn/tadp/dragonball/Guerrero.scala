@@ -24,7 +24,7 @@ case class Guerrero(
   
   def tuEnergiaMaximaEs(nuevoMaximo: Int) = variarEnergiaMaxima ( _ => nuevoMaximo)
   
-  def aumentaEnergia(aumento: Int) = variarEnergia( _ + aumento )
+  def aumentaEnergia(aumento: Int) = variarEnergia( aumento + )
   
   def disminuiEnergia(disminucion: Int) = aumentaEnergia( -disminucion )
 

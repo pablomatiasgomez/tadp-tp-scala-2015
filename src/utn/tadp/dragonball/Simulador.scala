@@ -36,7 +36,7 @@ object Simulador {
   ) 
   
   case class UsarItem(item: Item) extends Movimiento ((combatientes: Combatientes) => {
-    
+      
     val(atacante, oponente) = combatientes
     (item, oponente.especie) match {
       case (Arma(Roma), Androide) => combatientes
