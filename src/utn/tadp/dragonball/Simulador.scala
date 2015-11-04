@@ -138,14 +138,15 @@ object Simulador {
   
   case object Explotar extends Movimiento (combatientes => {
       
-    val(atacante, oponente) = combatientes onFst ( _ estas Muerto)
-    (atacante.especie, oponente.especie) match {
-      case (Androide, Namekusein) if atacante.energia * 3 > oponente.energia => 
-          (atacante tuEnergiaEs(0), oponente tuEnergiaEs 1)
-      case (Monstruo(_), Namekusein) if atacante.energia * 2 > oponente.energia => 
-          (atacante tuEnergiaEs(0), oponente tuEnergiaEs 1)
-      case (Androide, _) => (atacante tuEnergiaEs(0), oponente disminuiEnergia (atacante.energia * 3))
-      case (Monstruo(_), _) => (atacante tuEnergiaEs(0), oponente disminuiEnergia (atacante.energia * 2))
+    def recibiDanioExplosivo(especie:Especie,danio:Int):Guerrero=>Guerrero = especie match{
+      case Namekusein => _.variarEnergia( _ - danio  min 1)
+      case _ => _ disminuiEnergia danio
+    }
+     
+    val(atacante, oponente) = combatientes onFst ( _ tuEnergiaEs 0)
+    ((atacante.especie, atacante.energia), oponente.especie) match {
+      case ((Androide, energia), especie) => (atacante, recibiDanioExplosivo(especie,energia*3)(oponente))
+      case ((Monstruo(_), energia), especie) => (atacante, recibiDanioExplosivo(especie,energia*2)(oponente))
       case _ => combatientes
     }
     
