@@ -4,12 +4,21 @@ object BlackMagic {
   
    implicit class Count[T](list: List[T]) {
     def count(n: T): Int = list count (n equals)
-    def count(n: T, q:Int):Boolean = list.count(n) == q
+    def countIs(n: T, q:Int):Boolean = list.count(n) == q
+    def has(q:Int,n:T):Boolean = list.countIs(n,q)
   }
    
    implicit class SuperiorTuple2[T,U](tupla: Tuple2[T,U]) {
-    def on_1[S](f:(T=>S)):Tuple2[S,U] = (f(tupla._1), tupla._2)
-    def on_2[S](g:(U=>S)):Tuple2[T,S] = (tupla._1, g(tupla._2))
+    def onFst[S](f:(T=>S)): Tuple2[S,U] = (f(tupla._1), tupla._2)
+    def onSnd[S](g:(U=>S)): Tuple2[T,S] = (tupla._1, g(tupla._2))
   }
+   
+   implicit class Is(any:Any){
+     def is = any == _
+   }
+   
+   implicit class IntConPotenciaEntera(int:Int){
+     def ^^(cant:Int) = List.fill(cant)(int).foldRight(1)( _ * _)
+   }
    
 }
