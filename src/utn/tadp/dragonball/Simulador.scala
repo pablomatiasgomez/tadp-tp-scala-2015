@@ -10,7 +10,7 @@ object Simulador {
     
     def apply(combatientes: Combatientes) = {
       val(atacante, oponente) = combatientes
-      (atacante.estado, movimiento) match {
+      (atacante.estado, this) match {
         case (Muerto, _) => combatientes
         case (Inconsciente, UsarItem(SemillaDelErmitaño)) => movimiento(combatientes)
         case (Inconsciente, _) => combatientes
