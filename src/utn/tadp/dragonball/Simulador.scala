@@ -39,8 +39,13 @@ object Simulador {
 
   case class UsarItem(item: Item) extends Movimiento ( combatientes => {
       
+    def disparado:Especie=>Guerrero=>Guerrero = ({ 
+      case Humano => _ disminuiEnergia 20
+      case Namekusein => _.transformOnTrue( _.estado == Inconsciente)(_ disminuiEnergia 10)
+    })
+    
     val(atacante, oponente) = combatientes
-    if(atacante.inventario contains item)
+    combatientes.becomeOnTrue(atacante.inventario contains item)(
       (item, oponente.especie) match {
         case (Arma(Roma), Androide) => combatientes
         case (Arma(Roma), _) if oponente.energia < 300 => (atacante, oponente estas Inconsciente) 
@@ -52,14 +57,14 @@ object Simulador {
         case (Arma(Filosa), Saiyajing(fase, true)) => (atacante, oponente tuEnergiaEs 1
                                                                           transformateEn Saiyajing(fase,false))
         case (Arma(Filosa), _) => (atacante, oponente disminuiEnergia (atacante.energia / 100))
-        case (Arma(Fuego),Humano) => (atacante, oponente disminuiEnergia 20) //TODO: Controlar el tema de las balas
-        case (Arma(Fuego), Namekusein) if (oponente.estado == Inconsciente) => (atacante, oponente disminuiEnergia 10)
+        case (Arma(Fuego(tipo)), especieAtacado) if atacante.inventario.contains( Municion(tipo) ) =>
+                                                           (atacante gastarItems (List( Municion(tipo) )),
+                                                            disparado(especieAtacado)(oponente))
+        case (Arma(Fuego(tipo)), Humano) => (atacante, oponente disminuiEnergia 20) //TODO: Controlar el tema de las balas
+        case (Arma(Fuego(tipo)), Namekusein) if (oponente.estado == Inconsciente) => (atacante, oponente disminuiEnergia 10)
         case (SemillaDelErmitaño, _) => (atacante tuEnergiaEs (atacante.energiaMaxima), oponente)
         case _ => combatientes
-        }    
-    else
-      combatientes
-      
+        }    )   
     
   })
   

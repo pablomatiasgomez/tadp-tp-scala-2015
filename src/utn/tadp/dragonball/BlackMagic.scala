@@ -13,12 +13,20 @@ object BlackMagic {
     def onSnd[S](g:(U=>S)): Tuple2[T,S] = (tupla._1, g(tupla._2))
   }
    
-   implicit class Is(any:Any){
+   implicit class Is[T](any:T){
      def is = any == _
    }
    
    implicit class IntConPotenciaEntera(int:Int){
      def ^^(cant:Int) = List.fill(cant)(int).foldRight(1)( _ * _)
+   }
+   
+   implicit class MagicBool[T,U](algo:T){
+     def transformOnTrue(criterio:T=>Boolean)(f:T=>T):T = if(criterio(algo)) f(algo)
+                                                           else algo
+     def transformOnTrue(condicion:Boolean)(f:T=>T):T = algo.transformOnTrue( _ => condicion)(f)
+     def becomeOnTrue(criterio:T=>Boolean)(otraCosa:T):T = algo.transformOnTrue(criterio)( _ => otraCosa )
+     def becomeOnTrue(condicion:Boolean)(otraCosa:T):T = algo.transformOnTrue(condicion) ( _ => otraCosa )
    }
    
 }

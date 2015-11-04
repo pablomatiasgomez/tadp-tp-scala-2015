@@ -23,7 +23,7 @@ class Simulador_Test {
                                                                            a} }
       
   val krilin: Guerrero = new Guerrero("Krilin", List(Arma(Roma)), 100, 50, Humano, Luchando, todosSaben++List(UsarItem(Arma(Roma))))
-  val numero18: Guerrero = new Guerrero("N18", List(Arma(Fuego)), 300, 100, Androide, Luchando, todosSaben++List(Explotar, UsarItem(Arma(Fuego))))
+  val numero18: Guerrero = new Guerrero("N18", List(Arma(Fuego(Ak47))), 300, 100, Androide, Luchando, todosSaben++List(Explotar, UsarItem(Arma(Fuego))))
   val piccolo : Guerrero = new Guerrero("Piccolo", esferasDelDragon, 500, 200, Namekusein, Luchando, todosSaben++List(Fusion(krilin), Magia(dejarInconsciente), Onda(40)))
   val majinBuu: Guerrero = new Guerrero("Majin Buu", List(Arma(Filosa)), 700, 300, Monstruo(digerirMajinBuu), Luchando, todosSaben++List(UsarItem(Arma(Filosa)), ComerseAlOponente))
   val cell: Guerrero = new Guerrero("Cell", List(), 500, 250, Monstruo(digerirCell), Luchando, todosSaben++List(Explotar, ComerseAlOponente))
@@ -137,7 +137,7 @@ class Simulador_Test {
   
   @Test
   def usaArmaFuegoConHumanoTest() ={
-    val(n18, k) = UsarItem(Arma(Fuego))(numero18, krilin)
+    val(n18, k) = UsarItem(Arma(Fuego(Ak47)))(numero18, krilin)
     
     assertEquals(numero18, n18)
     assertEquals(30, k.energia)
@@ -146,7 +146,7 @@ class Simulador_Test {
   
   @Test
   def usaArmaFuegoConNamekuseinInconscienteTest() ={
-    val(n18, p) = UsarItem(Arma(Fuego))(numero18, piccolo.estas(Inconsciente))
+    val(n18, p) = UsarItem(Arma(Fuego(Ak47)))(numero18, piccolo.estas(Inconsciente))
     
     assertEquals(numero18, n18)
     assertEquals(190, p.energia)
@@ -155,7 +155,7 @@ class Simulador_Test {
   
   @Test
   def usaArmaFuegoConNamekuseinLuchandoTest() ={
-    val(n18, p) = UsarItem(Arma(Fuego))(numero18, piccolo)
+    val(n18, p) = UsarItem(Arma(Fuego(Ak47)))(numero18, piccolo)
     
     assertEquals(numero18, n18)
     assertEquals(piccolo, p)

@@ -8,10 +8,15 @@ abstract class TipoArma(){
   
 }
 
+trait TipoArmaFuego
+
 case object Roma extends TipoArma
 case object Filosa extends TipoArma
-case object Fuego extends TipoArma
+case class Fuego(tipo: TipoArmaFuego) extends TipoArma
 
+case class Municion(tipo: TipoArmaFuego) extends Item
+
+case object Ak47 extends TipoArmaFuego
 
 case class Arma(tipo : TipoArma) extends Item
 case object SemillaDelErmitaño extends Item
