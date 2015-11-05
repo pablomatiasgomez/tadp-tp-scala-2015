@@ -142,11 +142,11 @@ object Simulador {
       case Namekusein => _.variarEnergia( _ - danio  min 1)
       case _ => _ disminuiEnergia danio
     }
-     
-    val(atacante, oponente) = combatientes onFst ( _ tuEnergiaEs 0)
-    ((atacante.especie, atacante.energia), oponente.especie) match {
-      case ((Androide, energia), especie) => (atacante, recibiDanioExplosivo(especie,energia*3)(oponente))
-      case ((Monstruo(_), energia), especie) => (atacante, recibiDanioExplosivo(especie,energia*2)(oponente))
+    val energiaDelAtaque = combatientes._1.energia
+    val(atacante, oponente) = combatientes.onFst( _ tuEnergiaEs 0)
+    (atacante.especie, oponente.especie) match {
+      case (Androide, especie) => (atacante, recibiDanioExplosivo(especie,energiaDelAtaque*3)(oponente))
+      case (Monstruo(_), especie) => (atacante, recibiDanioExplosivo(especie,energiaDelAtaque*2)(oponente))
       case _ => combatientes
     }
     

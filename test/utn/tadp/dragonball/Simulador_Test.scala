@@ -425,7 +425,7 @@ class Simulador_Test {
     assertEquals(Muerto, k estado)
   }
   
-  @Test //XXX:Rancio
+  @Test
   def majinBuuExplotaYDañaAMonoTest(){
     val (m, mo) = Explotar(majinBuu, mono)
     
