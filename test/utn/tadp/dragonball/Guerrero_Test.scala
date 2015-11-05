@@ -10,7 +10,9 @@ class Guerrero_Test extends FlatSpec with Matchers {
   val todosSaben: List[Movimiento] = List(DejarseFajar, CargarKi, MuchosGolpesNinja, Onda(10))
   val goku : Guerrero = new Guerrero("Goku", List(SemillaDelErmitaño, FotoDeLaLuna), 2500, 1300, Saiyajin(SuperSaiyajin(1, 500), true), Fajado(3), todosSaben++List(Onda(99), Genkidama))
   val vegeta : Guerrero = new Guerrero("Vegeta", List(), 1001, 801, Saiyajin(Normal, false), Luchando, todosSaben++List(Onda(100), Fusion(goku)))
-
+  val cell: Guerrero = new Guerrero("Cell", List(), 500, 500, Monstruo({ a => a._1 }), Luchando, List(Onda(45)))
+  val yajirobe : Guerrero = new Guerrero("Yajirobe", List(SemillaDelErmitaño), 100, 100, Humano, Luchando, List(UsarItem(Arma(Filosa)), UsarItem(SemillaDelErmitaño)))
+  
   def quedoConMasKi(combatientes: Combatientes) = combatientes._1.energia
   def mayorVentajaDeKi(combatientes: Combatientes) = {
                 val(energiaA, energiaO) = combatientes.onBoth { guerrero => guerrero.energia }
@@ -53,6 +55,14 @@ class Guerrero_Test extends FlatSpec with Matchers {
     v.energia shouldBe 2101
     v.energiaMaxima shouldBe 3501
     v.especie shouldBe Fusionado(vegeta, goku)
+  }
+  
+  "goku" should "armar un plan dejandose fajar siempre" in {
+    goku.planDeAtaque(vegeta, 4)(quedoMasFajado) shouldBe List(DejarseFajar, DejarseFajar, DejarseFajar, DejarseFajar)
+  }
+  
+  "yajirobe" should "armar un plan primero usando la espada y luego la semilla del ermitaño" in {
+    yajirobe.planDeAtaque(cell, 2)(quedoConMasKi) shouldBe List(UsarItem(Arma(Filosa)), UsarItem(SemillaDelErmitaño))
   }
   
 }
