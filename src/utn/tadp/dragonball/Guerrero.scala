@@ -56,6 +56,8 @@ case class Guerrero(
   
   type CriterioDeCombate = Combatientes => Int
   
+  type PlanDeAtaque = List[Movimiento]
+  
   def movimientoMasEfectivoContra(oponente: Guerrero)(criterio: CriterioDeCombate): Movimiento = {
     val combatientes = (this,oponente)
     val mejorMovimiento = movimientos.maxBy(movimiento => criterio( movimiento( combatientes)))
@@ -80,20 +82,19 @@ case class Guerrero(
   
   }
   
-  def planDeAtaque(oponente: Guerrero, rounds: Int)(criterio: CriterioDeCombate): List[Movimiento] = {
+  def planDeAtaque(oponente: Guerrero, rounds: Int)(criterio: CriterioDeCombate): PlanDeAtaque = {
     
-    val (plan, combatientes) : (List[Movimiento], Combatientes)  = 
-      (List(movimientoMasEfectivoContra(oponente)(criterio)),
-       movimientoMasEfectivoContra(oponente)(criterio)(this,oponente)) 
+    val (planVacio,combatientes) = (List():PlanDeAtaque,(this,oponente)) 
     
-    (1 to (rounds-1)).reverse.foldLeft((plan, combatientes))((semilla, _) => {
-        val (p, (a, o)) = semilla
-        (p++List(a.movimientoMasEfectivoContra(o)(criterio)),
-        a.movimientoMasEfectivoContra(oponente)(criterio)(a, o))
+    List.range(1, rounds+1).foldLeft((planVacio,combatientes))( (semilla, _) => {
+        val (plan, (atacante, oponente)) = semilla
+        val mejorMovimiento = movimientoMasEfectivoContra(oponente)(criterio)
+        
+        (plan :+ mejorMovimiento, atacante.pelearUnRound(mejorMovimiento)(oponente))
+        
       })._1
       
   }
-  
   
   trait ResultadoPelea {
     
