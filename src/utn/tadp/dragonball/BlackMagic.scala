@@ -2,6 +2,10 @@ package utn.tadp.dragonball
 
 object BlackMagic {
   
+   implicit class IntConPorcentaje(int: Int){
+     def porcentajeDe(otroInt: Int):Int = (int.toDouble / otroInt.toDouble) toInt 
+   }
+  
    implicit class Count[T](list: List[T]) {
     def count(n: T): Int = list count (n equals)
     def countIs(n: T, q:Int):Boolean = list.count(n) == q
@@ -12,11 +16,12 @@ object BlackMagic {
     def onFst[S](f:( T => S )): Tuple2[S,U] = (f(tupla._1), tupla._2)
     def onSnd[S](g:( U => S )): Tuple2[T,S] = (tupla._1, g(tupla._2))
     def onEach[A,B](fTupla:( T =>A,U=>B)): Tuple2[A,B] = (fTupla._1(tupla._1),fTupla._2(tupla._2))
-    def fold[S](f:( (T, U) => S )): S = f(tupla._1, tupla._2)
+    def fold1[S](f:( (T, U) => S )): S = f(tupla._1, tupla._2)
+    def fold2[S](f:( (U, T) => S )): S = f(tupla._2, tupla._1)
   }
    
    implicit class SameTypeSuperiorTuple2[T](tupla: Tuple2[T,T]){
-     def onBoth[U](f:(T=>U)): Tuple2[U,U] = (f(tupla._1),f(tupla._2)) 
+     def map[U](f:(T=>U)): Tuple2[U,U] = (f(tupla._1),f(tupla._2)) 
    }
    
    implicit class Is[T](any:T){
