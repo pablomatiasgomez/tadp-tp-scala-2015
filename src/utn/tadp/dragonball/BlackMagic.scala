@@ -12,6 +12,7 @@ object BlackMagic {
     def onFst[S](f:( T => S )): Tuple2[S,U] = (f(tupla._1), tupla._2)
     def onSnd[S](g:( U => S )): Tuple2[T,S] = (tupla._1, g(tupla._2))
     def onEach[A,B](fTupla:( T =>A,U=>B)): Tuple2[A,B] = (fTupla._1(tupla._1),fTupla._2(tupla._2))
+    def fold[S](f:( (T, U) => S )): S = f(tupla._1, tupla._2)
   }
    
    implicit class SameTypeSuperiorTuple2[T](tupla: Tuple2[T,T]){

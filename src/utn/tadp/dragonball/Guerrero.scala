@@ -1,6 +1,6 @@
 package utn.tadp.dragonball
 import utn.tadp.dragonball.Simulador._
-
+import utn.tadp.dragonball.BlackMagic._
 
 case class Guerrero(
       nombre: String,
