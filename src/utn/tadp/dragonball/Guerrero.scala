@@ -73,7 +73,7 @@ case class Guerrero(
   def contraAtacarA(guerrero:Guerrero): Combatientes =
               this.atacarSegun(mayorVentajaDeKi)(guerrero)
   
-  def mayorVentajaDeKi(combatientes: Combatientes) = combatientes._2. energia - combatientes._1.energia
+  def mayorVentajaDeKi(combatientes: Combatientes) = combatientes._2. energia - combatientes._1.energia abs
   
   def pelearUnRound(movimiento: Movimiento)(oponente: Guerrero): Combatientes = {
     
@@ -98,17 +98,17 @@ case class Guerrero(
   
   trait ResultadoPelea {
     
-    def map(f: (Combatientes => Combatientes)): ResultadoPelea
+    def map(f: Guerrero=>Guerrero=>Combatientes): ResultadoPelea
     
   }
   
   case class Ganador(guerrero: Guerrero) extends ResultadoPelea {
     
-    def map(f: (Combatientes => Combatientes)) = Ganador(guerrero)
+    def map(f: Guerrero=>Guerrero=>Combatientes) = Ganador(guerrero)
     
   }
   case class PeleaEnCurso(combatientes: Combatientes) extends ResultadoPelea {
-    def map(f: (Combatientes => Combatientes)) = definirResultado(f(combatientes))
+    def map(f: Guerrero=>Guerrero=>Combatientes) = definirResultado(f(combatientes._1)(combatientes._2))
   }
   
   def definirResultado(combatientes: Combatientes) = {
@@ -125,7 +125,8 @@ case class Guerrero(
   def pelearContra(oponente: Guerrero)(plan: List[Movimiento]): ResultadoPelea = {
     
     val peleaEnCurso : ResultadoPelea = definirResultado((this, oponente))
-    plan.foldLeft(peleaEnCurso)((pelea, movimiento) => { pelea.map(movimiento) } )
+    plan.foldLeft(peleaEnCurso)((pelea, movimiento) => { pelea.map(_.pelearUnRound(movimiento)_) } )
+    
     
   }
   
