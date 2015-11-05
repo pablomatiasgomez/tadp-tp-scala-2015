@@ -17,7 +17,7 @@ object Simulador {
         case (Luchando, DejarseFajar) => movimiento(atacante estas Fajado(1), oponente)
         case (Luchando, _) => movimiento(combatientes)
         case (Fajado(rounds), DejarseFajar) => movimiento(atacante estas Fajado(rounds+1), oponente)
-        case (Fajado(_), _) => movimiento(atacante estas Luchando, oponente)
+        case (Fajado(_), _) => movimiento(atacante, oponente).onFst(_ estas Luchando)
       }
     }
     
@@ -166,8 +166,9 @@ object Simulador {
   
   case object Genkidama extends Movimiento ({case (atacante,oponente) => {
     
-    atacante.estado match {
-      case Fajado(rounds) => (atacante estas Luchando, oponente disminuiEnergia (10 ^^ rounds))
+    (atacante.estado, oponente.especie) match {
+      case (Fajado(rounds), Androide) => (atacante, oponente aumentaEnergia (10 ^^ rounds))
+      case (Fajado(rounds), _) => (atacante, oponente disminuiEnergia (10 ^^ rounds))
       case _ => (atacante, oponente)
     }
     
