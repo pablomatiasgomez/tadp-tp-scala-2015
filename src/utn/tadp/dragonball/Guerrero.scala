@@ -88,15 +88,14 @@ case class Guerrero(
   
   def planDeAtaque(oponente: Guerrero, rounds: Int)(criterio: CriterioDeCombate): PlanDeAtaque = {
     
-    val (plan, combatientes) : (List[Movimiento], Combatientes)  = 
-      (List(movimientoMasEfectivoContra(oponente)(criterio)),
-       this.pelearUnRound(movimientoMasEfectivoContra(oponente)(criterio))(oponente))  
+    val (planVacio,combatientes) = (List():PlanDeAtaque,(this,oponente))
     
-    (1 to (rounds-1)).reverse.foldLeft((plan, combatientes))((semilla, _) => {
-        val (p, (a, o)) = semilla
-        (p++List(a.movimientoMasEfectivoContra(o)(criterio)),
-        a.pelearUnRound(movimientoMasEfectivoContra(o)(criterio))(o)) 
-
+    List.range(0, rounds).foldLeft((planVacio,combatientes))( (semilla, _) => {
+        val (plan, (atacante, oponente)) = semilla
+        val mejorMovimiento = atacante.movimientoMasEfectivoContra(oponente)(criterio)
+        
+        (plan :+ mejorMovimiento, atacante.pelearUnRound(mejorMovimiento)(oponente))
+        
       })._1
       
   }
