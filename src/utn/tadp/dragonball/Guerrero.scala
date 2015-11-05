@@ -56,6 +56,8 @@ case class Guerrero(
   
   type CriterioDeCombate = Combatientes => Int
   
+  type PlanDeAtaque = List[Movimiento]
+  
   def movimientoMasEfectivoContra(oponente: Guerrero)(criterio: CriterioDeCombate): Movimiento = {
     val combatientes = (this,oponente)
     val mejorMovimiento = movimientos.maxBy(movimiento => criterio( movimiento( combatientes)))
@@ -71,14 +73,11 @@ case class Guerrero(
   def contraAtacarA(guerrero:Guerrero): Combatientes =
               this.atacarSegun(mayorVentajaDeKi)(guerrero)
   
-  def mayorVentajaDeKi(combatientes: Combatientes) = {
-                val(energiaA, energiaO) = combatientes.onBoth { guerrero => guerrero.energia }
-                if(energiaA > energiaO)
-                   //XXXPara distanciar la "ventaja" de la "desventaja, habria que buscar una mejor forma de hacerlo
-                  (energiaA - energiaO) * 1000
-                else
-                  energiaO - energiaA
-              }
+
+  def mayorVentajaDeKi(combatientes: Combatientes):Int =  {
+    if(combatientes._2.energia == 0) mayorVentajaDeKi(combatientes.map( _ aumentaEnergia 1 ))  
+    else combatientes.map( _.energia ).fold1( _ porcentajeDe _ )
+}
   
   def pelearUnRound(movimiento: Movimiento)(oponente: Guerrero): Combatientes = {
     
@@ -87,7 +86,7 @@ case class Guerrero(
   
   }
   
-  def planDeAtaque(oponente: Guerrero, rounds: Int)(criterio: CriterioDeCombate): List[Movimiento] = {
+  def planDeAtaque(oponente: Guerrero, rounds: Int)(criterio: CriterioDeCombate): PlanDeAtaque = {
     
     val (plan, combatientes) : (List[Movimiento], Combatientes)  = 
       (List(movimientoMasEfectivoContra(oponente)(criterio)),
@@ -97,24 +96,24 @@ case class Guerrero(
         val (p, (a, o)) = semilla
         (p++List(a.movimientoMasEfectivoContra(o)(criterio)),
         a.pelearUnRound(movimientoMasEfectivoContra(o)(criterio))(o)) 
+
       })._1
       
   }
   
-  
   trait ResultadoPelea {
     
-    def map(f: (Combatientes => Combatientes)): ResultadoPelea
+    def map(f: Guerrero=>Guerrero=>Combatientes): ResultadoPelea
     
   }
   
   case class Ganador(guerrero: Guerrero) extends ResultadoPelea {
     
-    def map(f: (Combatientes => Combatientes)) = Ganador(guerrero)
+    def map(f: Guerrero=>Guerrero=>Combatientes) = Ganador(guerrero)
     
   }
   case class PeleaEnCurso(combatientes: Combatientes) extends ResultadoPelea {
-    def map(f: (Combatientes => Combatientes)) = definirResultado(f(combatientes))
+    def map(f: Guerrero=>Guerrero=>Combatientes) = definirResultado(f(combatientes._1)(combatientes._2))
   }
   
   def definirResultado(combatientes: Combatientes) = {
@@ -131,7 +130,8 @@ case class Guerrero(
   def pelearContra(oponente: Guerrero)(plan: List[Movimiento]): ResultadoPelea = {
     
     val peleaEnCurso : ResultadoPelea = definirResultado((this, oponente))
-    plan.foldLeft(peleaEnCurso)((pelea, movimiento) => { pelea.map(movimiento) } )
+    plan.foldLeft(peleaEnCurso)((pelea, movimiento) => { pelea.map(_.pelearUnRound(movimiento)_) } )
+    
     
   }
   

@@ -15,7 +15,7 @@ class Guerrero_Test extends FlatSpec with Matchers {
   
   def quedoConMasKi(combatientes: Combatientes) = combatientes._1.energia
   def mayorVentajaDeKi(combatientes: Combatientes) = {
-                val(energiaA, energiaO) = combatientes.onBoth { guerrero => guerrero.energia }
+                val(energiaA, energiaO) = combatientes.map { guerrero => guerrero.energia }
                 if(energiaA > energiaO)
                   (energiaA - energiaO) * 1000
                 else
