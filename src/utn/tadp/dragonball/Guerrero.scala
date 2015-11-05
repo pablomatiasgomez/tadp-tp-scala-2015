@@ -57,23 +57,26 @@ case class Guerrero(
   type CriterioDeCombate = Combatientes => Int
   
   def movimientoMasEfectivoContra(oponente: Guerrero)(criterio: CriterioDeCombate): Movimiento = {
-    
-    val mejorMovimiento = movimientos.maxBy { movimiento => criterio(movimiento((this, oponente))) }
-    if(criterio(mejorMovimiento((this, oponente))) > 0)
+    val combatientes = (this,oponente)
+    val mejorMovimiento = movimientos.maxBy(movimiento => criterio( movimiento( combatientes)))
+    if( criterio (mejorMovimiento (combatientes) )  > 0)
       mejorMovimiento
     else
       throw new RuntimeException("No hay un movimiento satisfactorio")
-    
   }
   
-  def mayorVentajaDeKi(combatientes: Combatientes) = {
-    combatientes._2. energia - combatientes._1.energia
-  }
+  def atacarSegun(criterioDeCombate:CriterioDeCombate): (Guerrero=>Combatientes) = guerrero => 
+              this.movimientoMasEfectivoContra(guerrero)(criterioDeCombate)(this,guerrero)
+  
+  def contraAtacarA(guerrero:Guerrero): Combatientes =
+              this.atacarSegun(mayorVentajaDeKi)(guerrero)
+  
+  def mayorVentajaDeKi(combatientes: Combatientes) = combatientes._2. energia - combatientes._1.energia
   
   def pelearUnRound(movimiento: Movimiento)(oponente: Guerrero): Combatientes = {
     
-    val oponenteFajado = movimiento((this, oponente))._2
-    (oponenteFajado.movimientoMasEfectivoContra(this)(mayorVentajaDeKi)((oponenteFajado, this))._2, oponenteFajado)
+    val (thisFajado,oponenteFajado) = movimiento(this, oponente)
+    oponenteFajado.contraAtacarA(thisFajado)
   
   }
   
