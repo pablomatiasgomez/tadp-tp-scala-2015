@@ -92,7 +92,7 @@ case class Guerrero(
     
     List.range(0, rounds).foldLeft((planVacio,combatientes))( (semilla, _) => {
         val (plan, (atacante, oponente)) = semilla
-        val mejorMovimiento = movimientoMasEfectivoContra(oponente)(criterio)
+        val mejorMovimiento = atacante.movimientoMasEfectivoContra(oponente)(criterio)
         
         (plan :+ mejorMovimiento, atacante.pelearUnRound(mejorMovimiento)(oponente))
         
