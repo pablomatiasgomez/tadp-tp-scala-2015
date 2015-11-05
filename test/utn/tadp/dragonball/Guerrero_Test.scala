@@ -2,6 +2,7 @@ package utn.tadp.dragonball
 
 import utn.tadp.dragonball.Simulador._
 import utn.tadp.dragonball.Guerrero._
+import utn.tadp.dragonball.BlackMagic._
 import org.scalatest._
 
 class Guerrero_Test extends FlatSpec with Matchers {
@@ -11,7 +12,13 @@ class Guerrero_Test extends FlatSpec with Matchers {
   val vegeta : Guerrero = new Guerrero("Vegeta", List(), 1001, 801, Saiyajin(Normal, false), Luchando, todosSaben++List(Onda(100), Fusion(goku)))
 
   def quedoConMasKi(combatientes: Combatientes) = combatientes._1.energia
-  def mayorVentajaDeKi(combatientes: Combatientes) = combatientes._2. energia - combatientes._1.energia
+  def mayorVentajaDeKi(combatientes: Combatientes) = {
+                val(energiaA, energiaO) = combatientes.onBoth { guerrero => guerrero.energia }
+                if(energiaA > energiaO)
+                  (energiaA - energiaO) * 1000
+                else
+                  energiaO - energiaA
+              }
   def quedoMasFajado(combatientes: Combatientes) = combatientes._1.estado match {
                                                                                 case Fajado(rounds) => rounds
                                                                                 case _ => 0
@@ -45,7 +52,7 @@ class Guerrero_Test extends FlatSpec with Matchers {
     g.energia shouldBe 1450
     v.energia shouldBe 2101
     v.energiaMaxima shouldBe 3501
-    v.especie shouldBe Fusionado(goku, vegeta)
+    v.especie shouldBe Fusionado(vegeta, goku)
   }
   
 }

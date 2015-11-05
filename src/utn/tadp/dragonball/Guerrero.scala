@@ -71,12 +71,19 @@ case class Guerrero(
   def contraAtacarA(guerrero:Guerrero): Combatientes =
               this.atacarSegun(mayorVentajaDeKi)(guerrero)
   
-  def mayorVentajaDeKi(combatientes: Combatientes) = combatientes._2. energia - combatientes._1.energia
+  def mayorVentajaDeKi(combatientes: Combatientes) = {
+                val(energiaA, energiaO) = combatientes.onBoth { guerrero => guerrero.energia }
+                if(energiaA > energiaO)
+                   //XXXPara distanciar la "ventaja" de la "desventaja, habria que buscar una mejor forma de hacerlo
+                  (energiaA - energiaO) * 1000
+                else
+                  energiaO - energiaA
+              }
   
   def pelearUnRound(movimiento: Movimiento)(oponente: Guerrero): Combatientes = {
     
     val (thisFajado,oponenteFajado) = movimiento(this, oponente)
-    oponenteFajado.contraAtacarA(thisFajado)
+    oponenteFajado.contraAtacarA(thisFajado).swap
   
   }
   
