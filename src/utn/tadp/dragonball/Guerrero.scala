@@ -91,12 +91,12 @@ case class Guerrero(
     
     val (plan, combatientes) : (List[Movimiento], Combatientes)  = 
       (List(movimientoMasEfectivoContra(oponente)(criterio)),
-       movimientoMasEfectivoContra(oponente)(criterio)(this,oponente)) 
+       this.pelearUnRound(movimientoMasEfectivoContra(oponente)(criterio))(oponente))  
     
     (1 to (rounds-1)).reverse.foldLeft((plan, combatientes))((semilla, _) => {
         val (p, (a, o)) = semilla
         (p++List(a.movimientoMasEfectivoContra(o)(criterio)),
-        a.movimientoMasEfectivoContra(oponente)(criterio)(a, o))
+        a.pelearUnRound(movimientoMasEfectivoContra(o)(criterio))(o)) 
       })._1
       
   }
