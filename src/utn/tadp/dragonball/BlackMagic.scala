@@ -3,7 +3,7 @@ package utn.tadp.dragonball
 object BlackMagic {
   
    implicit class IntConPorcentaje(int: Int){
-     def porcentajeDe(otroInt: Int):Int = (int.toDouble / otroInt.toDouble) toInt 
+     def porcentajeDe(otroInt: Int):Double = (int.toDouble / otroInt.toDouble) 
    }
   
    implicit class Count[T](list: List[T]) {

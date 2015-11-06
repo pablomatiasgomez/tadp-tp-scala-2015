@@ -55,7 +55,7 @@ case class Guerrero(
   
   def puedeFusionarse = especie.fusionable
   
-  type CriterioDeCombate = Combatientes => Int
+  type CriterioDeCombate = Combatientes => Double
   
   type PlanDeAtaque = List[Movimiento]
   
@@ -76,7 +76,7 @@ case class Guerrero(
               this.atacarSegun(mayorVentajaDeKi)(guerrero)
   
 
-  def mayorVentajaDeKi(combatientes: Combatientes):Int =  {
+  def mayorVentajaDeKi(combatientes: Combatientes):Double =  {
     if(combatientes._2.energia == 0) mayorVentajaDeKi(combatientes.map( _ aumentaEnergia 1 ))  
     else combatientes.map( _.energia ).fold1( _ porcentajeDe _ )
 }
