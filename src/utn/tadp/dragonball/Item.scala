@@ -1,12 +1,8 @@
 package utn.tadp.dragonball
 
-abstract class Item(){
-  
-}
+abstract class Item
 
-abstract class TipoArma(){
-  
-}
+abstract class TipoArma
 
 trait TipoArmaFuego
 

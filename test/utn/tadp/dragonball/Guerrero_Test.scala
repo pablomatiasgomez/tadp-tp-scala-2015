@@ -14,13 +14,12 @@ class Guerrero_Test extends FlatSpec with Matchers {
   val yajirobe : Guerrero = new Guerrero("Yajirobe", List(SemillaDelErmitaño), 100, 100, Humano, Luchando, List(UsarItem(Arma(Filosa)), UsarItem(SemillaDelErmitaño)))
   
   def quedoConMasKi(combatientes: Combatientes) = combatientes._1.energia
-  def mayorVentajaDeKi(combatientes: Combatientes) = {
-                val(energiaA, energiaO) = combatientes.map { guerrero => guerrero.energia }
-                if(energiaA > energiaO)
-                  (energiaA - energiaO) * 1000
-                else
-                  energiaO - energiaA
-              }
+  def mayorVentajaDeKi(combatientes: Combatientes) = (combatientes._1.energia - combatientes._2.energia) match {
+                case diferencia if diferencia > 0 => diferencia 
+                case 0 => 0.99
+                case diferencia if diferencia < 0 => 0.98/ diferencia
+            }
+  
   def quedoMasFajado(combatientes: Combatientes) = combatientes._1.estado match {
                                                                                 case Fajado(rounds) => rounds
                                                                                 case _ => 0
@@ -73,7 +72,7 @@ class Guerrero_Test extends FlatSpec with Matchers {
   
   "goku" should "pelear con vegeta y se deja fajar pero lo mata con una Genkidama" in {
     val vegetaMono = new Guerrero("MonoV", List(), 3003, 3003, Saiyajin(MonoGigante(1001), true), Luchando, todosSaben)
-    DejarseFajar(goku,vegetaMono)._2.movimientoMasEfectivoContra(goku)(_.diferenciaDeKi) shouldBe Onda(10)
+    
     goku.pelearContra(vegetaMono)(List(DejarseFajar, Genkidama)) shouldBe Ganador(goku disminuiEnergia(20) estas Luchando)
   }
   
