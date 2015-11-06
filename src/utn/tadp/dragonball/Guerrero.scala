@@ -1,6 +1,7 @@
 package utn.tadp.dragonball
 import utn.tadp.dragonball.Simulador._
 import utn.tadp.dragonball.BlackMagic._
+import utn.tadp.dragonball.BlackMagic._
 
 case class Guerrero(
       nombre: String,
@@ -54,6 +55,12 @@ case class Guerrero(
   def sumaAInventario(agregados: List[Item]) = variarInventario( _ ++ agregados )
   
   def puedeFusionarse = especie.fusionable
+  
+  def tiene(item:Item):Boolean = inventario contains item
+  
+  def tiene(items:List[Item]):Boolean = items forall (inventario contains)
+  
+  def tiene(item:Item, cantidad:Int) = inventario has (cantidad,item)
   
   type CriterioDeCombate = Combatientes => Double
   

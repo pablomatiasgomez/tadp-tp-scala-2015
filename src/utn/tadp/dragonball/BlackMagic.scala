@@ -5,9 +5,9 @@ object BlackMagic {
   implicit def doubleToInt(double:Double) = double.toInt
   
    implicit class Count[T](list: List[T]) {
-    def count(n: T): Int = list count (n equals)
-    def countIs(n: T, q:Int):Boolean = list.count(n) == q
-    def has(q:Int,n:T):Boolean = list.countIs(n,q)
+    def count(elem: T): Int = list count (elem equals)
+    def countIs(elem: T, cant:Int):Boolean = list.count(elem) == cant
+    def has(cant:Int,elem:T):Boolean = list.countIs(elem,cant)
   }
    
    implicit class SuperiorTuple2[T, U](tupla: Tuple2[T,U]) {

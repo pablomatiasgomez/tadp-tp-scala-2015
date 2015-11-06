@@ -14,10 +14,10 @@ object Simulador {
         case (Muerto, _) => combatientes
         case (Inconsciente, UsarItem(SemillaDelErmitaño)) => movimiento(combatientes)
         case (Inconsciente, _) => combatientes
-        case (Luchando, DejarseFajar) => movimiento(atacante estas Fajado(1), oponente)
+        case (Luchando, DejarseFajar) => movimiento(combatientes) onFst (_ estas Fajado(1))
         case (Luchando, _) => movimiento(combatientes)
-        case (Fajado(rounds), DejarseFajar) => movimiento(atacante estas Fajado(rounds+1), oponente)
-        case (Fajado(_), _) => movimiento(atacante, oponente).onFst(_ estas Luchando)
+        case (Fajado(rounds), DejarseFajar) => movimiento(combatientes) onFst (_ estas Fajado(rounds+1))
+        case (Fajado(_), _) => movimiento(combatientes) onFst (_ estas Luchando)
       }
     }
     
@@ -44,20 +44,21 @@ object Simulador {
       case Namekusein => _.transformOnTrue( _.estado == Inconsciente)(_ disminuiEnergia 10)
     })
     
+    def perderCola(modoSaiyajin:EstadoSaiyajing):Guerrero=>Guerrero = modoSaiyajin match{
+      case MonoGigante(energiaNormal) => (_ tuEnergiaMaximaEs energiaNormal
+                                            transformateEn Saiyajin(Normal,false)
+                                            estas Inconsciente)
+      case fase => _ transformateEn Saiyajin(fase,false) 
+    }
+    
     val(atacante, oponente) = combatientes
-    combatientes.becomeOnTrue(atacante.inventario contains item)(
+    combatientes.becomeOnTrue(atacante tiene item)(
       (item, oponente.especie) match {
         case (Arma(Roma), Androide) => combatientes
-        case (Arma(Roma), _) if oponente.energia < 300 => (atacante, oponente estas Inconsciente) 
-        case (Arma(Filosa), Saiyajin(MonoGigante(energiaNormal), true)) => (atacante, 
-                                                                             oponente tuEnergiaEs 1
-                                                                                      tuEnergiaMaximaEs energiaNormal
-                                                                                      transformateEn Saiyajin(Normal,false)
-                                                                                      estas Inconsciente)
-        case (Arma(Filosa), Saiyajin(fase, true)) => (atacante, oponente tuEnergiaEs 1
-                                                                          transformateEn Saiyajin(fase,false))
+        case (Arma(Roma), _) if oponente.energia < 300 => (atacante, oponente estas Inconsciente)
+        case (Arma(Filosa), Saiyajin(modo, true)) => (atacante, perderCola(modo)(oponente tuEnergiaEs 1))
         case (Arma(Filosa), _) => (atacante, oponente disminuiEnergia (atacante.energia / 100))
-        case (Arma(Fuego(tipo)), especieAtacado) if atacante.inventario.contains( Municion(tipo) ) =>
+        case (Arma(Fuego(tipo)), especieAtacado) if atacante tiene Municion(tipo) =>
           (atacante gastarItems (List( Municion(tipo) )), disparado(especieAtacado)(oponente))
         case (SemillaDelErmitaño, _) => (atacante tuEnergiaEs (atacante.energiaMaxima), oponente)
         case _ => combatientes
@@ -80,7 +81,7 @@ object Simulador {
 
     (guerrero.especie,guerrero.energiaMaxima) match {  
       case (Saiyajin(MonoGigante(_), _),_) => guerrero
-      case (Saiyajin(fase, true),energiaMaxima) if (guerrero.inventario contains FotoDeLaLuna) =>
+      case (Saiyajin(fase, true),energiaMaxima) if (guerrero tiene FotoDeLaLuna) =>
                                   val energiaO = fase.energiaOriginal(guerrero)
                                   (guerrero transformateEn Saiyajin(MonoGigante(energiaO), true)
                                             tuEnergiaMaximaEs (3*energiaO)
@@ -118,7 +119,7 @@ object Simulador {
     val(atacante, oponente) = combatientes
     val paseDeMagia:Combatientes=>Combatientes = atacante.especie match{
       case Namekusein | Monstruo(_) => cambioDeEstado
-      case _ if (atacante.inventario count EsferaDelDragon is 7) => ({ case(atacante,oponente) =>
+      case _ if (atacante tiene (EsferaDelDragon,7)) => ({ case(atacante,oponente) =>
                               cambioDeEstado (atacante gastarItems (List.fill(7)(EsferaDelDragon)), oponente)
       })
       case _ => identity
