@@ -114,63 +114,70 @@ object Simulador {
   } )
  
   case class Magia(cambioDeEstado: Function1[Combatientes, Combatientes]) extends Movimiento (combatientes => {
-    
+
     val(atacante, oponente) = combatientes
-    atacante.especie match{
-      case Namekusein => cambioDeEstado(combatientes)
-      case Monstruo(_) => cambioDeEstado(combatientes)
-      case _ if (atacante.inventario count EsferaDelDragon is 7) => 
-                              cambioDeEstado(atacante gastarItems (List.fill(7)(EsferaDelDragon)), oponente)
-      case _ => combatientes
+    val paseDeMagia:Combatientes=>Combatientes = atacante.especie match{
+      case Namekusein | Monstruo(_) => cambioDeEstado
+      case _ if (atacante.inventario count EsferaDelDragon is 7) => ({ case(atacante,oponente) =>
+                              cambioDeEstado (atacante gastarItems (List.fill(7)(EsferaDelDragon)), oponente)
+      })
+      case _ => identity
     }
-    
+     paseDeMagia(combatientes)
   } )
   
-  case object MuchosGolpesNinja extends Movimiento ({case (atacante,oponente) => {
+  case object MuchosGolpesNinja extends Ataque(Fisico, ({case (atacante,oponente) => {
     
     (atacante.especie, oponente.especie) match {
-      case (Humano, Androide) => (atacante disminuiEnergia 10, oponente)
-      case _ if atacante.energia < oponente.energia => (atacante disminuiEnergia 20, oponente)
-      case _  => (atacante, oponente disminuiEnergia 20)
-    }
-  }
+      case (Humano, Androide) => (10, 0)
+      case _ if atacante.energia < oponente.energia => (20, 0)
+      case _  => (0, 20)
+    } }
   } )
+  )
   
-  case object Explotar extends Movimiento (combatientes => {
-      
-    def recibiDanioExplosivo(especie:Especie,danio:Int):Guerrero=>Guerrero = especie match{
-      case Namekusein => _.variarEnergia( _ - danio  max 1)
-      case _ => _ disminuiEnergia danio
-    }
-    val energiaDelAtaque = combatientes._1.energia
-    val(atacante, oponente) = combatientes.onFst( _ tuEnergiaEs 0)
-    (atacante.especie, oponente.especie) match {
-      case (Androide, especie) => (atacante, recibiDanioExplosivo(especie,energiaDelAtaque*3)(oponente))
-      case (Monstruo(_), especie) => (atacante, recibiDanioExplosivo(especie,energiaDelAtaque*2)(oponente))
-      case _ => combatientes
+  case object Explotar extends Ataque( Fisico, ({case (atacante, oponente) => {
+    
+    val energiaAtaque = atacante.energia
+    
+    def daniosBase = atacante.especie match{
+      case Androide | Monstruo(_) => (energiaAtaque, calcOfensiva(energiaAtaque))
+      case _ => (0,0)
     }
     
-  } )
-  
-  
-  case class Onda(energiaNecesaria: Int) extends Ataque( Energia, ({case (_, oponente)=> {
+    def calcOfensiva:Int=>Int = atacante.especie match{
+        case Androide => 3*
+        case Monstruo(_) => 2*
+    }    
     
-    val poderOfensivo:Especie=>Int = _ match{
-                       case Monstruo(_) => energiaNecesaria/2
-                       case _ => energiaNecesaria*2 }
+    def calcDefensiva:Int=>Int = oponente.especie match{
+      case Namekusein =>  _ min (oponente.energia - 1)
+      case _ => identity _
+    }
+    
+    daniosBase onSnd calcDefensiva
+    
+  }}))
+  
+  case class Onda(energiaNecesaria: Int) extends Ataque( Energia, ({case (atacante, oponente)=> {
+    
+      def poderOfensivo = oponente.especie match{
+                       case Monstruo(_) => energiaNecesaria / 2
+                       case _ => energiaNecesaria * 2 }
    
-    (energiaNecesaria, poderOfensivo(oponente.especie)  )      
+      if (atacante.energia > energiaNecesaria) (energiaNecesaria, poderOfensivo )
+      else (0, 0)
     
   } }) )
   
 
   case object Genkidama extends Ataque(Energia, ( { case(atacante,_) =>
      
-      val poderAcumulado:EstadoDeLucha=>Int = _ match {
+      val poderAcumulado = atacante.estado match {
                     case Fajado(rounds) => 10 pow rounds
                     case _ => 0 } 
       
-       (0 , poderAcumulado(atacante.estado)  )
+      (0 , poderAcumulado  )
        
     }  )  
 )
