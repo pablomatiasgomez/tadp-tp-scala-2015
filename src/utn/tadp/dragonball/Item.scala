@@ -14,7 +14,7 @@ case class Municion(tipo: TipoArmaFuego) extends Item
 
 case object Ak47 extends TipoArmaFuego
 
-case class Arma(tipo : TipoArma) extends Item
+case class Arma(tipo: TipoArma) extends Item
 case object SemillaDelErmitaño extends Item
 case object FotoDeLaLuna extends Item
 case object EsferaDelDragon extends Item

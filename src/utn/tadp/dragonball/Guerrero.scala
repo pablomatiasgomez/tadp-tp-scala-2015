@@ -74,12 +74,9 @@ case class Guerrero(
     
     val combatientes = (this, oponente)
     val mejorMovimiento = movimientos.maxBy(movimiento => criterio(movimiento(combatientes)))
-    if(criterio (mejorMovimiento (combatientes))  > 0)
+    if(criterio(mejorMovimiento(combatientes))  > 0)
       mejorMovimiento
     else
-      //throw new RuntimeException("No hay un movimiento satisfactorio") no deberiamos tirar excepcion
-      //DejarseFajar
-      //discrepo
       throw new RuntimeException("No hay un movimiento satisfactorio")
 
   }
@@ -119,8 +116,8 @@ case class Guerrero(
   def pelearContra(oponente: Guerrero)(plan: List[Movimiento]): ResultadoPelea = {
     
     val peleaEnCurso: ResultadoPelea = (this, oponente).definirResultado
-    plan.foldLeft(peleaEnCurso)((pelea, movimiento) => pelea.map({ case (atacante, adversario) =>
-                                                              atacante.pelearUnRound(movimiento)(adversario)
+    plan.foldLeft(peleaEnCurso)((pelea, movimiento) => pelea.map({ case (atacante, oponente) =>
+                                                              atacante.pelearUnRound(movimiento)(oponente)
                                                               }))
     }
     
@@ -135,18 +132,18 @@ case object Muerto extends EstadoDeLucha
 
 trait ResultadoPelea {
     
-    def map(f: Combatientes=>Combatientes): ResultadoPelea
+    def map(f: Combatientes => Combatientes): ResultadoPelea
     
 }
   
 case class Ganador(guerrero: Guerrero) extends ResultadoPelea {
   
-    def map(f: Combatientes=>Combatientes) = Ganador(guerrero)
+    def map(f: Combatientes => Combatientes) = Ganador(guerrero)
     
 }
   
 case class PeleaEnCurso(combatientes: Combatientes) extends ResultadoPelea {
   
-  def map(luchar: Combatientes=>Combatientes) = luchar(combatientes) definirResultado
+  def map(luchar: Combatientes => Combatientes) = luchar(combatientes) definirResultado
   
 }

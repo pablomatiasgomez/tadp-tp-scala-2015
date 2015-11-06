@@ -115,17 +115,38 @@ object Simulador {
         
   })
  
-  case class Magia(cambioDeEstado: Function1[Combatientes, Combatientes]) extends Movimiento (combatientes => {
+  case class Magia(paseDeMagia: Function1[Combatientes, Combatientes]) extends Movimiento (combatientes => {
     val(atacante, oponente):Combatientes = combatientes
     atacante.especie match {
-      case Namekusein | Monstruo(_) => cambioDeEstado(combatientes)
+      case Namekusein | Monstruo(_) => paseDeMagia(combatientes)
       case _ if (atacante tiene (EsferaDelDragon, 7)) =>
-                              cambioDeEstado (atacante gastarItems (List.fill(7)(EsferaDelDragon)), oponente)
+                              paseDeMagia (atacante gastarItems (List.fill(7)(EsferaDelDragon)), oponente)
       case _ => combatientes
     }
   
   })
   
+    
+  type Daños = (Int, Int)
+  
+  trait TipoAtaque
+  
+  case object Energia extends TipoAtaque
+  case object Fisico extends TipoAtaque
+  
+  class Ataque(tipoAtaque: TipoAtaque, funcionDaño: (Combatientes => Daños)) extends Movimiento(combatientes => {
+    
+    val (dañoAtacante, dañoAtacado) = funcionDaño(combatientes)
+    def efectoEn(guerrero:Guerrero) = (tipoAtaque, guerrero.especie) match {
+      case (Energia, Androide) => guerrero.aumentaEnergia _
+      case _ => guerrero.disminuiEnergia _
+    }
+    
+    combatientes.onEach( _ disminuiEnergia dañoAtacante, efectoEn(_)(dañoAtacado) )
+  }
+  
+  )
+
   case object MuchosGolpesNinja extends Ataque(Fisico, ({ case (atacante, oponente) => {
     
          (atacante.especie, oponente.especie) match {
@@ -140,24 +161,24 @@ object Simulador {
   
   case object Explotar extends Ataque(Fisico, ({ case (atacante, oponente) => {
     
-        val energiaAtaque = atacante.energia
+        val energiaDeExplosion = atacante.energia
         
-        def daniosBase = atacante.especie match {
-          case Androide | Monstruo(_) => (energiaAtaque, calcOfensiva(energiaAtaque))
+        def factorExplosivo: Int = atacante.especie match {
+            case Androide => 3
+            case Monstruo(_) => 2
+        }    
+        
+        def daño = atacante.especie match {
+          case Androide | Monstruo(_) => (energiaDeExplosion, energiaDeExplosion * factorExplosivo)
           case _ => (0, 0)
         }
         
-        def calcOfensiva:Int=>Int = atacante.especie match {
-            case Androide => 3*
-            case Monstruo(_) => 2*
-        }    
-        
-        def calcDefensiva: Int => Int = oponente.especie match {
+        def esquivaLaMuerte: Int => Int = oponente.especie match {
           case Namekusein =>  _ min (oponente.energia - 1)
           case _ => identity _
         }
         
-        daniosBase onSnd calcDefensiva
+        daño onSnd esquivaLaMuerte
         
       }
     })
@@ -166,11 +187,11 @@ object Simulador {
   
   case class Onda(energiaNecesaria: Int) extends Ataque(Energia, ({ case (atacante, oponente) => {
     
-        def poderOfensivo = oponente.especie match {
+        def poderDeOnda = oponente.especie match {
                          case Monstruo(_) => energiaNecesaria / 2
                          case _ => energiaNecesaria * 2 }
      
-        if (atacante.energia > energiaNecesaria) (energiaNecesaria, poderOfensivo )
+        if (atacante.energia > energiaNecesaria) (energiaNecesaria, poderDeOnda)
         else (0, 0)
       
       } 
@@ -185,29 +206,9 @@ object Simulador {
                     case _ => 0 } 
       
       (0, poderAcumulado)
+      
     })  
   
   )
   
-  
-  type Danios = (Int, Int)
-  
-  trait TipoAtaque
-  
-  case object Energia extends TipoAtaque
-  case object Fisico extends TipoAtaque
-  
-  class Ataque(tipoAtaque: TipoAtaque, funcionDanio: (Combatientes => Danios)) extends Movimiento(combatientes => {
-    
-    val (danioAtacante, danioAtacado) = funcionDanio(combatientes)
-    def efectoEn(guerrero:Guerrero) = (tipoAtaque, guerrero.especie) match {
-      case (Energia, Androide) => guerrero.aumentaEnergia _
-      case _ => guerrero.disminuiEnergia _
-    }
-    
-    combatientes.onEach( _ disminuiEnergia danioAtacante, efectoEn(_)(danioAtacado) )
-  }
-  
-  )
-
 }
