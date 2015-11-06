@@ -139,7 +139,7 @@ object Simulador {
   case object Explotar extends Movimiento (combatientes => {
       
     def recibiDanioExplosivo(especie:Especie,danio:Int):Guerrero=>Guerrero = especie match{
-      case Namekusein => _.variarEnergia( _ - danio  min 1)
+      case Namekusein => _.variarEnergia( _ - danio  max 1)
       case _ => _ disminuiEnergia danio
     }
     val energiaDelAtaque = combatientes._1.energia
