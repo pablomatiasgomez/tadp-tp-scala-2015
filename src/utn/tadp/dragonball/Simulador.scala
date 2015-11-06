@@ -167,12 +167,14 @@ object Simulador {
   case object Genkidama extends Movimiento ({case (atacante,oponente) => {
     
     (atacante.estado, oponente.especie) match {
-      case (Fajado(rounds), Androide) => (atacante, oponente aumentaEnergia (10 ^^ rounds))
-      case (Fajado(rounds), _) => (atacante, oponente disminuiEnergia (10 ^^ rounds))
+      case (Fajado(rounds), Androide) => (atacante, oponente aumentaEnergia (10 pow rounds)) //DAT REPEATED LOGIC
+      case (Fajado(rounds), _) => (atacante, oponente disminuiEnergia (10 pow rounds))
       case _ => (atacante, oponente)
+      }
     }
-    
-  } })
+  }
+ )
+  
   
   type Danios = (Int,Int)
   

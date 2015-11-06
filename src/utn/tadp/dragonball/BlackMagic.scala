@@ -2,9 +2,7 @@ package utn.tadp.dragonball
 
 object BlackMagic {
   
-   implicit class IntConPorcentaje(int: Int){
-     def porcentajeDe(otroInt: Int):Double = (int.toDouble / otroInt.toDouble) 
-   }
+  implicit def doubleToInt(double:Double) = double.toInt
   
    implicit class Count[T](list: List[T]) {
     def count(n: T): Int = list count (n equals)
@@ -28,8 +26,9 @@ object BlackMagic {
      def is = any == _
    }
    
-   implicit class IntConPotenciaEntera(int:Int){
-     def ^^(cant:Int) = List.fill(cant)(int).foldRight(1)( _ * _)
+   implicit class IntConPotencia(base:Int){
+     def pow(exponente:Int):Double = math pow(base,exponente)
+     //def pow(cant:Int) = List.fill(cant)(int).foldRight(1)( _ * _) me da lastima borrar esto
    }
    
    implicit class MagicBool[T,U](algo:T){
@@ -40,7 +39,7 @@ object BlackMagic {
      def becomeOnTrue(condicion:Boolean)(otraCosa:T):T = algo.transformOnTrue(condicion)( _ => otraCosa )
    }
    
-   implicit class Resultados(combatientes: Simulador.Combatientes) {
+   implicit class TuplaDeCombatientes(combatientes: Simulador.Combatientes) {
      def definirResultado: ResultadoPelea = {
       val (atacanteFinal, oponenteFinal) = combatientes
       (atacanteFinal.estado,oponenteFinal.estado) match {
@@ -49,6 +48,7 @@ object BlackMagic {
           case (_, _) => PeleaEnCurso((atacanteFinal, oponenteFinal))
         }   
       }
+     def diferenciaDeKi:Int = combatientes._1.energia - combatientes._2.energia
    }
    
 }
