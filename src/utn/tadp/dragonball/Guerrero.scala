@@ -73,7 +73,9 @@ case class Guerrero(
       mejorMovimiento
     else
       //throw new RuntimeException("No hay un movimiento satisfactorio") no deberiamos tirar excepcion
-      DejarseFajar
+      //DejarseFajar
+      //discrepo
+      throw new RuntimeException("No hay un movimiento satisfactorio")
   }
   
   def atacarSegun(criterioDeCombate:CriterioDeCombate): (Guerrero=>Combatientes) = guerrero => 
@@ -85,8 +87,8 @@ case class Guerrero(
 
   def mayorVentajaDeKi(combatientes: Combatientes):Double =  (combatientes._1.energia - combatientes._2.energia) match {
                 case diferencia if diferencia > 0 => diferencia 
-                case 0 => 0.99
-                case diferencia if diferencia < 0 => 0.98/ diferencia
+                case 0 => 0.95
+                case diferencia if diferencia < 0 => 0.90 / diferencia
 }
               
   def pelearUnRound(movimiento: Movimiento)(oponente: Guerrero): Combatientes = {
