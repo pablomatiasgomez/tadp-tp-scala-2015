@@ -64,7 +64,8 @@ case class Guerrero(
     if( criterio (mejorMovimiento (combatientes) )  > 0)
       mejorMovimiento
     else
-      throw new RuntimeException("No hay un movimiento satisfactorio")
+      //throw new RuntimeException("No hay un movimiento satisfactorio") no deberiamos tirar excepcion
+      DejarseFajar
   }
   
   def atacarSegun(criterioDeCombate:CriterioDeCombate): (Guerrero=>Combatientes) = guerrero => 
