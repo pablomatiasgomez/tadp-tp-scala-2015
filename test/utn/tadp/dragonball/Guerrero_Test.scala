@@ -73,7 +73,7 @@ class Guerrero_Test extends FlatSpec with Matchers {
   
   "goku" should "pelear con vegeta y se deja fajar pero lo mata con una Genkidama" in {
     val vegetaMono = new Guerrero("MonoV", List(), 3003, 3003, Saiyajin(MonoGigante(1001), true), Luchando, todosSaben)
-    
+    DejarseFajar(goku,vegetaMono)._2.movimientoMasEfectivoContra(goku)(_.diferenciaDeKi) shouldBe Onda(10)
     goku.pelearContra(vegetaMono)(List(DejarseFajar, Genkidama)) shouldBe Ganador(goku disminuiEnergia(20) estas Luchando)
   }
   

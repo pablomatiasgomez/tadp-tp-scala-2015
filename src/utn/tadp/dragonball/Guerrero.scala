@@ -83,7 +83,11 @@ case class Guerrero(
               this.atacarSegun(mayorVentajaDeKi)(guerrero)
   
 
-  def mayorVentajaDeKi(combatientes: Combatientes):Double =  2 pow combatientes.diferenciaDeKi
+  def mayorVentajaDeKi(combatientes: Combatientes):Double =  (combatientes._1.energia - combatientes._2.energia) match {
+                case diferencia if diferencia > 0 => diferencia 
+                case 0 => 0.99
+                case diferencia if diferencia < 0 => 0.98/ diferencia
+}
               
   def pelearUnRound(movimiento: Movimiento)(oponente: Guerrero): Combatientes = {
     
