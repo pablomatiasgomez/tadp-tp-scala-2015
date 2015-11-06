@@ -173,5 +173,21 @@ object Simulador {
     }
     
   } })
+  
+  type Danios = (Int,Int)
+  
+  trait TipoAtaque
+  case object Onda extends TipoAtaque
+  case object Fisico extends TipoAtaque
+  
+  case class Ataque(tipoAtaque:TipoAtaque,funcionDanio:(Combatientes=>Danios)) extends Movimiento( combatientes => {
+    val (danioAtacante, danioAtacado) = funcionDanio(combatientes)
+    def efectoEn(guerrero:Guerrero) = (tipoAtaque,guerrero.especie) match{
+      case (Onda,Androide) => guerrero.aumentaEnergia _
+      case _ => guerrero.disminuiEnergia _
+    }
+    combatientes.onEach( _ disminuiEnergia danioAtacante, efectoEn(_)(danioAtacado) )
+  }
+)
 
 }
