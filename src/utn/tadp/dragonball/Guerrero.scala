@@ -92,7 +92,7 @@ case class Guerrero(
   def mayorVentajaDeKi(combatientes: Combatientes): Double =  (combatientes._1.energia - combatientes._2.energia) match {
                 case diferencia if diferencia > 0 => diferencia 
                 case 0 => 0.99
-                case diferencia if diferencia < 0 => 0.98 / diferencia
+                case diferencia if diferencia < 0 => 0.98 / diferencia.abs
   }
 
               
