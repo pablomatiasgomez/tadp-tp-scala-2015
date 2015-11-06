@@ -116,17 +116,13 @@ object Simulador {
   })
  
   case class Magia(cambioDeEstado: Function1[Combatientes, Combatientes]) extends Movimiento (combatientes => {
-
-    val(atacante, oponente) = combatientes
-    val paseDeMagia: Combatientes => Combatientes = atacante.especie match {
-      case Namekusein | Monstruo(_) => cambioDeEstado
-      case _ if (atacante tiene (EsferaDelDragon, 7)) => ({ case(atacante, oponente) =>
+    val(atacante, oponente):Combatientes = combatientes
+    atacante.especie match {
+      case Namekusein | Monstruo(_) => cambioDeEstado(combatientes)
+      case _ if (atacante tiene (EsferaDelDragon, 7)) =>
                               cambioDeEstado (atacante gastarItems (List.fill(7)(EsferaDelDragon)), oponente)
-      })
-      case _ => identity
+      case _ => combatientes
     }
-  
-    paseDeMagia(combatientes)
   
   })
   
