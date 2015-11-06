@@ -55,7 +55,7 @@ case class Guerrero(
   
   def puedeFusionarse = especie.fusionable
   
-  type CriterioDeCombate = Combatientes => Int
+  type CriterioDeCombate = Combatientes => Double
   
   type PlanDeAtaque = List[Movimiento]
   
@@ -65,7 +65,8 @@ case class Guerrero(
     if( criterio (mejorMovimiento (combatientes) )  > 0)
       mejorMovimiento
     else
-      throw new RuntimeException("No hay un movimiento satisfactorio")
+      //throw new RuntimeException("No hay un movimiento satisfactorio") no deberiamos tirar excepcion
+      DejarseFajar
   }
   
   def atacarSegun(criterioDeCombate:CriterioDeCombate): (Guerrero=>Combatientes) = guerrero => 
@@ -75,7 +76,7 @@ case class Guerrero(
               this.atacarSegun(mayorVentajaDeKi)(guerrero)
   
 
-  def mayorVentajaDeKi(combatientes: Combatientes):Int =  {
+  def mayorVentajaDeKi(combatientes: Combatientes):Double =  {
     if(combatientes._2.energia == 0) mayorVentajaDeKi(combatientes.map( _ aumentaEnergia 1 ))  
     else combatientes.map( _.energia ).fold1( _ porcentajeDe _ )
 }
@@ -100,40 +101,15 @@ case class Guerrero(
       })._1
       
   }
-  
-  trait ResultadoPelea {
-    
-    def map(f: Combatientes=>Combatientes): ResultadoPelea
-    
-  }
-  
-  case class Ganador(guerrero: Guerrero) extends ResultadoPelea {
-    
-    def map(f: Combatientes=>Combatientes) = Ganador(guerrero)
-    
-  }
-  case class PeleaEnCurso(combatientes: Combatientes) extends ResultadoPelea {
-    def map(luchar: Combatientes=>Combatientes) = (luchar andThen definirResultado)(combatientes) //un lujo esta linea
-  }
-  
-  def definirResultado(combatientes: Combatientes) = {
-    
-    val (atacanteFinal, oponenteFinal) = combatientes
-    (atacanteFinal.estado,oponenteFinal.estado) match {
-        case (Muerto, _) => Ganador(oponenteFinal)
-        case (_, Muerto) => Ganador(atacanteFinal)
-        case (_, _) => PeleaEnCurso(atacanteFinal, oponenteFinal)
-      }   
-    
-  }
- 
+   
   
   def pelearContra(oponente: Guerrero)(plan: List[Movimiento]): ResultadoPelea = {
     
     
-    val peleaEnCurso : ResultadoPelea = definirResultado(this, oponente)
-    plan.foldLeft(peleaEnCurso)((pelea, movimiento) => pelea.map({case (atacante,adversario) =>
-                                                            atacante.pelearUnRound(movimiento)(adversario)}))
+  val peleaEnCurso : ResultadoPelea = (this, oponente).definirResultado
+  plan.foldLeft(peleaEnCurso)((pelea, movimiento) => pelea.map( {case (atacante,adversario) =>
+                                                            atacante.pelearUnRound(movimiento)(adversario)} ))
+        
   }
 }
 
@@ -143,3 +119,21 @@ case object Luchando extends EstadoDeLucha
 case class Fajado(rounds: Int) extends EstadoDeLucha
 case object Inconsciente extends EstadoDeLucha
 case object Muerto extends EstadoDeLucha
+
+trait ResultadoPelea {
+    
+    def map(f: Combatientes=>Combatientes): ResultadoPelea
+    
+}
+  
+case class Ganador(guerrero: Guerrero) extends ResultadoPelea {
+  
+    def map(f: Combatientes=>Combatientes) = Ganador(guerrero)
+    
+}
+  
+case class PeleaEnCurso(combatientes: Combatientes) extends ResultadoPelea {
+  
+  def map(f: Combatientes=>Combatientes) = f(combatientes) definirResultado
+  
+}

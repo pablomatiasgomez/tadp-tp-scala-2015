@@ -65,4 +65,16 @@ class Guerrero_Test extends FlatSpec with Matchers {
     yajirobe.planDeAtaque(cell, 2)(quedoConMasKi) shouldBe List(UsarItem(Arma(Filosa)), UsarItem(SemillaDelErmitaño))
   }
   
+  "yajirobe" should "pelear con cell y terminar peleando" in {
+    val (yajirobeFinal, cellFinal) = (yajirobe disminuiEnergia(90), cell disminuiEnergia(90))
+    
+    yajirobe.pelearContra(cell)(List(UsarItem(Arma(Filosa)), UsarItem(SemillaDelErmitaño))) shouldBe PeleaEnCurso((yajirobeFinal, cellFinal))
+  }
+  
+  "goku" should "pelear con vegeta y se deja fajar pero lo mata con una Genkidama" in {
+    val vegetaMono = new Guerrero("MonoV", List(), 3003, 3003, Saiyajin(MonoGigante(1001), true), Luchando, todosSaben)
+    
+    goku.pelearContra(vegetaMono)(List(DejarseFajar, Genkidama)) shouldBe Ganador(goku disminuiEnergia(20) estas Luchando)
+  }
+  
 }

@@ -3,7 +3,7 @@ package utn.tadp.dragonball
 object BlackMagic {
   
    implicit class IntConPorcentaje(int: Int){
-     def porcentajeDe(otroInt: Int):Int = (int.toDouble / otroInt.toDouble) toInt 
+     def porcentajeDe(otroInt: Int):Double = (int.toDouble / otroInt.toDouble) 
    }
   
    implicit class Count[T](list: List[T]) {
@@ -40,4 +40,17 @@ object BlackMagic {
      def becomeOnTrue(condicion:Boolean)(otraCosa:T):T = algo.transformOnTrue(condicion)( _ => otraCosa )
    }
    
+   implicit class Resultados(combatientes: Simulador.Combatientes) {
+     def definirResultado: ResultadoPelea = {
+      val (atacanteFinal, oponenteFinal) = combatientes
+      (atacanteFinal.estado,oponenteFinal.estado) match {
+          case (Muerto, _) => Ganador(oponenteFinal)
+          case (_, Muerto) => Ganador(atacanteFinal)
+          case (_, _) => PeleaEnCurso((atacanteFinal, oponenteFinal))
+        }   
+      }
+   }
+   
 }
+
+
