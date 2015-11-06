@@ -152,25 +152,26 @@ object Simulador {
     
   } )
   
-  case class Onda(energiaNecesaria: Int) extends Movimiento ({case (atacante, oponente)=> {
+  
+  case class Onda(energiaNecesaria: Int) extends Ataque( Energia, ({case (_, oponente)=> {
     
-    (atacante,oponente).becomeOnTrue(atacante.energia > energiaNecesaria)(
-      (atacante disminuiEnergia energiaNecesaria,
-       oponente disminuiEnergia (oponente.especie match {
-                                 case Androide => - energiaNecesaria * 2
-                                 case Monstruo(_) => energiaNecesaria / 2
-                                 case _ => energiaNecesaria*2 })
-      ))
+    val poderOfensivo:Especie=>Int = _ match{
+                       case Monstruo(_) => energiaNecesaria/2
+                       case _ => energiaNecesaria*2 }
+   
+    (energiaNecesaria, poderOfensivo(oponente.especie)  )      
     
-  } })
+  } }) )
   
 
-  case object Genkidama extends Ataque(Energia, 
-     ( { case(atacante,_) =>
-        (  0 , atacante.estado match {
+  case object Genkidama extends Ataque(Energia, ( { case(atacante,_) =>
+     
+      val poderAcumulado:EstadoDeLucha=>Int = _ match {
                     case Fajado(rounds) => 10 pow rounds
-                    case _ => 0 
-        }  )  
+                    case _ => 0 } 
+      
+       (0 , poderAcumulado(atacante.estado)  )
+       
     }  )  
 )
   
