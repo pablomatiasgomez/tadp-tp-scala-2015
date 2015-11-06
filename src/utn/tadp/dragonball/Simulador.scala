@@ -164,28 +164,27 @@ object Simulador {
     
   } })
   
-  case object Genkidama extends Movimiento ({case (atacante,oponente) => {
-    
-    (atacante.estado, oponente.especie) match {
-      case (Fajado(rounds), Androide) => (atacante, oponente aumentaEnergia (10 pow rounds)) //DAT REPEATED LOGIC
-      case (Fajado(rounds), _) => (atacante, oponente disminuiEnergia (10 pow rounds))
-      case _ => (atacante, oponente)
-      }
-    }
-  }
- )
+
+  case object Genkidama extends Ataque(Energia, 
+     ( { case(atacante,_) =>
+        (  0 , atacante.estado match {
+                    case Fajado(rounds) => 10 pow rounds
+                    case _ => 0 
+        }  )  
+    }  )  
+)
   
   
   type Danios = (Int,Int)
   
   trait TipoAtaque
-  case object Onda extends TipoAtaque
+  case object Energia extends TipoAtaque
   case object Fisico extends TipoAtaque
   
-  case class Ataque(tipoAtaque:TipoAtaque,funcionDanio:(Combatientes=>Danios)) extends Movimiento( combatientes => {
+  class Ataque(tipoAtaque:TipoAtaque,funcionDanio:(Combatientes=>Danios)) extends Movimiento( combatientes => {
     val (danioAtacante, danioAtacado) = funcionDanio(combatientes)
     def efectoEn(guerrero:Guerrero) = (tipoAtaque,guerrero.especie) match{
-      case (Onda,Androide) => guerrero.aumentaEnergia _
+      case (Energia,Androide) => guerrero.aumentaEnergia _
       case _ => guerrero.disminuiEnergia _
     }
     combatientes.onEach( _ disminuiEnergia danioAtacante, efectoEn(_)(danioAtacado) )

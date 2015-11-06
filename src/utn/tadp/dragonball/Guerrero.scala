@@ -88,7 +88,7 @@ case class Guerrero(
   def planDeAtaque(oponente: Guerrero, rounds: Int)(criterio: CriterioDeCombate): PlanDeAtaque = {
     
     val (planVacio,combatientes) = (List():PlanDeAtaque,(this,oponente))
-    
+
     List.range(0, rounds).foldLeft((planVacio,combatientes))( (semilla, _) => {
         val (plan, (atacante, oponente)) = semilla
         val mejorMovimiento = atacante.movimientoMasEfectivoContra(oponente)(criterio)
@@ -131,6 +131,6 @@ case class Ganador(guerrero: Guerrero) extends ResultadoPelea {
   
 case class PeleaEnCurso(combatientes: Combatientes) extends ResultadoPelea {
   
-  def map(f: Combatientes=>Combatientes) = f(combatientes) definirResultado
+  def map(luchar: Combatientes=>Combatientes) = luchar(combatientes) definirResultado
   
 }
