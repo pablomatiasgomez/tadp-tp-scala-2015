@@ -100,35 +100,9 @@ case class Guerrero(
       
   }
   
-  trait ResultadoPelea {
-    
-    def map(f: Guerrero=>Guerrero=>Combatientes): ResultadoPelea
-    
-  }
-  
-  case class Ganador(guerrero: Guerrero) extends ResultadoPelea {
-    
-    def map(f: Guerrero=>Guerrero=>Combatientes) = Ganador(guerrero)
-    
-  }
-  case class PeleaEnCurso(combatientes: Combatientes) extends ResultadoPelea {
-    def map(f: Guerrero=>Guerrero=>Combatientes) = definirResultado(f(combatientes._1)(combatientes._2))
-  }
-  
-  def definirResultado(combatientes: Combatientes) = {
-    
-    val (atacanteFinal, oponenteFinal) = combatientes
-    (atacanteFinal.estado,oponenteFinal.estado) match {
-        case (Muerto, _) => Ganador(oponenteFinal)
-        case (_, Muerto) => Ganador(atacanteFinal)
-        case (_, _) => PeleaEnCurso((atacanteFinal, oponenteFinal))
-      }   
-    
-  }
-  
   def pelearContra(oponente: Guerrero)(plan: List[Movimiento]): ResultadoPelea = {
     
-    val peleaEnCurso : ResultadoPelea = definirResultado((this, oponente))
+    val peleaEnCurso : ResultadoPelea = (this, oponente).definirResultado
     plan.foldLeft(peleaEnCurso)((pelea, movimiento) => { pelea.map(_.pelearUnRound(movimiento)_) } )
     
     
@@ -144,3 +118,21 @@ case object Luchando extends EstadoDeLucha
 case class Fajado(rounds: Int) extends EstadoDeLucha
 case object Inconsciente extends EstadoDeLucha
 case object Muerto extends EstadoDeLucha
+
+trait ResultadoPelea {
+    
+    def map(f: Guerrero=>Guerrero=>Combatientes): ResultadoPelea
+    
+}
+  
+case class Ganador(guerrero: Guerrero) extends ResultadoPelea {
+  
+    def map(f: Guerrero=>Guerrero=>Combatientes) = Ganador(guerrero)
+    
+}
+  
+case class PeleaEnCurso(combatientes: Combatientes) extends ResultadoPelea {
+  
+  def map(f: Guerrero=>Guerrero=>Combatientes) = f(combatientes._1)(combatientes._2) definirResultado
+  
+}
