@@ -26,24 +26,24 @@ class Guerrero_Test extends FlatSpec with Matchers {
                                                                           }
   
   
-  "goku" should "elegir CargarKi porque lo deja con mas ki" in {
+  "movimientoMasEfectivoContra" should "goku elige CargarKi porque lo deja con mas ki" in {
     goku.movimientoMasEfectivoContra(vegeta)(quedoConMasKi) shouldBe CargarKi
   }
   
-  "goku" should "elegir Genkidama porque lo deja con mayor ventaja" in {
+  "movimientoMasEfectivoContra" should "goku elige Genkidama porque lo deja con mayor ventaja" in {
     goku.movimientoMasEfectivoContra(vegeta)(mayorVentajaDeKi) shouldBe Genkidama
   }
   
-  "vegeta" should "elegir Fusion porque lo deja con mas ki y con mas Venjata" in {
+  "movimientoMasEfectivoContra" should " vegeta elige Fusion porque lo deja con mas ki y con mas Venjata" in {
     vegeta.movimientoMasEfectivoContra(goku)(quedoConMasKi) shouldBe Fusion(goku)
     vegeta.movimientoMasEfectivoContra(goku)(mayorVentajaDeKi) shouldBe Fusion(goku)
   }
   
-  "goku" should "elegir DejarseFajar porque lo deja mas fajado" in {
+  "movimientoMasEfectivoContra" should "goku elige DejarseFajar porque lo deja mas fajado" in {
     goku.movimientoMasEfectivoContra(vegeta)(quedoMasFajado) shouldBe DejarseFajar
   }
   
-  "goku" should "cargar ki mientras que vegeta se fusiona como contra ataque" in {
+  "pelearUnRound" should "goku carga ki mientras que vegeta se fusiona como contra ataque" in {
     val movimientoDeGoku = goku.movimientoMasEfectivoContra(vegeta)(quedoConMasKi)
 
     val (g, v) = goku.pelearUnRound(movimientoDeGoku)(vegeta)
@@ -56,21 +56,21 @@ class Guerrero_Test extends FlatSpec with Matchers {
     v.especie shouldBe Fusionado(vegeta, goku)
   }
   
-  "goku" should "armar un plan dejandose fajar siempre" in {
+  "planDeAtaque" should "goku arma un plan dejandose fajar siempre" in {
     goku.planDeAtaque(vegeta, 4)(quedoMasFajado) shouldBe List(DejarseFajar, DejarseFajar, DejarseFajar, DejarseFajar)
   }
   
-  "yajirobe" should "armar un plan primero usando la espada y luego la semilla del ermitaño" in {
+  "planDeAtaque" should "yajirobe arma un plan primero usando la espada y luego la semilla del ermitaño" in {
     yajirobe.planDeAtaque(cell, 2)(quedoConMasKi) shouldBe List(UsarItem(Arma(Filosa)), UsarItem(SemillaDelErmitaño))
   }
   
-  "yajirobe" should "pelear con cell y terminar peleando" in {
+  "pelearContra" should "yajirobe pelea con cell y terminan peleando" in {
     val (yajirobeFinal, cellFinal) = (yajirobe disminuiEnergia(90), cell disminuiEnergia(90))
     
-    yajirobe.pelearContra(cell)(List(UsarItem(Arma(Filosa)), UsarItem(SemillaDelErmitaño))) shouldBe PeleaEnCurso((yajirobeFinal, cellFinal))
+    yajirobe.pelearContra(cell)(yajirobe.planDeAtaque(cell, 2)(quedoConMasKi)) shouldBe PeleaEnCurso((yajirobeFinal, cellFinal))
   }
   
-  "goku" should "pelear con vegeta y se deja fajar pero lo mata con una Genkidama" in {
+  "pelearContra" should "goku pelea con vegeta y se deja fajar pero lo mata con una Genkidama" in {
     val vegetaMono = new Guerrero("MonoV", List(), 3003, 3003, Saiyajin(MonoGigante(1001), true), Luchando, todosSaben)
     
     goku.pelearContra(vegetaMono)(List(DejarseFajar, Genkidama)) shouldBe Ganador(goku disminuiEnergia(20) estas Luchando)

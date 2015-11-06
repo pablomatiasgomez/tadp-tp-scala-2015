@@ -17,8 +17,8 @@ class Simulador_Test {
   val dejarInconsciente: Function1[Combatientes, Combatientes] = { case (atacante, oponente) => (atacante, oponente estas Inconsciente) }
   val convertirEnHumano: Function1[Combatientes, Combatientes] = { case (atacante, oponente) => (atacante, oponente transformateEn Humano) }
   
-  val digerirMajinBuu: Function1[Combatientes, Guerrero] = {case (a, o) => {a tusMovimientos(o movimientos)} }
-  val digerirCell: Function1[Combatientes, Guerrero] = {case (a, o) => { if(o.especie == Androide)
+  val digerirMajinBuu: Function1[Combatientes, Guerrero] = { case (a, o) => {a tusMovimientos(o movimientos)} }
+  val digerirCell: Function1[Combatientes, Guerrero] = { case (a, o) => { if(o.especie == Androide)
                                                                            a agregaMovimientos(o.movimientos)
                                                                          else
                                                                            a} }
@@ -46,7 +46,7 @@ class Simulador_Test {
   
   //Sobre CargarKi
   @Test
-  def superSaiyajingCargaKiTest() ={
+  def superSaiyajingCargaKiTest() = {
     val(g, k) = CargarKi(goku, krilin)
     
     assertEquals(1450, g energia)
@@ -54,7 +54,7 @@ class Simulador_Test {
   }
   
   @Test
-  def androideNoCargaKiTest() ={
+  def androideNoCargaKiTest() = {
     val(n18, k) = CargarKi(numero18, krilin)
     
     assertEquals(numero18 energia, n18 energia)
@@ -62,7 +62,7 @@ class Simulador_Test {
   }
   
   @Test
-  def otroCargaKiTest() ={
+  def otroCargaKiTest() = {
     val(p, k) = CargarKi(piccolo, krilin)
     
     assertEquals(300, p energia)
@@ -71,7 +71,7 @@ class Simulador_Test {
   
   //Sobre UsarItem
   @Test
-  def usaArmaRomaContraAndroideTest() ={
+  def usaArmaRomaContraAndroideTest() = {
     val(k, n18) = UsarItem(Arma(Roma))(krilin, numero18)
     
     assertEquals(n18, numero18)
@@ -79,7 +79,7 @@ class Simulador_Test {
   }
   
   @Test
-  def usaArmaRomaYDejaInconscienteTest() ={
+  def usaArmaRomaYDejaInconscienteTest() = {
     val(k, p) = UsarItem(Arma(Roma))(krilin, piccolo)
     
     assertEquals(Inconsciente, p estado)
@@ -87,7 +87,7 @@ class Simulador_Test {
   }
   
   @Test
-  def usaArmaRomaNoPasaNadaTest() ={
+  def usaArmaRomaNoPasaNadaTest() = {
     val(k, g) = UsarItem(Arma(Roma))(krilin, goku)
     
     assertEquals(goku, g)
@@ -95,7 +95,7 @@ class Simulador_Test {
   }
   
   @Test
-  def siNoTieneUnArmaRomaEnElInventarioNoPasaNadaTest() ={
+  def siNoTieneUnArmaRomaEnElInventarioNoPasaNadaTest() = {
     val(g, p) = UsarItem(Arma(Roma))(goku, piccolo)
     
     assertEquals(goku, g)
@@ -103,7 +103,7 @@ class Simulador_Test {
   }
   
   @Test
-  def usaArmaFilosaConMonoTest() ={
+  def usaArmaFilosaConMonoTest() = {
     val(buu, m) = UsarItem(Arma(Filosa))(majinBuu, mono)
     
     assertEquals(majinBuu, buu)
@@ -113,7 +113,7 @@ class Simulador_Test {
   }
   
   @Test
-  def usaArmaFilosaConSSJTest() ={
+  def usaArmaFilosaConSSJTest() = {
     val(buu, g) = UsarItem(Arma(Filosa))(majinBuu, goku)
     
     assertEquals(majinBuu, buu)
@@ -122,7 +122,7 @@ class Simulador_Test {
   }
   
   @Test
-  def usaArmaFilosaConSJSinColaTest() ={
+  def usaArmaFilosaConSJSinColaTest() = {
     val(buu, v) = UsarItem(Arma(Filosa))(majinBuu, vegeta)
     
     assertEquals(majinBuu, buu)
@@ -131,7 +131,7 @@ class Simulador_Test {
   }
   
   @Test
-  def usaArmaFilosaConOtroTest() ={
+  def usaArmaFilosaConOtroTest() = {
     val(buu, c) = UsarItem(Arma(Filosa))(majinBuu, cell)
     
     assertEquals(majinBuu, buu)
@@ -139,7 +139,7 @@ class Simulador_Test {
   }
   
   @Test
-  def usaArmaFuegoConHumanoTest() ={
+  def usaArmaFuegoConHumanoTest() = {
     val(n18, k) = UsarItem(Arma(Fuego(Ak47)))(numero18, krilin)
     
     assertEquals(numero18 gastarItems List(Municion(Ak47)), n18)
@@ -147,7 +147,7 @@ class Simulador_Test {
   }
   
   @Test
-  def usaArmaFuegoConNamekuseinInconscienteTest() ={
+  def usaArmaFuegoConNamekuseinInconscienteTest() = {
     val(n18, p) = UsarItem(Arma(Fuego(Ak47)))(numero18, piccolo estas Inconsciente)
     
     assertEquals(numero18 gastarItems(List(Municion(Ak47))), n18)
@@ -155,7 +155,7 @@ class Simulador_Test {
   }
   
   @Test
-  def usaArmaFuegoConNamekuseinLuchandoTest() ={
+  def usaArmaFuegoConNamekuseinLuchandoTest() = {
     val(n18, p) = UsarItem(Arma(Fuego(Ak47)))(numero18, piccolo)
     
     assertEquals(numero18 gastarItems List(Municion(Ak47)), n18)
@@ -163,7 +163,7 @@ class Simulador_Test {
   }
   
   @Test
-  def usaSemillaDelErmitañoTest() ={
+  def usaSemillaDelErmitañoTest() = {
     val(g, p) = UsarItem(SemillaDelErmitaño)(goku, piccolo)
     
     assertEquals(goku energiaMaxima, g energia)
@@ -171,7 +171,7 @@ class Simulador_Test {
   }
   
   @Test
-  def usarUnaEsferaDelDragonSolaNoHaceNadaTest(){
+  def usarUnaEsferaDelDragonSolaNoHaceNadaTest() {
     val(k, n18) = UsarItem(EsferaDelDragon)(krilin, numero18)
     
     assertEquals(krilin, k)
@@ -180,7 +180,7 @@ class Simulador_Test {
   
   //Sobre ComerseAlOponente
   @Test
-  def majinBuuSeComeAGokuTest() ={
+  def majinBuuSeComeAGokuTest() = {
     val(m, g) = ComerseAlOponente(majinBuu, goku)
     
     assertEquals(goku estas Muerto , g)
@@ -188,7 +188,7 @@ class Simulador_Test {
   }
   
   @Test
-  def cellIntentaComerseAGokuSinEfectoTest() ={
+  def cellIntentaComerseAGokuSinEfectoTest() = {
     val(c, g) = ComerseAlOponente(cell, goku)
     
     assertEquals(goku estas Muerto, g)
@@ -196,7 +196,7 @@ class Simulador_Test {
   }
   
   @Test
-  def cellSeComeANumero18Test() ={
+  def cellSeComeANumero18Test() = {
     val(c, n18) = ComerseAlOponente(cell, numero18)
     
     assertEquals(numero18 estas Muerto , n18)
@@ -204,7 +204,7 @@ class Simulador_Test {
   }
   
   @Test
-  def unNoMonstruoIntentaComerseAlOponentePeroSinSurgirEfectoTest() ={
+  def unNoMonstruoIntentaComerseAlOponentePeroSinSurgirEfectoTest() = {
     val(g, p) = ComerseAlOponente(goku, piccolo)
     
     assertEquals(goku, g)
@@ -213,7 +213,7 @@ class Simulador_Test {
   
   //Sobre ConvertirseEnMono
   @Test
-  def unMonoConvirtiendoseEnMonoMonoQuedaTest() ={
+  def unMonoConvirtiendoseEnMonoMonoQuedaTest() = {
     val(m, k) = ConvertirseEnMono(mono, krilin)
     
     assertEquals(mono, m)
@@ -221,7 +221,7 @@ class Simulador_Test {
   }
   
   @Test
-  def sinColaNoHayMonoTest() ={
+  def sinColaNoHayMonoTest() = {
     val(v, k) = ConvertirseEnMono(vegeta, krilin)
     
     assertEquals(vegeta, v)
@@ -229,7 +229,7 @@ class Simulador_Test {
   }
   
   @Test
-  def sinSaiyajingNoHayMonoTest() ={
+  def sinSaiyajingNoHayMonoTest() = {
     val(p, k) = ConvertirseEnMono(piccolo, krilin)
     
     assertEquals(piccolo, p)
@@ -237,7 +237,7 @@ class Simulador_Test {
   }
   
   @Test
-  def sinFotoDeLaLunaNoHayMonoTest() ={
+  def sinFotoDeLaLunaNoHayMonoTest() = {
     val(g, k) = ConvertirseEnMono(goku copy(inventario = List()), krilin)
     
     
@@ -246,7 +246,7 @@ class Simulador_Test {
   }
   
   @Test
-  def gokuSeTransformaEnMonoTest() ={
+  def gokuSeTransformaEnMonoTest() = {
     val(g, k) = ConvertirseEnMono(goku, krilin)
     
     assertEquals(Saiyajin(MonoGigante(500),true), g especie)
@@ -257,7 +257,7 @@ class Simulador_Test {
   
   //Sobre ConvertirseEnSuperSaiyajin
   @Test
-  def vegetaSeConvierteEnSSJTest(){
+  def vegetaSeConvierteEnSSJTest() = {
     val (v, g) = ConvertirseEnSuperSaiyajing(vegeta, goku)
     
     assertEquals(5005, v energiaMaxima)
@@ -266,7 +266,7 @@ class Simulador_Test {
   }
   
   @Test
-  def vegetaNoSeConvierteEnSSJConPocoKiTest(){
+  def vegetaNoSeConvierteEnSSJConPocoKiTest() = {
     val (v, g) = ConvertirseEnSuperSaiyajing(vegeta disminuiEnergia 500, goku)
     
     assertEquals(v, vegeta disminuiEnergia 500)
@@ -274,7 +274,7 @@ class Simulador_Test {
   }
   
   @Test
-  def gokuSeConvierteEnSSJ2Test(){
+  def gokuSeConvierteEnSSJ2Test() = {
     val (g, v) = ConvertirseEnSuperSaiyajing(goku, vegeta)
     
     assertEquals(5000, g energiaMaxima)
@@ -283,7 +283,7 @@ class Simulador_Test {
   }
   
   @Test
-  def monoNoSeConvierteEnSSJTest(){
+  def monoNoSeConvierteEnSSJTest() = {
     val (m, v) = ConvertirseEnSuperSaiyajing(mono, vegeta)
     
     assertEquals(mono, m)
@@ -291,7 +291,7 @@ class Simulador_Test {
   }
   
   @Test
-  def krilinNoSeConvierteEnSSJTest(){
+  def krilinNoSeConvierteEnSSJTest() = {
     val (k, v) = ConvertirseEnSuperSaiyajing(krilin, vegeta)
     
     assertEquals(krilin, k)
@@ -299,7 +299,7 @@ class Simulador_Test {
   }
   
   @Test
-  def ssjSeVuelveNormalAlQuedarInconscienteTest(){
+  def ssjSeVuelveNormalAlQuedarInconscienteTest() = {
     val (g, v) = (goku estas Inconsciente, vegeta)
     
     assertEquals(500, g energiaMaxima)
@@ -309,7 +309,7 @@ class Simulador_Test {
   
   //Sobre Fusion
   @Test
-  def krilinSeFusionaConPiccoloTest(){
+  def krilinSeFusionaConPiccoloTest() = {
     val (f, v) = Fusion(krilin)(piccolo, vegeta)
     
     assertEquals(piccolo.inventario++krilin.inventario, f inventario)
@@ -320,7 +320,7 @@ class Simulador_Test {
   }
   
   @Test
-  def vegetaSeFusionaConGokuTest(){
+  def vegetaSeFusionaConGokuTest() = {
     val (f, m) = Fusion(goku)(vegeta, majinBuu)
     
     assertEquals(vegeta.inventario++goku.inventario, f inventario)
@@ -331,7 +331,7 @@ class Simulador_Test {
   }
   
   @Test
-  def noTodosPuedenFusionarseTest(){
+  def noTodosPuedenFusionarseTest() = {
     val (k, c) = Fusion(numero18)(krilin, cell)
     
     assertEquals(krilin, k)
@@ -339,7 +339,7 @@ class Simulador_Test {
   }
   
   @Test
-  def vegetaSeFusionaConGokuYMuereTest(){
+  def vegetaSeFusionaConGokuYMuereTest() = {
     val (f, m) = Fusion(goku)(vegeta, majinBuu)
     
     
@@ -348,7 +348,7 @@ class Simulador_Test {
   }
   
   @Test
-  def vegetaSeFusionaConGokuYQuedaInconscienteTest(){
+  def vegetaSeFusionaConGokuYQuedaInconscienteTest() = {
     val (f, m) = Fusion(goku)(vegeta, majinBuu)
     
     
@@ -358,7 +358,7 @@ class Simulador_Test {
   
   //Sobre Magia
   @Test
-  def piccoloUsaMagiaTest(){
+  def piccoloUsaMagiaTest() = {
     val (p, g) = Magia(dejarInconsciente)(piccolo, goku)
     
     assertEquals(piccolo, p)
@@ -366,7 +366,7 @@ class Simulador_Test {
   }
   
   @Test
-  def majinBuuUsaMagiaTest(){
+  def majinBuuUsaMagiaTest() = {
     val (m, g) = Magia(dejarInconsciente)(majinBuu, goku)
     
     assertEquals(majinBuu, m)
@@ -374,14 +374,14 @@ class Simulador_Test {
   }
   
   @Test
-  def numero18NoUsaMagiaTest(){
+  def numero18NoUsaMagiaTest() = {
     val (n18, g) = Magia(convertirEnHumano)(numero18, numero18)
     
     assertEquals(numero18, n18)
   }
   
   @Test
-  def krilinUsaMagiaTest(){
+  def krilinUsaMagiaTest() = {
     val (k, n18) = Magia(convertirEnHumano)(krilin, numero18)
     
     assertEquals(krilin.inventario diff esferasDelDragon, k.inventario)
@@ -390,7 +390,7 @@ class Simulador_Test {
   
   //Sobre MuchosGolpesNinja
   @Test
-  def krilinSePeleaConNumero18YSeLastmiaLosDeditosTest(){
+  def krilinSePeleaConNumero18YSeLastmiaLosDeditosTest() = {
     val (k, n18) = MuchosGolpesNinja(krilin, numero18)
     
     assertEquals(krilin disminuiEnergia 10, k)
@@ -398,7 +398,7 @@ class Simulador_Test {
   }
   
   @Test
-  def numero18SePeleaConKrilinYLoLastimaTest(){
+  def numero18SePeleaConKrilinYLoLastimaTest() = {
     val (n18, k) = MuchosGolpesNinja(numero18, krilin)
     
     assertEquals(krilin disminuiEnergia 20, k)
@@ -406,7 +406,7 @@ class Simulador_Test {
   }
   
   @Test
-  def piccoloMataAVegetaAGolpesTest(){
+  def piccoloMataAVegetaAGolpesTest() = {
     val (p, v) = MuchosGolpesNinja(piccolo,vegeta tuEnergiaEs(1))
     
     assertEquals(0, v energia)
@@ -416,7 +416,7 @@ class Simulador_Test {
   
   //Sobre Explotar
   @Test
-  def numero18ExplotaYMataAKrilinTest(){
+  def numero18ExplotaYMataAKrilinTest() = {
     val (n18, k) = Explotar(numero18, krilin)
     
     assertEquals(0, n18 energia)
@@ -426,7 +426,7 @@ class Simulador_Test {
   }
   
   @Test
-  def majinBuuExplotaYDañaAMonoTest(){
+  def majinBuuExplotaYDañaAMonoTest() = {
     val (m, mo) = Explotar(majinBuu, mono)
     
     assertEquals(0, m energia)
@@ -436,7 +436,7 @@ class Simulador_Test {
   }
   
   @Test
-  def numero18ExplotaYDañaAMonoTest(){
+  def numero18ExplotaYDañaAMonoTest() = {
     val (n18, mo) = Explotar(numero18, mono)
     
     assertEquals(0, n18 energia)
@@ -446,7 +446,7 @@ class Simulador_Test {
   }
   
   @Test
-  def cellExplotaYNoMataAPiccoloTest(){
+  def cellExplotaYNoMataAPiccoloTest() = {
     val (c, p) = Explotar(cell, piccolo)
     
     assertEquals(0, c energia)
@@ -456,7 +456,7 @@ class Simulador_Test {
   }
   
   @Test
-  def numero18ExplotaYNoMataAPiccoloTest(){
+  def numero18ExplotaYNoMataAPiccoloTest() = {
     val (n18, p) = Explotar(numero18, piccolo)
     
     assertEquals(0, n18 energia)
@@ -466,7 +466,7 @@ class Simulador_Test {
   }
   
   @Test
-  def krilinNoExplotaTest(){
+  def krilinNoExplotaTest() = {
     val (k, v) = Explotar(krilin, vegeta)
     
     assertEquals(krilin, k)
@@ -475,7 +475,7 @@ class Simulador_Test {
   
   //Sobre Onda
   @Test
-  def piccoloTiraOndaAVegetaTest(){
+  def piccoloTiraOndaAVegetaTest() = {
     val (p, v) = Onda(40)(piccolo,vegeta)
     
     assertEquals(piccolo disminuiEnergia 40, p)
@@ -483,7 +483,7 @@ class Simulador_Test {
   }
   
   @Test
-  def numero18TiraOndaACellTest(){
+  def numero18TiraOndaACellTest() = {
     val (n18, c) = Onda(40)(numero18, cell)
     
     assertEquals(numero18 disminuiEnergia 40, n18)
@@ -491,7 +491,7 @@ class Simulador_Test {
   }
   
   @Test
-  def krilinTiraOndaANumero18Test(){
+  def krilinTiraOndaANumero18Test() = {
     val (k, n18) = Onda(40)(krilin, numero18)
     
     assertEquals(krilin disminuiEnergia 40, k)
@@ -499,7 +499,7 @@ class Simulador_Test {
   }
   
   @Test
-  def krilinNoPuedeTirarOndaAVegetaTest(){
+  def krilinNoPuedeTirarOndaAVegetaTest() = {
     val (k, v) = Onda(100)(krilin,vegeta)
     
     assertEquals(krilin, k)
@@ -508,7 +508,7 @@ class Simulador_Test {
   
   //Sobre Genkidama
   @Test
-  def gokuTiraUnaGenkidamaSinDejarseFajarYNoHaceNadaTest(){
+  def gokuTiraUnaGenkidamaSinDejarseFajarYNoHaceNadaTest() = {
     val (g, k) = Genkidama(goku, krilin)
     
     assertEquals(goku, g)
@@ -516,7 +516,7 @@ class Simulador_Test {
   }
   
   @Test
-  def gokuTiraUnaGenkidamaDejandonseFajar1TurnoTest(){
+  def gokuTiraUnaGenkidamaDejandonseFajar1TurnoTest() = {
     val(gokuFajado, kr) = DejarseFajar(goku, krilin)
     
     assertEquals(Fajado(1), gokuFajado estado)
@@ -528,7 +528,7 @@ class Simulador_Test {
   }
   
   @Test
-  def gokuTiraUnaGenkidamaDejandonseFajar1TurnoTestYCuraANumero18(){
+  def gokuTiraUnaGenkidamaDejandonseFajar1TurnoTestYCuraANumero18Test() = {
     val(gokuFajado, n18) = DejarseFajar(goku, numero18)
     
     assertEquals(Fajado(1), gokuFajado estado)
@@ -540,7 +540,7 @@ class Simulador_Test {
   }
   
   @Test
-  def gokuTiraUnaGenkidamaDejandonseFajar2TurnoTest(){
+  def gokuTiraUnaGenkidamaDejandonseFajar2TurnoTest() = {
     val(gokuFajado, kr) = DejarseFajar(DejarseFajar(goku, krilin))
     
     assertEquals(Fajado(2), gokuFajado estado)
@@ -553,7 +553,7 @@ class Simulador_Test {
   }
   
   @Test
-  def gokuTiraUnaGenkidamaDejandonseFajar3TurnoTest(){
+  def gokuTiraUnaGenkidamaDejandonseFajar3TurnoTest() = {
     val(gokuFajado, mo) = DejarseFajar(DejarseFajar(DejarseFajar(goku, mono)))
     
     assertEquals(Fajado(3), gokuFajado estado)
@@ -566,7 +566,7 @@ class Simulador_Test {
   
   //Sobre Estados, podrian ser mas detallistas pero hay mucho testeado implicitamente en los anteriores
   @Test
-  def unMuertoNoPuedeRealizarNingunMovimientoTest(){
+  def unMuertoNoPuedeRealizarNingunMovimientoTest() = {
     val(r, g) = CargarKi(raditz, goku)
     
     assertEquals(raditz, r)
@@ -582,7 +582,7 @@ class Simulador_Test {
   }
   
   @Test
-  def unInconscienteNoPuedeRealizarCasiNingunMovimientoTest(){
+  def unInconscienteNoPuedeRealizarCasiNingunMovimientoTest() = {
     val(y, g) = CargarKi(yamcha, goku)
     
     assertEquals(yamcha, y)
