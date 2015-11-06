@@ -11,6 +11,7 @@ case class Guerrero(
       estado: EstadoDeLucha,
       movimientos: List[Movimiento]
       ) {
+
   
   def tusMovimientos(agregados: List[Movimiento]) = copy(movimientos = agregados)
   
@@ -102,17 +103,17 @@ case class Guerrero(
   
   trait ResultadoPelea {
     
-    def map(f: Guerrero=>Guerrero=>Combatientes): ResultadoPelea
+    def map(f: Combatientes=>Combatientes): ResultadoPelea
     
   }
   
   case class Ganador(guerrero: Guerrero) extends ResultadoPelea {
     
-    def map(f: Guerrero=>Guerrero=>Combatientes) = Ganador(guerrero)
+    def map(f: Combatientes=>Combatientes) = Ganador(guerrero)
     
   }
   case class PeleaEnCurso(combatientes: Combatientes) extends ResultadoPelea {
-    def map(f: Guerrero=>Guerrero=>Combatientes) = definirResultado(f(combatientes._1)(combatientes._2))
+    def map(luchar: Combatientes=>Combatientes) = (luchar andThen definirResultado)(combatientes) //un lujo esta linea
   }
   
   def definirResultado(combatientes: Combatientes) = {
@@ -121,24 +122,22 @@ case class Guerrero(
     (atacanteFinal.estado,oponenteFinal.estado) match {
         case (Muerto, _) => Ganador(oponenteFinal)
         case (_, Muerto) => Ganador(atacanteFinal)
-        case (_, _) => PeleaEnCurso((atacanteFinal, oponenteFinal))
+        case (_, _) => PeleaEnCurso(atacanteFinal, oponenteFinal)
       }   
     
   }
+ 
   
   def pelearContra(oponente: Guerrero)(plan: List[Movimiento]): ResultadoPelea = {
     
-    val peleaEnCurso : ResultadoPelea = definirResultado((this, oponente))
-    plan.foldLeft(peleaEnCurso)((pelea, movimiento) => { pelea.map(_.pelearUnRound(movimiento)_) } )
     
-    
+    val peleaEnCurso : ResultadoPelea = definirResultado(this, oponente)
+    plan.foldLeft(peleaEnCurso)((pelea, movimiento) => pelea.map({case (atacante,adversario) =>
+                                                            atacante.pelearUnRound(movimiento)(adversario)}))
   }
-  
 }
 
-abstract class EstadoDeLucha(){
-  
-}
+abstract class EstadoDeLucha
 
 case object Luchando extends EstadoDeLucha
 case class Fajado(rounds: Int) extends EstadoDeLucha
