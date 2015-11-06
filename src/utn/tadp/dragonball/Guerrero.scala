@@ -13,32 +13,34 @@ case class Guerrero(
       movimientos: List[Movimiento]
       ) {
 
-  
   def tusMovimientos(agregados: List[Movimiento]) = copy(movimientos = agregados)
   
   def agregaMovimientos(agregados: List[Movimiento]) = copy(movimientos = movimientos++agregados)
     
-  def variarEnergia(f:(Int=>Int)) = {
+  def variarEnergia(f:(Int => Int)) = {
+    
     val guerreroAfectado = copy(energia = f(energia).max(0).min(energiaMaxima))
     if(guerreroAfectado.energia == 0) guerreroAfectado.estas(Muerto)
     else guerreroAfectado
+    
   }
   
-  def tuEnergiaEs(nuevaEnergia: Int) = variarEnergia( _ => nuevaEnergia )
+  def tuEnergiaEs(nuevaEnergia: Int) = variarEnergia( _ => nuevaEnergia)
   
-  def variarEnergiaMaxima(f:(Int=>Int)) = copy(energiaMaxima = f(energiaMaxima))
+  def variarEnergiaMaxima(f:(Int => Int)) = copy(energiaMaxima = f(energiaMaxima))
   
   def tuEnergiaMaximaEs(nuevoMaximo: Int) = variarEnergiaMaxima ( _ => nuevoMaximo)
   
-  def aumentaEnergia(aumento: Int) = variarEnergia( aumento + )
+  def aumentaEnergia(aumento: Int) = variarEnergia(aumento+ )
   
-  def disminuiEnergia(disminucion: Int) = aumentaEnergia( -disminucion )
+  def disminuiEnergia(disminucion: Int) = aumentaEnergia(-disminucion )
 
   def transformateEn(transformacion: Especie) = copy(especie = transformacion)
   
   def cargarAlMaximo = tuEnergiaEs(energiaMaxima)
   
   def estas(nuevoEstado: EstadoDeLucha): Guerrero = {
+    
     (nuevoEstado, especie) match {
       case (Muerto, Fusionado((original, _))) => original estas Muerto
       case (Inconsciente, Fusionado((original, _))) => original estas Inconsciente
@@ -47,79 +49,78 @@ case class Guerrero(
                                                                                       estas Inconsciente)
       case _ => copy(estado = nuevoEstado)
     }
+    
   }
-  def variarInventario(f:(List[Item]=>List[Item])) = copy(inventario = f(inventario))
+  
+  def variarInventario(f: (List[Item] => List[Item])) = copy(inventario = f(inventario))
   
   def gastarItems(itemsUsados: List[Item]) = variarInventario( _ diff itemsUsados)
   
-  def sumaAInventario(agregados: List[Item]) = variarInventario( _ ++ agregados )
+  def sumaAInventario(agregados: List[Item]) = variarInventario( _++agregados )
   
   def puedeFusionarse = especie.fusionable
   
-  def tiene(item:Item):Boolean = inventario contains item
+  def tiene(item:Item): Boolean = inventario contains item
   
-  def tiene(items:List[Item]):Boolean = items forall (inventario contains)
+  def tiene(items: List[Item]): Boolean = items forall (inventario contains)
   
-  def tiene(item:Item, cantidad:Int) = inventario has (cantidad,item)
+  def tiene(item: Item, cantidad: Int) = inventario has (cantidad, item)
   
   type CriterioDeCombate = Combatientes => Double
   
   type PlanDeAtaque = List[Movimiento]
   
   def movimientoMasEfectivoContra(oponente: Guerrero)(criterio: CriterioDeCombate): Movimiento = {
-    val combatientes = (this,oponente)
-    val mejorMovimiento = movimientos.maxBy(movimiento => criterio( movimiento( combatientes)))
-    if( criterio (mejorMovimiento (combatientes) )  > 0)
+    
+    val combatientes = (this, oponente)
+    val mejorMovimiento = movimientos.maxBy(movimiento => criterio(movimiento(combatientes)))
+    if(criterio (mejorMovimiento (combatientes))  > 0)
       mejorMovimiento
     else
-      //throw new RuntimeException("No hay un movimiento satisfactorio") no deberiamos tirar excepcion
       DejarseFajar
+      
   }
   
-  def atacarSegun(criterioDeCombate:CriterioDeCombate): (Guerrero=>Combatientes) = guerrero => 
-              this.movimientoMasEfectivoContra(guerrero)(criterioDeCombate)(this,guerrero)
+  def atacarSegun(criterioDeCombate: CriterioDeCombate): (Guerrero => Combatientes) = guerrero => 
+              this.movimientoMasEfectivoContra(guerrero)(criterioDeCombate)(this, guerrero)
   
-  def contraAtacarA(guerrero:Guerrero): Combatientes =
-              this.atacarSegun(mayorVentajaDeKi)(guerrero)
+  def contraAtacarA(guerrero: Guerrero): Combatientes = this.atacarSegun(mayorVentajaDeKi)(guerrero)
   
-
-  def mayorVentajaDeKi(combatientes: Combatientes):Double =  (combatientes._1.energia - combatientes._2.energia) match {
+  def mayorVentajaDeKi(combatientes: Combatientes): Double =  (combatientes._1.energia - combatientes._2.energia) match {
                 case diferencia if diferencia > 0 => diferencia 
                 case 0 => 0.99
-                case diferencia if diferencia < 0 => 0.98/ diferencia
-}
+                case diferencia if diferencia < 0 => 0.98 / diferencia
+  }
               
   def pelearUnRound(movimiento: Movimiento)(oponente: Guerrero): Combatientes = {
     
-    val (thisFajado,oponenteFajado) = movimiento(this, oponente)
+    val (thisFajado, oponenteFajado) = movimiento(this, oponente)
     oponenteFajado.contraAtacarA(thisFajado).swap
   
   }
   
   def planDeAtaque(oponente: Guerrero, rounds: Int)(criterio: CriterioDeCombate): PlanDeAtaque = {
     
-    val (planVacio,combatientes) = (List():PlanDeAtaque,(this,oponente))
+    val (planVacio, combatientes) = (List(): PlanDeAtaque, (this, oponente))
 
-    List.range(0, rounds).foldLeft((planVacio,combatientes))( (semilla, _) => {
+    List.range(0, rounds).foldLeft((planVacio, combatientes))((semilla, _) => {
         val (plan, (atacante, oponente)) = semilla
         val mejorMovimiento = atacante.movimientoMasEfectivoContra(oponente)(criterio)
         
         (plan :+ mejorMovimiento, atacante.pelearUnRound(mejorMovimiento)(oponente))
-        
       })._1
       
   }
    
-  
   def pelearContra(oponente: Guerrero)(plan: List[Movimiento]): ResultadoPelea = {
     
+    val peleaEnCurso: ResultadoPelea = (this, oponente).definirResultado
+    plan.foldLeft(peleaEnCurso)((pelea, movimiento) => pelea.map({ case (atacante, adversario) =>
+                                                              atacante.pelearUnRound(movimiento)(adversario)
+                                                              }))
+    }
     
-  val peleaEnCurso : ResultadoPelea = (this, oponente).definirResultado
-  plan.foldLeft(peleaEnCurso)((pelea, movimiento) => pelea.map( {case (atacante,adversario) =>
-                                                            atacante.pelearUnRound(movimiento)(adversario)} ))
-        
   }
-}
 
 abstract class EstadoDeLucha
 

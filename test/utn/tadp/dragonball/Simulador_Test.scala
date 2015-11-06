@@ -574,7 +574,7 @@ class Simulador_Test {
   }
   
   @Test
-  def usaSemillaDelErmitañoAunEstandoInconscienteTest() ={
+  def usaSemillaDelErmitañoAunEstandoInconscienteTest() = {
     val(g, p) = UsarItem(SemillaDelErmitaño)(goku estas Inconsciente, piccolo)
     
     assertEquals(g energiaMaxima, g energia)
