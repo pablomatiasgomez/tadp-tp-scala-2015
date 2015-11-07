@@ -1,12 +1,14 @@
 package utn.tadp.dragonball
 
+import utn.tadp.dragonball.Simulador._
+
 abstract class Especie
 
 case object Humano extends Especie
 case object Androide extends Especie
 case object Namekusein extends Especie
-case class  Fusionado(miembros:(Guerrero,Guerrero)) extends Especie
-case class Monstruo(digerir: Function1[(Guerrero, Guerrero), Guerrero])extends Especie
+case class  Fusionado(miembros: Combatientes) extends Especie
+case class Monstruo(digerir: Combatientes => Guerrero)extends Especie
 case class Saiyajin(
   estado: EstadoSaiyajing,
   cola: Boolean
