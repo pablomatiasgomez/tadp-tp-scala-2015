@@ -106,13 +106,13 @@ object Simulador {
   
   case class Fusion(aliado: Guerrero) extends AutoMovimiento (guerrero => {
       
-    guerrero.transformOnTrue(
-        List(aliado, guerrero) forall ( _.puedeFusionarse ))(
-            _ sumaAInventario (aliado.inventario)
-            variarEnergiaMaxima (aliado.energiaMaxima+)
-            aumentaEnergia (aliado.energia)
-            transformateEn (Fusionado(guerrero, aliado)))
-        
+    (guerrero.especie,aliado.especie) match{
+      case (Humano|Saiyajin(_,_)|Namekusein,Humano|Saiyajin(_,_)|Namekusein) => (guerrero sumaAInventario (aliado.inventario)
+                                                                                 variarEnergiaMaxima (aliado.energiaMaxima+)
+                                                                                 aumentaEnergia (aliado.energia)
+                                                                                 transformateEn (Fusionado(guerrero, aliado)))
+      case _ => guerrero
+    }   
   })
  
   case class Magia(paseDeMagia: Function1[Combatientes, Combatientes]) extends Movimiento (combatientes => {

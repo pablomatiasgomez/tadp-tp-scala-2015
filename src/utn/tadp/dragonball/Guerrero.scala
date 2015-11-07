@@ -58,8 +58,6 @@ case class Guerrero(
   
   def sumaAInventario(agregados: List[Item]) = variarInventario( _++agregados )
   
-  def puedeFusionarse = especie.fusionable
-  
   def tiene(item:Item): Boolean = inventario contains item
   
   def tiene(items: List[Item]): Boolean = items forall (inventario contains)
