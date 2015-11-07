@@ -115,7 +115,7 @@ object Simulador {
     }   
   })
  
-  case class Magia(paseDeMagia: Function1[Combatientes, Combatientes]) extends Movimiento (combatientes => {
+  case class Magia(paseDeMagia: Combatientes => Combatientes) extends Movimiento (combatientes => {
     val(atacante, oponente):Combatientes = combatientes
     atacante.especie match {
       case Namekusein | Monstruo(_) => paseDeMagia(combatientes)
