@@ -14,10 +14,9 @@ object Simulador {
         case (Muerto, _) => combatientes
         case (Inconsciente, UsarItem(SemillaDelErmitaño)) => movimiento(combatientes)
         case (Inconsciente, _) => combatientes
-        case (Luchando, DejarseFajar) => movimiento(combatientes) onFst (_ estas Fajado(1))
         case (Luchando, _) => movimiento(combatientes)
-        case (Fajado(rounds), DejarseFajar) => movimiento(combatientes) onFst (_ estas Fajado(rounds + 1))
-        case (Fajado(_), _) => movimiento(combatientes) onFst (_ estas Luchando)
+        case (Fajado(_), Genkidama) => movimiento(combatientes) onFst (_ estas Luchando)
+        case (Fajado(_), _) => movimiento(combatientes onFst (_ estas Luchando)) 
       }
     }
     
@@ -25,8 +24,12 @@ object Simulador {
   
   abstract class AutoMovimiento(autoMovimiento: (Guerrero => Guerrero)) extends Movimiento( _ onFst autoMovimiento)
   
-  case object DejarseFajar extends AutoMovimiento(guerrero => guerrero)
-  
+  case object DejarseFajar extends AutoMovimiento(guerrero => guerrero.estado match {
+      case Luchando => guerrero estas Fajado(1)
+      case Fajado(rounds) => guerrero estas Fajado(rounds + 1)
+      case _ => guerrero
+  } )
+    
   case object CargarKi extends AutoMovimiento (guerrero => {
     
     guerrero.especie match {
@@ -42,6 +45,7 @@ object Simulador {
     def disparado: Especie => Guerrero => Guerrero = ({ 
       case Humano => _ disminuiEnergia 20
       case Namekusein => _.transformOnTrue( _.estado == Inconsciente)(_ disminuiEnergia 10)
+      case _ => identity
     })
     
     def perderCola(modoSaiyajin: EstadoSaiyajing): Guerrero => Guerrero = modoSaiyajin match{
@@ -107,16 +111,16 @@ object Simulador {
   case class Fusion(aliado: Guerrero) extends AutoMovimiento (guerrero => {
       
     (guerrero.especie,aliado.especie) match{
-      case (Humano|Saiyajin(_,_)|Namekusein,Humano|Saiyajin(_,_)|Namekusein) => (guerrero sumaAInventario (aliado.inventario)
-                                                                                 variarEnergiaMaxima (aliado.energiaMaxima+)
-                                                                                 aumentaEnergia (aliado.energia)
-                                                                                 transformateEn (Fusionado(guerrero, aliado)))
+      case (Humano | Saiyajin(_,_) | Namekusein, Humano | Saiyajin(_,_) | Namekusein) => (guerrero sumaAInventario (aliado.inventario)
+                                                                                       variarEnergiaMaxima (aliado.energiaMaxima+)
+                                                                                       aumentaEnergia (aliado.energia)
+                                                                                       transformateEn (Fusionado(guerrero, aliado)))
       case _ => guerrero
     }   
   })
  
   case class Magia(paseDeMagia: Combatientes => Combatientes) extends Movimiento (combatientes => {
-    val(atacante, oponente):Combatientes = combatientes
+    val(atacante, oponente): Combatientes = combatientes
     atacante.especie match {
       case Namekusein | Monstruo(_) => paseDeMagia(combatientes)
       case _ if (atacante tiene (EsferaDelDragon, 7)) =>
@@ -203,7 +207,7 @@ object Simulador {
      
       val poderAcumulado = atacante.estado match {
                     case Fajado(rounds) => 10 pow rounds
-                    case _ => 0 } 
+                    case _ => 1 } 
       
       (0, poderAcumulado)
       

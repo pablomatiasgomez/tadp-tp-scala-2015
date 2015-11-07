@@ -1,6 +1,6 @@
 package utn.tadp.dragonball
+
 import utn.tadp.dragonball.Simulador._
-import utn.tadp.dragonball.BlackMagic._
 import utn.tadp.dragonball.BlackMagic._
 
 case class Guerrero(
@@ -42,8 +42,7 @@ case class Guerrero(
   def estas(nuevoEstado: EstadoDeLucha): Guerrero = {
     
     (nuevoEstado, especie) match {
-      case (Muerto, Fusionado((original, _))) => original estas Muerto
-      case (Inconsciente, Fusionado((original, _))) => original estas Inconsciente
+      case (Muerto | Inconsciente, Fusionado((original, _))) => original estas nuevoEstado
       case (Inconsciente, Saiyajin(SuperSaiyajin(_, energiaOriginal), cola)) => (this transformateEn Saiyajin(Normal, cola)
                                                                                       tuEnergiaMaximaEs energiaOriginal
                                                                                       estas Inconsciente)
@@ -72,7 +71,7 @@ case class Guerrero(
     
     val combatientes = (this, oponente)
     val mejorMovimiento = movimientos.maxBy(movimiento => criterio(movimiento(combatientes)))
-    if(criterio(mejorMovimiento(combatientes))  > 0)
+    if(criterio(mejorMovimiento(combatientes))  > 0) //TODO: Opt para no hay movimiento
       mejorMovimiento
     else
       throw new RuntimeException("No hay un movimiento satisfactorio")
@@ -98,7 +97,7 @@ case class Guerrero(
   
   }
   
-  def planDeAtaque(oponente: Guerrero, rounds: Int)(criterio: CriterioDeCombate): PlanDeAtaque = {
+  def planDeAtaque(oponente: Guerrero, rounds: Int)(criterio: CriterioDeCombate): PlanDeAtaque = { //TODO: aca hay un Try
     
     val (planVacio, combatientes) = (List(): PlanDeAtaque, (this, oponente))
 
@@ -117,7 +116,8 @@ case class Guerrero(
     plan.foldLeft(peleaEnCurso)((pelea, movimiento) => pelea.map({ case (atacante, oponente) =>
                                                               atacante.pelearUnRound(movimiento)(oponente)
                                                               }))
-    }
+   
+  }
     
   }
 
@@ -131,17 +131,25 @@ case object Muerto extends EstadoDeLucha
 trait ResultadoPelea {
     
     def map(f: Combatientes => Combatientes): ResultadoPelea
+    def filter(f: Combatientes => Boolean): ResultadoPelea
     
 }
   
 case class Ganador(guerrero: Guerrero) extends ResultadoPelea {
   
-    def map(f: Combatientes => Combatientes) = Ganador(guerrero)
-    
+    def map(f: Combatientes => Combatientes) = this
+    def filter(f: Combatientes => Boolean): ResultadoPelea = this
 }
   
 case class PeleaEnCurso(combatientes: Combatientes) extends ResultadoPelea {
   
   def map(luchar: Combatientes => Combatientes) = luchar(combatientes) definirResultado
+
+  def filter(f: Combatientes => Boolean): ResultadoPelea = {
+    if (f(combatientes))
+      this
+    else
+      combatientes.definirResultado
+  }
   
 }

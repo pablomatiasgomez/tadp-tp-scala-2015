@@ -62,8 +62,8 @@ object BlackMagic {
      def definirResultado: ResultadoPelea = {
        val (atacanteFinal, oponenteFinal) = combatientes
         (atacanteFinal.estado,oponenteFinal.estado) match {
-            case (Muerto, _) => Ganador(oponenteFinal)
             case (_, Muerto) => Ganador(atacanteFinal)
+            case (Muerto, _) => Ganador(oponenteFinal)
             case (_, _) => PeleaEnCurso((atacanteFinal, oponenteFinal))
           }   
       }
