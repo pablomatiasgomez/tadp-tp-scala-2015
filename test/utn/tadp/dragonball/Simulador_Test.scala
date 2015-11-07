@@ -2,7 +2,6 @@ package utn.tadp.dragonball
 
 import utn.tadp.dragonball.Simulador._
 import utn.tadp.dragonball.Guerrero._
-import utn.tadp.dragonball.Especie._
 
 import org.junit.Before
 import org.junit.Test
