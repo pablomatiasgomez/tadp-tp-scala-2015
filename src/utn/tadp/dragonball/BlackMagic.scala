@@ -57,19 +57,4 @@ object BlackMagic {
    
    }
    
-   implicit class TuplaDeCombatientes(combatientes: Simulador.Combatientes) {
-     
-     def definirResultado: ResultadoPelea = {
-       val (atacanteFinal, oponenteFinal) = combatientes
-        (atacanteFinal.estado,oponenteFinal.estado) match {
-            case (_, Muerto) => Ganador(atacanteFinal)
-            case (Muerto, _) => Ganador(oponenteFinal)
-            case (_, _) => PeleaEnCurso((atacanteFinal, oponenteFinal))
-          }   
-      }
-     
-     def diferenciaDeKi:Int = combatientes._1.energia - combatientes._2.energia
-   
-   }
-   
 }

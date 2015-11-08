@@ -100,31 +100,32 @@ case class Guerrero(
   
   }
   
-  object NoSePuedeGenerarPlanException extends Exception
-  
   def planDeAtaque(oponente: Guerrero, rounds: Int)(criterio: CriterioDeCombate): Try[PlanDeAtaque] = Try{
-    
+   
     val (planVacio, combatientes) = (List(): PlanDeAtaque, (this, oponente))
 
-               ((planVacio,     combatientes    )  /:  List.range(0, rounds))( //Ayuda en algo forzar esta identacion chota a que se entienda el foldeo?
-        { case ((plan,      (atacante, oponente))  ,         _              ) =>
-        atacante.movimientoMasEfectivoContra(oponente)(criterio).fold(throw NoSePuedeGenerarPlanException)(mov => (plan :+ mov, atacante.pelearUnRound(mov)(oponente)))
-      })._1
+    
+               ((planVacio,     combatientes    )  /:  List.range(0, rounds))( //Ayuda en algo forzar esta identacion chota a que se entienda el foldeo?  
+        { case ((plan,      (atacante, oponente))  ,         _              ) =>  //No la verdad que es una garompa, yo lo dejaria con el fold
+        atacante.movimientoMasEfectivoContra(oponente)(criterio).fold(throw NoSePuedeGenerarPlanException)(mov => (plan :+ mov, atacante.pelearUnRound(mov)(oponente)))  
+      })._1  
+
       
-  }
-  
-                                                                   
+  }                                                                   
    
   def pelearContra(oponente: Guerrero)(plan: List[Movimiento]): ResultadoPelea = {
     
     val peleaEnCurso: ResultadoPelea = ResultadoPelea(this, oponente)
     
-    plan.foldLeft(peleaEnCurso){(pelea, movimiento) => for{(atacante,oponente) <- pelea}
-                                                       yield(atacante.pelearUnRound(movimiento)(oponente))}.filter( _ => true)
+    plan.foldLeft(peleaEnCurso){(pelea, movimiento) => for{ (atacante,oponente) <- pelea }
+                                                       yield(atacante.pelearUnRound(movimiento)(oponente))
+                                                       }
 
       }
     
-  }
+}
+
+object NoSePuedeGenerarPlanException extends Exception
 
 abstract class EstadoDeLucha
 
@@ -160,19 +161,19 @@ trait ResultadoPelea {
   
 case class Ganador(guerrero: Guerrero) extends ResultadoPelea {
   
-    def map(f: Combatientes => Combatientes):ResultadoPelea = this
+    def map(f: Combatientes => Combatientes) = this
     
-    def filter(f: Combatientes => Boolean): ResultadoPelea = this
+    def filter(f: Combatientes => Boolean) = this
     
     def flatMap(f: Combatientes => ResultadoPelea) = this
 }
   
 case class PeleaEnCurso(combatientes: Combatientes) extends ResultadoPelea {
   
-  def map(luchar: Combatientes => Combatientes):ResultadoPelea = PeleaEnCurso(luchar(combatientes))
+  def map(luchar: Combatientes => Combatientes) = ResultadoPelea(luchar(combatientes))
 
-  def filter(f: Combatientes => Boolean): ResultadoPelea = ResultadoPelea(combatientes)
+  def filter(f: Combatientes => Boolean) = ResultadoPelea(combatientes)
   
-  def flatMap(f: Combatientes => ResultadoPelea):ResultadoPelea = for( combatientesResultantes <- f(combatientes)) yield combatientesResultantes
+  def flatMap(f: Combatientes => ResultadoPelea) = for( combatientesResultantes <- f(combatientes)) yield combatientesResultantes
   
 }
