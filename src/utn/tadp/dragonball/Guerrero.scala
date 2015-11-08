@@ -105,8 +105,8 @@ case class Guerrero(
     val (planVacio, combatientes) = (List(): PlanDeAtaque, (this, oponente))
 
     
-               ((planVacio,     combatientes    )  /:  List.range(0, rounds))( //Ayuda en algo forzar esta identacion chota a que se entienda el foldeo?  
-        { case ((plan,      (atacante, oponente))  ,         _              ) =>  //No la verdad que es una garompa, yo lo dejaria con el fold
+        (1 to rounds).foldLeft(planVacio, combatientes)(
+        { case ((plan, (atacante, oponente)), _ ) => 
         atacante.movimientoMasEfectivoContra(oponente)(criterio).fold(throw NoSePuedeGenerarPlanException)(mov => (plan :+ mov, atacante.pelearUnRound(mov)(oponente)))  
       })._1  
 
