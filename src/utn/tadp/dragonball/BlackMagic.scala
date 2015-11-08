@@ -1,4 +1,5 @@
 package utn.tadp.dragonball
+import scala.util.Try
 
 object BlackMagic {
   
@@ -44,7 +45,7 @@ object BlackMagic {
      
    }
    
-   implicit class MagicBool[T, U](algo: T){
+   implicit class ForElseReloaded[T, U](algo: T){
      
      def transformOnTrue(criterio: T => Boolean)(f: T => T): T = if(criterio(algo)) f(algo)
                                                                  else algo
@@ -55,6 +56,10 @@ object BlackMagic {
      
      def becomeOnTrue(condicion: Boolean)(otraCosa: T): T = algo.transformOnTrue(condicion)( _ => otraCosa)
    
+   }
+   
+   implicit class ListWithOptionStuff[T](list: List[T]){
+     def optMaxBy[U](f: T => U)(implicit cmp: Ordering[U]) = Try(list.maxBy(f)).toOption
    }
    
 }

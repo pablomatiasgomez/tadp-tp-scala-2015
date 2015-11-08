@@ -71,12 +71,11 @@ case class Guerrero(
   def movimientoMasEfectivoContra(oponente: Guerrero)(criterio: CriterioDeCombate): Option[Movimiento] = {
     
     val combatientes = (this, oponente)
-    val mejorMovimiento = movimientos.maxBy(movimiento => criterio(movimiento(combatientes)))
-    if(criterio(mejorMovimiento(combatientes))  > 0) //TODO: Opt para no hay movimiento
-      Some(mejorMovimiento)
-    else
-      None
-
+    
+    def valorDelMovimiento:Movimiento=>Double = movimiento => criterio(movimiento(combatientes))
+    
+    movimientos.filter( 0 < valorDelMovimiento(_) ).optMaxBy( valorDelMovimiento )
+    
   }
   
   def atacarSegun(criterioDeCombate: CriterioDeCombate): (Guerrero => Combatientes) = guerrero => {
