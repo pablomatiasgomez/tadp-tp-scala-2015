@@ -6,8 +6,7 @@ object Simulador {
  
   type Combatientes = (Guerrero, Guerrero)
   
-  trait ConsideraEstadoAnterior
-    
+  
   abstract class Movimiento extends Function[Combatientes , Combatientes ] {
     def movimiento:Combatientes=>Combatientes
     def apply(combatientes: Combatientes) = {
@@ -17,7 +16,8 @@ object Simulador {
         case (Inconsciente, UsarItem(SemillaDelErmitaño)) => movimiento(combatientes)
         case (Inconsciente, _) => combatientes
         case (Luchando, _) => movimiento(combatientes)
-        case (estado @ Fajado(_), mov:ConsideraEstadoAnterior ) => movimiento(combatientes)
+        case (Fajado(_), DejarseFajar) => movimiento(combatientes)
+        case (Fajado(_), Genkidama) => movimiento(combatientes) onFst (_ estas Luchando)
         case (Fajado(_), _) => movimiento(combatientes onFst (_ estas Luchando))
 
       }
@@ -32,7 +32,7 @@ object Simulador {
   
 
   
-  case object DejarseFajar extends AutoMovimiento with ConsideraEstadoAnterior{
+  case object DejarseFajar extends AutoMovimiento{
     def autoMovimiento = guerrero => guerrero.estado match {  
       case Luchando => guerrero estas Fajado(1)
       case Fajado(rounds) => guerrero estas Fajado(rounds + 1)
@@ -237,7 +237,5 @@ object Simulador {
       
     })  
   
-  ) with ConsideraEstadoAnterior {
-      override def movimiento = super.movimiento andThen (_ onFst (_ estas Luchando))
-  }
+  )
 }

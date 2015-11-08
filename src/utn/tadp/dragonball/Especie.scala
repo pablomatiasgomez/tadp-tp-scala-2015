@@ -4,6 +4,8 @@ import utn.tadp.dragonball.Simulador._
 
 abstract class Especie
 
+
+
 case object Humano extends Especie
 case object Androide extends Especie
 case object Namekusein extends Especie
