@@ -25,14 +25,14 @@ object Simulador {
     
   }
   
-  abstract class AutoMovimiento extends Movimiento{
+  abstract class AutoMovimiento extends Movimiento {
     def autoMovimiento: Guerrero=>Guerrero
     def movimiento = ( _ onFst autoMovimiento)
   }
   
 
   
-  case object DejarseFajar extends AutoMovimiento{
+  case object DejarseFajar extends AutoMovimiento {
     def autoMovimiento = guerrero => guerrero.estado match {  
       case Luchando => guerrero estas Fajado(1)
       case Fajado(rounds) => guerrero estas Fajado(rounds + 1)
@@ -41,7 +41,7 @@ object Simulador {
     
   }
     
-  case object CargarKi extends AutoMovimiento{ 
+  case object CargarKi extends AutoMovimiento { 
     def autoMovimiento = guerrero => {
       guerrero.especie match {
         case Saiyajin(SuperSaiyajin(nivel, _), _) => guerrero aumentaEnergia (150 * nivel) 
@@ -51,7 +51,7 @@ object Simulador {
     }
   }
 
-  case class UsarItem(item: Item) extends Movimiento{
+  case class UsarItem(item: Item) extends Movimiento {
     def movimiento = combatientes => {
       
     def disparado: Especie => Guerrero => Guerrero = ({ 
@@ -84,7 +84,7 @@ object Simulador {
   }
   
 
-  case object ComerseAlOponente extends Movimiento{ 
+  case object ComerseAlOponente extends Movimiento { 
     def movimiento = combatientes => {
     
       val(atacante, oponente) = combatientes
@@ -93,62 +93,64 @@ object Simulador {
         case _ => combatientes
     }
     
-  }
+    }
   }
   
-  case object ConvertirseEnMono extends AutoMovimiento{ 
-  def autoMovimiento = guerrero => {
-
-    (guerrero.especie, guerrero.energiaMaxima) match {  
-      case (Saiyajin(MonoGigante(_), _), _) => guerrero
-      case (Saiyajin(fase, true), energiaMaxima) if (guerrero tiene FotoDeLaLuna) =>
-                                  val energiaO = fase.energiaOriginal(guerrero)
-                                  (guerrero transformateEn Saiyajin(MonoGigante(energiaO), true)
-                                            tuEnergiaMaximaEs (3 * energiaO)
-                                            cargarAlMaximo)
-      case _ => guerrero
+  case object ConvertirseEnMono extends AutoMovimiento { 
+    def autoMovimiento = guerrero => {
+  
+      (guerrero.especie, guerrero.energiaMaxima) match {  
+        case (Saiyajin(MonoGigante(_), _), _) => guerrero
+        case (Saiyajin(fase, true), energiaMaxima) if (guerrero tiene FotoDeLaLuna) =>
+                                    val energiaO = fase.energiaOriginal(guerrero)
+                                    (guerrero transformateEn Saiyajin(MonoGigante(energiaO), true)
+                                              tuEnergiaMaximaEs (3 * energiaO)
+                                              cargarAlMaximo)
+        case _ => guerrero
+      }
+      
     }
-    
-  }
   }
   
   case object ConvertirseEnSuperSaiyajing extends AutoMovimiento {
-  def autoMovimiento = guerrero => {
-    
-    (guerrero.especie, guerrero.energia, guerrero.energiaMaxima) match {
-      case (Saiyajin(MonoGigante(_), _), _, _) => guerrero
-      case (Saiyajin(fase, cola), ki, kiMaximo) if (ki > kiMaximo/2) => 
-                                    val (nivel, energiaOriginal) = (fase.proxNivelSSJ, fase.energiaOriginal(guerrero))
-                                    (guerrero transformateEn Saiyajin(SuperSaiyajin(nivel, energiaOriginal), cola)
-                                              tuEnergiaMaximaEs (5 * nivel * energiaOriginal))
-      case _ => guerrero
+    def autoMovimiento = guerrero => {
+      
+      (guerrero.especie, guerrero.energia, guerrero.energiaMaxima) match {
+        case (Saiyajin(MonoGigante(_), _), _, _) => guerrero
+        case (Saiyajin(fase, cola), ki, kiMaximo) if (ki > kiMaximo/2) => 
+                                      val (nivel, energiaOriginal) = (fase.proxNivelSSJ, fase.energiaOriginal(guerrero))
+                                      (guerrero transformateEn Saiyajin(SuperSaiyajin(nivel, energiaOriginal), cola)
+                                                tuEnergiaMaximaEs (5 * nivel * energiaOriginal))
+        case _ => guerrero
+        }
+      
+    }
+  }
+  
+  case class Fusion(aliado: Guerrero) extends AutoMovimiento  {
+    def autoMovimiento = guerrero => {
+        
+      (guerrero.especie,aliado.especie) match{
+        case (_:Fusionable, _:Fusionable) => (guerrero sumaAInventario (aliado.inventario)
+                                                       variarEnergiaMaxima (aliado.energiaMaxima+)
+                                                       aumentaEnergia (aliado.energia)
+                                                       transformateEn (Fusionado(guerrero, aliado)))
+        case _ => guerrero
+      }   
+    }}
+   
+    case class Magia(paseDeMagia: Combatientes => Combatientes) extends Movimiento {
+    def movimiento = combatientes => {
+      val(atacante, oponente): Combatientes = combatientes
+      atacante.especie match {
+        case _:Magico => paseDeMagia(combatientes)
+        case _ if (atacante tiene (EsferaDelDragon, 7)) =>
+                                paseDeMagia (atacante gastarItems (List.fill(7)(EsferaDelDragon)), oponente)
+        case _ => combatientes
       }
     
-  }}
-  
-  case class Fusion(aliado: Guerrero) extends AutoMovimiento{
-  def autoMovimiento = guerrero => {
-      
-    (guerrero.especie,aliado.especie) match{
-      case (_:Fusionable, _:Fusionable) => (guerrero sumaAInventario (aliado.inventario)
-                                                     variarEnergiaMaxima (aliado.energiaMaxima+)
-                                                     aumentaEnergia (aliado.energia)
-                                                     transformateEn (Fusionado(guerrero, aliado)))
-      case _ => guerrero
-    }   
-  }}
- 
-  case class Magia(paseDeMagia: Combatientes => Combatientes) extends Movimiento {
-  def movimiento = combatientes => {
-    val(atacante, oponente): Combatientes = combatientes
-    atacante.especie match {
-      case _:Magico => paseDeMagia(combatientes)
-      case _ if (atacante tiene (EsferaDelDragon, 7)) =>
-                              paseDeMagia (atacante gastarItems (List.fill(7)(EsferaDelDragon)), oponente)
-      case _ => combatientes
     }
-  
-  }}
+  }
   
     
   type Daños = (Int, Int)
@@ -158,20 +160,21 @@ object Simulador {
   case object Energia extends TipoAtaque
   case object Fisico extends TipoAtaque
   
-  class Ataque(tipoAtaque: TipoAtaque, funcionDaño: (Combatientes => Daños)) extends Movimiento{
-  def movimiento = combatientes => {
-    
-    val (dañoAtacante, dañoAtacado) = funcionDaño(combatientes)
-    
-    def efectoEnAtacado(guerrero:Guerrero) = (this, tipoAtaque, guerrero.especie) match {
-      case (_, Energia, Androide) => guerrero.aumentaEnergia _
-      case _ => guerrero.disminuiEnergia _
-    }
-    
+  class Ataque(tipoAtaque: TipoAtaque, funcionDaño: (Combatientes => Daños)) extends Movimiento {
 
-    
-    combatientes.onEach( _ disminuiEnergia dañoAtacante, efectoEnAtacado(_)(dañoAtacado) )
-  }
+    def movimiento = combatientes => {
+      
+      val (dañoAtacante, dañoAtacado) = funcionDaño(combatientes)
+      
+      def efectoEnAtacado(guerrero:Guerrero) = (this, tipoAtaque, guerrero.especie) match {
+        case (_, Energia, Androide) => guerrero.aumentaEnergia _
+        case _ => guerrero.disminuiEnergia _
+      }
+      
+  
+      
+      combatientes.onEach( _ disminuiEnergia dañoAtacante, efectoEnAtacado(_)(dañoAtacado) )
+    }
   
   }
 

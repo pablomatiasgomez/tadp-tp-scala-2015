@@ -99,15 +99,15 @@ case class Guerrero(
   
   }
   
-  def planDeAtaque(oponente: Guerrero, rounds: Int)(criterio: CriterioDeCombate): Try[PlanDeAtaque] = Try{
+  def planDeAtaque(oponente: Guerrero, rounds: Int)(criterio: CriterioDeCombate): Try[PlanDeAtaque] = Try {
    
     val (planVacio, combatientes) = (List(): PlanDeAtaque, (this, oponente))
 
-    
         (1 to rounds).foldLeft(planVacio, combatientes)(
-        { case ((plan, (atacante, oponente)), _ ) => 
-        atacante.movimientoMasEfectivoContra(oponente)(criterio).fold(throw NoSePuedeGenerarPlanException)(mov => (plan :+ mov, atacante.pelearUnRound(mov)(oponente)))  
-      })._1  
+          { case ((plan, (atacante, oponente)), _ ) => 
+          atacante.movimientoMasEfectivoContra(oponente)(criterio)
+            .fold(throw NoSePuedeGenerarPlanException)(mov => (plan :+ mov, atacante.pelearUnRound(mov)(oponente)))  
+        })._1  
 
       
   }                                                                   
@@ -173,6 +173,7 @@ case class PeleaEnCurso(combatientes: Combatientes) extends ResultadoPelea {
 
   def filter(f: Combatientes => Boolean) = ResultadoPelea(combatientes)
   
-  def flatMap(f: Combatientes => ResultadoPelea) = for( combatientesResultantes <- f(combatientes)) yield combatientesResultantes
+  def flatMap(f: Combatientes => ResultadoPelea) = for( combatientesResultantes <- f(combatientes)) 
+                                                   yield combatientesResultantes
   
 }
