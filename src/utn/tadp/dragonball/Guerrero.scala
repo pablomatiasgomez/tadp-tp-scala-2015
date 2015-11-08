@@ -2,6 +2,7 @@ package utn.tadp.dragonball
 
 import utn.tadp.dragonball.Simulador._
 import utn.tadp.dragonball.BlackMagic._
+import scala.util.Try
 
 case class Guerrero(
       nombre: String,
@@ -67,19 +68,21 @@ case class Guerrero(
   
   type PlanDeAtaque = List[Movimiento]
   
-  def movimientoMasEfectivoContra(oponente: Guerrero)(criterio: CriterioDeCombate): Movimiento = {
+  def movimientoMasEfectivoContra(oponente: Guerrero)(criterio: CriterioDeCombate): Option[Movimiento] = {
     
     val combatientes = (this, oponente)
     val mejorMovimiento = movimientos.maxBy(movimiento => criterio(movimiento(combatientes)))
     if(criterio(mejorMovimiento(combatientes))  > 0) //TODO: Opt para no hay movimiento
-      mejorMovimiento
+      Some(mejorMovimiento)
     else
-      throw new RuntimeException("No hay un movimiento satisfactorio")
+      None
 
   }
   
-  def atacarSegun(criterioDeCombate: CriterioDeCombate): (Guerrero => Combatientes) = guerrero => 
-              this.movimientoMasEfectivoContra(guerrero)(criterioDeCombate)(this, guerrero)
+  def atacarSegun(criterioDeCombate: CriterioDeCombate): (Guerrero => Combatientes) = guerrero => {
+              val combatientes = (this, guerrero)
+              this.movimientoMasEfectivoContra(guerrero)(criterioDeCombate).fold(combatientes)(_(combatientes))
+  }
   
   def contraAtacarA(guerrero: Guerrero): Combatientes = this.atacarSegun(mayorVentajaDeKi)(guerrero)
   
@@ -97,27 +100,29 @@ case class Guerrero(
   
   }
   
-  def planDeAtaque(oponente: Guerrero, rounds: Int)(criterio: CriterioDeCombate): PlanDeAtaque = { //TODO: aca hay un Try
+  object NoSePuedeGenerarPlanException extends Exception
+  
+  def planDeAtaque(oponente: Guerrero, rounds: Int)(criterio: CriterioDeCombate): Try[PlanDeAtaque] = Try{
     
     val (planVacio, combatientes) = (List(): PlanDeAtaque, (this, oponente))
 
-    List.range(0, rounds).foldLeft((planVacio, combatientes))((semilla, _) => {
-        val (plan, (atacante, oponente)) = semilla
-        val mejorMovimiento = atacante.movimientoMasEfectivoContra(oponente)(criterio)
-        
-        (plan :+ mejorMovimiento, atacante.pelearUnRound(mejorMovimiento)(oponente))
+               ((planVacio,     combatientes    )  /:  List.range(0, rounds))( //Ayuda en algo forzar esta identacion chota a que se entienda el foldeo?
+        { case ((plan,      (atacante, oponente))  ,         _              ) =>
+        atacante.movimientoMasEfectivoContra(oponente)(criterio).fold(throw NoSePuedeGenerarPlanException)(mov => (plan :+ mov, atacante.pelearUnRound(mov)(oponente)))
       })._1
       
   }
+  
+                                                                   
    
   def pelearContra(oponente: Guerrero)(plan: List[Movimiento]): ResultadoPelea = {
     
-    val peleaEnCurso: ResultadoPelea = (this, oponente).definirResultado
-    plan.foldLeft(peleaEnCurso)((pelea, movimiento) => pelea.map({ case (atacante, oponente) =>
-                                                              atacante.pelearUnRound(movimiento)(oponente)
-                                                              }))
-   
-  }
+    val peleaEnCurso: ResultadoPelea = ResultadoPelea(this, oponente)
+    
+    plan.foldLeft(peleaEnCurso){(pelea, movimiento) => for{(atacante,oponente) <- pelea}
+                                                       yield(atacante.pelearUnRound(movimiento)(oponente))}.filter( _ => true)
+
+      }
     
   }
 
@@ -128,28 +133,46 @@ case class Fajado(rounds: Int) extends EstadoDeLucha
 case object Inconsciente extends EstadoDeLucha
 case object Muerto extends EstadoDeLucha
 
+object ResultadoPelea {
+  
+  def apply(combatientes:Combatientes):ResultadoPelea = {
+    val (atacante, oponente) = combatientes
+    combatientes.map(_.estado) match {
+      case ( _ , Muerto ) => Ganador(atacante)
+      case ( Muerto, _ ) => Ganador(oponente)
+      case (_, _) => PeleaEnCurso(atacante, oponente)
+    }
+}
+  
+  def apply(guerrero:Guerrero):ResultadoPelea = Ganador(guerrero)
+  
+}
+
 trait ResultadoPelea {
     
     def map(f: Combatientes => Combatientes): ResultadoPelea
+    
     def filter(f: Combatientes => Boolean): ResultadoPelea
+    
+    def flatMap(f: Combatientes => ResultadoPelea): ResultadoPelea
     
 }
   
 case class Ganador(guerrero: Guerrero) extends ResultadoPelea {
   
-    def map(f: Combatientes => Combatientes) = this
+    def map(f: Combatientes => Combatientes):ResultadoPelea = this
+    
     def filter(f: Combatientes => Boolean): ResultadoPelea = this
+    
+    def flatMap(f: Combatientes => ResultadoPelea) = this
 }
   
 case class PeleaEnCurso(combatientes: Combatientes) extends ResultadoPelea {
   
-  def map(luchar: Combatientes => Combatientes) = luchar(combatientes) definirResultado
+  def map(luchar: Combatientes => Combatientes):ResultadoPelea = PeleaEnCurso(luchar(combatientes))
 
-  def filter(f: Combatientes => Boolean): ResultadoPelea = {
-    if (f(combatientes))
-      this
-    else
-      combatientes.definirResultado
-  }
+  def filter(f: Combatientes => Boolean): ResultadoPelea = ResultadoPelea(combatientes)
+  
+  def flatMap(f: Combatientes => ResultadoPelea):ResultadoPelea = for( combatientesResultantes <- f(combatientes)) yield combatientesResultantes
   
 }

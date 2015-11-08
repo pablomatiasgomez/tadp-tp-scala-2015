@@ -15,8 +15,9 @@ object Simulador {
         case (Inconsciente, UsarItem(SemillaDelErmitaño)) => movimiento(combatientes)
         case (Inconsciente, _) => combatientes
         case (Luchando, _) => movimiento(combatientes)
-        case (Fajado(_), Genkidama) => movimiento(combatientes) onFst (_ estas Luchando)
-        case (Fajado(_), _) => movimiento(combatientes onFst (_ estas Luchando)) 
+        case (Fajado(_), DejarseFajar) => movimiento(combatientes)
+        case (Fajado(_), _) => movimiento(combatientes) onFst (_ estas Luchando)
+
       }
     }
     

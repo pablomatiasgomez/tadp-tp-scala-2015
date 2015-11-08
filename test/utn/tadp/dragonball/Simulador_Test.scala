@@ -511,7 +511,7 @@ class Simulador_Test {
     val (g, k) = Genkidama(goku, krilin)
     
     assertEquals(goku, g)
-    assertEquals(krilin, k)
+    assertEquals(krilin disminuiEnergia 1, k)
   }
   
   @Test
