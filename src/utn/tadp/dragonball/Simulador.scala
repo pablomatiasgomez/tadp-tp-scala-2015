@@ -160,8 +160,10 @@ object Simulador {
   case object Energia extends TipoAtaque
   case object Fisico extends TipoAtaque
   
-  class Ataque(tipoAtaque: TipoAtaque, funcionDaño: (Combatientes => Daños)) extends Movimiento {
+  abstract class Ataque(tipoAtaque: TipoAtaque) extends Movimiento {
 
+    def funcionDaño:Combatientes => Daños
+    
     def movimiento = combatientes => {
       
       val (dañoAtacante, dañoAtacado) = funcionDaño(combatientes)
@@ -178,7 +180,9 @@ object Simulador {
   
   }
 
-  case object MuchosGolpesNinja extends Ataque(Fisico, ({ case (atacante, oponente) => {
+  case object MuchosGolpesNinja extends Ataque(Fisico){
+    
+    def funcionDaño = { case (atacante, oponente) => {
     
          (atacante.especie, oponente.especie) match {
            case (Humano, Androide) => (10, 0)
@@ -186,11 +190,13 @@ object Simulador {
            case _  => (0, 20)
          } 
        }
-     })
-     
-   )
+     }
+  }
   
-  case object Explotar extends Ataque(Fisico, ({ case (atacante, oponente) => {
+  case object Explotar extends Ataque(Fisico){
+    
+    def funcionDaño = { case (atacante, oponente) => {
+  
     
         val energiaDeExplosion = atacante.energia
         
@@ -212,11 +218,13 @@ object Simulador {
         daño onSnd esquivaLaMuerte
         
       }
-    })
+    }
     
-  )
+  }
   
-  case class Onda(energiaNecesaria: Int) extends Ataque(Energia, ({ case (atacante, oponente) => {
+  case class Onda(energiaNecesaria: Int) extends Ataque(Energia){
+  
+  def funcionDaño = { case (atacante, oponente) => {
     
         def poderDeOnda = oponente.especie match {
                          case Monstruo(_) => energiaNecesaria / 2
@@ -226,11 +234,14 @@ object Simulador {
         else (0, 0)
       
       } 
-    })
+    }
     
-  )
   
-  case object Genkidama extends Ataque(Energia, ({ case(atacante, _) =>
+}
+  
+  case object Genkidama extends Ataque(Energia){
+    
+    def funcionDaño = { case(atacante, _) =>
      
       val poderAcumulado = atacante.estado match {
                     case Fajado(rounds) => 10 pow rounds
@@ -238,7 +249,6 @@ object Simulador {
       
       (0, poderAcumulado)
       
-    })  
-  
-  )
+    }  
+  }
 }
