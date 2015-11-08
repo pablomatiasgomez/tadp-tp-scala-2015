@@ -4,17 +4,18 @@ import utn.tadp.dragonball.Simulador._
 
 abstract class Especie
 
+trait Magico
+trait Fusionable
 
-
-case object Humano extends Especie
+case object Humano extends Especie with Fusionable
 case object Androide extends Especie
-case object Namekusein extends Especie
+case object Namekusein extends Especie with Fusionable with Magico
 case class  Fusionado(miembros: Combatientes) extends Especie
-case class Monstruo(digerir: Combatientes => Guerrero)extends Especie
+case class Monstruo(digerir: Combatientes => Guerrero)extends Especie with Magico
 case class Saiyajin(
   estado: EstadoSaiyajing,
   cola: Boolean
-  ) extends Especie
+  ) extends Especie with Fusionable
 
 abstract class EstadoSaiyajing{
   

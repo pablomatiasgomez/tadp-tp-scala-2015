@@ -130,10 +130,10 @@ object Simulador {
   def autoMovimiento = guerrero => {
       
     (guerrero.especie,aliado.especie) match{
-      case (Humano | Saiyajin(_,_) | Namekusein, Humano | Saiyajin(_,_) | Namekusein) => (guerrero sumaAInventario (aliado.inventario)
-                                                                                       variarEnergiaMaxima (aliado.energiaMaxima+)
-                                                                                       aumentaEnergia (aliado.energia)
-                                                                                       transformateEn (Fusionado(guerrero, aliado)))
+      case (_:Fusionable, _:Fusionable) => (guerrero sumaAInventario (aliado.inventario)
+                                                     variarEnergiaMaxima (aliado.energiaMaxima+)
+                                                     aumentaEnergia (aliado.energia)
+                                                     transformateEn (Fusionado(guerrero, aliado)))
       case _ => guerrero
     }   
   }}
@@ -142,7 +142,7 @@ object Simulador {
   def movimiento = combatientes => {
     val(atacante, oponente): Combatientes = combatientes
     atacante.especie match {
-      case Namekusein | Monstruo(_) => paseDeMagia(combatientes)
+      case _:Magico => paseDeMagia(combatientes)
       case _ if (atacante tiene (EsferaDelDragon, 7)) =>
                               paseDeMagia (atacante gastarItems (List.fill(7)(EsferaDelDragon)), oponente)
       case _ => combatientes
