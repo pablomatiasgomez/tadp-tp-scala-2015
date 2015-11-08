@@ -6,8 +6,10 @@ object Simulador {
  
   type Combatientes = (Guerrero, Guerrero)
   
-  abstract class Movimiento(movimiento: (Combatientes => Combatientes)) extends Function[Combatientes , Combatientes ] {
+  trait ConsideraEstadoAnterior
     
+  abstract class Movimiento extends Function[Combatientes , Combatientes ] {
+    def movimiento:Combatientes=>Combatientes
     def apply(combatientes: Combatientes) = {
       val(atacante, oponente) = combatientes
       (atacante.estado, this) match {
@@ -15,33 +17,42 @@ object Simulador {
         case (Inconsciente, UsarItem(SemillaDelErmitaño)) => movimiento(combatientes)
         case (Inconsciente, _) => combatientes
         case (Luchando, _) => movimiento(combatientes)
-        case (Fajado(_), DejarseFajar) => movimiento(combatientes)
-        case (Fajado(_), _) => movimiento(combatientes) onFst (_ estas Luchando)
+        case (estado @ Fajado(_), mov:ConsideraEstadoAnterior ) => movimiento(combatientes)
+        case (Fajado(_), _) => movimiento(combatientes onFst (_ estas Luchando))
 
       }
     }
     
   }
   
-  abstract class AutoMovimiento(autoMovimiento: (Guerrero => Guerrero)) extends Movimiento( _ onFst autoMovimiento)
+  abstract class AutoMovimiento extends Movimiento{
+    def autoMovimiento: Guerrero=>Guerrero
+    def movimiento = ( _ onFst autoMovimiento)
+  }
   
-  case object DejarseFajar extends AutoMovimiento(guerrero => guerrero.estado match {
+
+  
+  case object DejarseFajar extends AutoMovimiento with ConsideraEstadoAnterior{
+    def autoMovimiento = guerrero => guerrero.estado match {  
       case Luchando => guerrero estas Fajado(1)
       case Fajado(rounds) => guerrero estas Fajado(rounds + 1)
       case _ => guerrero
-  } )
+    }
     
-  case object CargarKi extends AutoMovimiento (guerrero => {
+  }
     
-    guerrero.especie match {
-      case Saiyajin(SuperSaiyajin(nivel, _), _) => guerrero aumentaEnergia (150 * nivel) 
-      case Androide => guerrero
-      case _ => guerrero aumentaEnergia 100
+  case object CargarKi extends AutoMovimiento{ 
+    def autoMovimiento = guerrero => {
+      guerrero.especie match {
+        case Saiyajin(SuperSaiyajin(nivel, _), _) => guerrero aumentaEnergia (150 * nivel) 
+        case Androide => guerrero
+        case _ => guerrero aumentaEnergia 100
       }
-    
-  }) 
+    }
+  }
 
-  case class UsarItem(item: Item) extends Movimiento ( combatientes => {
+  case class UsarItem(item: Item) extends Movimiento{
+    def movimiento = combatientes => {
       
     def disparado: Especie => Guerrero => Guerrero = ({ 
       case Humano => _ disminuiEnergia 20
@@ -69,20 +80,24 @@ object Simulador {
         case _ => combatientes
         })   
     
-  })
+     }
+  }
   
 
-  case object ComerseAlOponente extends Movimiento (combatientes => {
+  case object ComerseAlOponente extends Movimiento{ 
+    def movimiento = combatientes => {
     
-    val(atacante, oponente) = combatientes
-    atacante.especie match {
-      case Monstruo(digerir) => (digerir(combatientes), oponente estas Muerto)
-      case _ => combatientes
+      val(atacante, oponente) = combatientes
+      atacante.especie match {
+        case Monstruo(digerir) => (digerir(combatientes), oponente estas Muerto)
+        case _ => combatientes
     }
     
-  })
+  }
+  }
   
-  case object ConvertirseEnMono extends AutoMovimiento (guerrero => {
+  case object ConvertirseEnMono extends AutoMovimiento{ 
+  def autoMovimiento = guerrero => {
 
     (guerrero.especie, guerrero.energiaMaxima) match {  
       case (Saiyajin(MonoGigante(_), _), _) => guerrero
@@ -94,9 +109,11 @@ object Simulador {
       case _ => guerrero
     }
     
-  })
+  }
+  }
   
-  case object ConvertirseEnSuperSaiyajing extends AutoMovimiento (guerrero => {
+  case object ConvertirseEnSuperSaiyajing extends AutoMovimiento {
+  def autoMovimiento = guerrero => {
     
     (guerrero.especie, guerrero.energia, guerrero.energiaMaxima) match {
       case (Saiyajin(MonoGigante(_), _), _, _) => guerrero
@@ -107,9 +124,10 @@ object Simulador {
       case _ => guerrero
       }
     
-  })
+  }}
   
-  case class Fusion(aliado: Guerrero) extends AutoMovimiento (guerrero => {
+  case class Fusion(aliado: Guerrero) extends AutoMovimiento{
+  def autoMovimiento = guerrero => {
       
     (guerrero.especie,aliado.especie) match{
       case (Humano | Saiyajin(_,_) | Namekusein, Humano | Saiyajin(_,_) | Namekusein) => (guerrero sumaAInventario (aliado.inventario)
@@ -118,9 +136,10 @@ object Simulador {
                                                                                        transformateEn (Fusionado(guerrero, aliado)))
       case _ => guerrero
     }   
-  })
+  }}
  
-  case class Magia(paseDeMagia: Combatientes => Combatientes) extends Movimiento (combatientes => {
+  case class Magia(paseDeMagia: Combatientes => Combatientes) extends Movimiento {
+  def movimiento = combatientes => {
     val(atacante, oponente): Combatientes = combatientes
     atacante.especie match {
       case Namekusein | Monstruo(_) => paseDeMagia(combatientes)
@@ -129,7 +148,7 @@ object Simulador {
       case _ => combatientes
     }
   
-  })
+  }}
   
     
   type Daños = (Int, Int)
@@ -139,18 +158,22 @@ object Simulador {
   case object Energia extends TipoAtaque
   case object Fisico extends TipoAtaque
   
-  class Ataque(tipoAtaque: TipoAtaque, funcionDaño: (Combatientes => Daños)) extends Movimiento(combatientes => {
+  class Ataque(tipoAtaque: TipoAtaque, funcionDaño: (Combatientes => Daños)) extends Movimiento{
+  def movimiento = combatientes => {
     
     val (dañoAtacante, dañoAtacado) = funcionDaño(combatientes)
-    def efectoEn(guerrero:Guerrero) = (tipoAtaque, guerrero.especie) match {
-      case (Energia, Androide) => guerrero.aumentaEnergia _
+    
+    def efectoEnAtacado(guerrero:Guerrero) = (this, tipoAtaque, guerrero.especie) match {
+      case (_, Energia, Androide) => guerrero.aumentaEnergia _
       case _ => guerrero.disminuiEnergia _
     }
     
-    combatientes.onEach( _ disminuiEnergia dañoAtacante, efectoEn(_)(dañoAtacado) )
+
+    
+    combatientes.onEach( _ disminuiEnergia dañoAtacante, efectoEnAtacado(_)(dañoAtacado) )
   }
   
-  )
+  }
 
   case object MuchosGolpesNinja extends Ataque(Fisico, ({ case (atacante, oponente) => {
     
@@ -214,6 +237,7 @@ object Simulador {
       
     })  
   
-  )
-  
+  ) with ConsideraEstadoAnterior {
+      override def movimiento = super.movimiento andThen (_ onFst (_ estas Luchando))
+  }
 }
