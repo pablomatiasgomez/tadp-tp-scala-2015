@@ -148,6 +148,8 @@ object ResultadoPelea {
   
 }
 
+
+
 trait ResultadoPelea {
     
     def map(f: Combatientes => Combatientes): ResultadoPelea
@@ -155,6 +157,8 @@ trait ResultadoPelea {
     def filter(f: Combatientes => Boolean): ResultadoPelea
     
     def flatMap(f: Combatientes => ResultadoPelea): ResultadoPelea
+    
+    def fold[T](seed: T)(f: Combatientes => T) : T
     
 }
   
@@ -165,6 +169,8 @@ case class Ganador(guerrero: Guerrero) extends ResultadoPelea {
     def filter(f: Combatientes => Boolean) = this
     
     def flatMap(f: Combatientes => ResultadoPelea) = this
+    
+    def fold[T](semilla: T)(f: Combatientes => T) = semilla
 }
   
 case class PeleaEnCurso(combatientes: Combatientes) extends ResultadoPelea {
@@ -176,4 +182,5 @@ case class PeleaEnCurso(combatientes: Combatientes) extends ResultadoPelea {
   def flatMap(f: Combatientes => ResultadoPelea) = for( combatientesResultantes <- f(combatientes)) 
                                                    yield combatientesResultantes
   
+  def fold[T](semilla: T)(f: Combatientes => T) = f(combatientes)
 }
