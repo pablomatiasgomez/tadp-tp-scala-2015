@@ -15,9 +15,9 @@ case class Guerrero(
       turnosFajado: Int = 0
       ) {
 
-  def pasarTurnoFajado = copy(turnosFajado=turnosFajado+1)
+  def pasarTurnoFajado = copy(turnosFajado = turnosFajado + 1)
   
-  def resetearTurnosFajados = copy(turnosFajado=0)
+  def resetearTurnosFajados = copy(turnosFajado = 0)
   
   def tusMovimientos(agregados: List[Movimiento]) = copy(movimientos = agregados)
   
@@ -49,7 +49,7 @@ case class Guerrero(
     
     (nuevoEstado, estado, especie) match {
       case (Muerto | Inconsciente, _, Fusionado((original, _))) => original estas nuevoEstado
-      case (_, estadoAnterior:EstadoSaiyajing, _) => copy(estado = nuevoEstado) tuEnergiaMaximaEs estadoAnterior.energiaOriginal(this)
+      case (_, estadoAnterior: EstadoSaiyajing, _) => copy(estado = nuevoEstado) tuEnergiaMaximaEs estadoAnterior.energiaOriginal(this)
       case _ => copy(estado = nuevoEstado)
     }
     

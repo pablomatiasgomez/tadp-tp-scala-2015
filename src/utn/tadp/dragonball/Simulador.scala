@@ -6,7 +6,6 @@ object Simulador {
  
   type Combatientes = (Guerrero, Guerrero)
   
-  
   abstract class Movimiento extends Function[Combatientes , Combatientes ] {
     def movimiento:Combatientes=>Combatientes
     def apply(combatientes: Combatientes) = {
@@ -15,7 +14,7 @@ object Simulador {
         case (Muerto, _) => combatientes
         case (Inconsciente, UsarItem(SemillaDelErmitaño)) => movimiento(combatientes)
         case (Inconsciente, _) => combatientes
-        case (_, DejarseFajar) => movimiento(combatientes) //POR QUE HABIAMOS PUESTO FAJADO(_),DejarseFajar ACA?
+        case (_, DejarseFajar) => movimiento(combatientes)
         case (_, _) => movimiento(combatientes) onFst (_ resetearTurnosFajados)
 
       }
@@ -96,8 +95,8 @@ object Simulador {
         case (Saiyajin(true), fase, energiaMaxima) if (guerrero tiene FotoDeLaLuna) =>
                                                     val energiaO = fase.energiaOriginal(guerrero)
                                                     (guerrero estas MonoGigante(energiaO)
-                                                      tuEnergiaMaximaEs (3 * energiaO)
-                                                      cargarAlMaximo)
+                                                              tuEnergiaMaximaEs (3 * energiaO)
+                                                              cargarAlMaximo)
         case _ => guerrero
       }
       
@@ -109,7 +108,7 @@ object Simulador {
       
       (guerrero.especie, guerrero.estado, guerrero.energia, guerrero.energiaMaxima) match {
         case (Saiyajin(_), MonoGigante(_), _, _) => guerrero
-        case (Saiyajin(_), fase:EstadoSaiyajing, ki, kiMaximo) if (ki > kiMaximo/2) => 
+        case (Saiyajin(_), fase: EstadoSaiyajing, ki, kiMaximo) if (ki > kiMaximo/2) => 
                                       val (nivel, energiaOriginal) = (fase.proxNivelSSJ, fase.energiaOriginal(guerrero))
                                       (guerrero estas SuperSaiyajin(nivel, energiaOriginal)
                                                 tuEnergiaMaximaEs (5 * nivel * energiaOriginal))
