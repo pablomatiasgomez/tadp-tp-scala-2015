@@ -11,9 +11,14 @@ case class Guerrero(
       energia: Int,
       especie: Especie,
       estado: EstadoDeLucha,
-      movimientos: List[Movimiento]
+      movimientos: List[Movimiento],
+      turnosFajado: Int = 0
       ) {
 
+  def pasarTurnoFajado = copy(turnosFajado=turnosFajado+1)
+  
+  def resetearTurnosFajados = copy(turnosFajado=0)
+  
   def tusMovimientos(agregados: List[Movimiento]) = copy(movimientos = agregados)
   
   def agregaMovimientos(agregados: List[Movimiento]) = copy(movimientos = movimientos++agregados)
@@ -42,11 +47,9 @@ case class Guerrero(
   
   def estas(nuevoEstado: EstadoDeLucha): Guerrero = {
     
-    (nuevoEstado, especie) match {
-      case (Muerto | Inconsciente, Fusionado((original, _))) => original estas nuevoEstado
-      case (Inconsciente, Saiyajin(SuperSaiyajin(_, energiaOriginal), cola)) => (this transformateEn Saiyajin(Normal, cola)
-                                                                                      tuEnergiaMaximaEs energiaOriginal
-                                                                                      estas Inconsciente)
+    (nuevoEstado, estado, especie) match {
+      case (Muerto | Inconsciente, _, Fusionado((original, _))) => original estas nuevoEstado
+      case (_, estadoAnterior:EstadoSaiyajing, _) => copy(estado = nuevoEstado) tuEnergiaMaximaEs estadoAnterior.energiaOriginal(this)
       case _ => copy(estado = nuevoEstado)
     }
     
@@ -126,10 +129,11 @@ case class Guerrero(
 
 object NoSePuedeGenerarPlanException extends Exception
 
-abstract class EstadoDeLucha
+abstract class EstadoDeLucha{
+  def energiaOriginal(guerrero: Guerrero) = guerrero.energiaMaxima
+}
 
 case object Luchando extends EstadoDeLucha
-case class Fajado(rounds: Int) extends EstadoDeLucha
 case object Inconsciente extends EstadoDeLucha
 case object Muerto extends EstadoDeLucha
 
