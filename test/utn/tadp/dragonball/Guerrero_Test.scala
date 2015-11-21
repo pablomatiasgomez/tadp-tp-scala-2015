@@ -9,10 +9,10 @@ import scala.util.Success
 class Guerrero_Test extends FlatSpec with Matchers {
 
   val todosSaben: List[Movimiento] = List(DejarseFajar, CargarKi, MuchosGolpesNinja, Onda(10))
-  val goku : Guerrero = new Guerrero("Goku", List(SemillaDelErmitaño, FotoDeLaLuna), 2500, 1300, Saiyajin(SuperSaiyajin(1, 500), true), Fajado(3), todosSaben++List(Onda(99), Genkidama))
-  val vegeta : Guerrero = new Guerrero("Vegeta", List(), 1001, 801, Saiyajin(Normal, false), Luchando, todosSaben++List(Onda(100), Fusion(goku)))
-  val cell: Guerrero = new Guerrero("Cell", List(), 500, 500, Monstruo({ a => a._1 }), Luchando, List(Onda(45)))
-  val yajirobe : Guerrero = new Guerrero("Yajirobe", List(SemillaDelErmitaño), 100, 100, Humano, Luchando, List(UsarItem(Arma(Filosa)), UsarItem(SemillaDelErmitaño)))
+  val goku : Guerrero = new Guerrero("Goku", List(SemillaDelErmitaño, FotoDeLaLuna), 2500, 1300, Saiyajin(true), SuperSaiyajin(1, 500), todosSaben++List(Onda(99), Genkidama), 3)
+  val vegeta : Guerrero = new Guerrero("Vegeta", List(), 1001, 801, Saiyajin(false), Luchando, todosSaben++List(Onda(100), Fusion(goku)), 0)
+  val cell: Guerrero = new Guerrero("Cell", List(), 500, 500, Monstruo({ a => a._1 }), Luchando, List(Onda(45)), 0)
+  val yajirobe : Guerrero = new Guerrero("Yajirobe", List(SemillaDelErmitaño), 100, 100, Humano, Luchando, List(UsarItem(Arma(Filosa)), UsarItem(SemillaDelErmitaño)), 0)
   
   def quedoConMasKi(combatientes: Combatientes) = combatientes._1.energia
   def mayorVentajaDeKi(combatientes: Combatientes) = (combatientes._1.energia - combatientes._2.energia) match {
@@ -21,10 +21,7 @@ class Guerrero_Test extends FlatSpec with Matchers {
                 case diferencia if diferencia < 0 => 0.98/ diferencia
             }
   
-  def quedoMasFajado(combatientes: Combatientes) = combatientes._1.estado match {
-                                                                                case Fajado(rounds) => rounds
-                                                                                case _ => 0
-                                                                          }
+  def quedoMasFajado(combatientes: Combatientes) = combatientes._1.turnosFajado
   
   
   "movimientoMasEfectivoContra" should "goku elige CargarKi porque lo deja con mas ki" in {
@@ -50,7 +47,7 @@ class Guerrero_Test extends FlatSpec with Matchers {
     val (g, v) = goku.pelearUnRound(movimientoDeGoku.get)(vegeta)
     
     movimientoDeGoku shouldBe Some(CargarKi)
-    g.estado shouldBe Luchando
+    g.estado shouldBe SuperSaiyajin(1,500)
     g.energia shouldBe 1450
     v.energia shouldBe 2101
     v.energiaMaxima shouldBe 3501
@@ -72,9 +69,9 @@ class Guerrero_Test extends FlatSpec with Matchers {
   }
   
   "pelearContra" should "goku pelea con vegeta y se deja fajar pero lo mata con una Genkidama" in {
-    val vegetaMono = new Guerrero("MonoV", List(), 3003, 3003, Saiyajin(MonoGigante(1001), true), Luchando, todosSaben)
+    val vegetaMono = new Guerrero("MonoV", List(), 3003, 3003, Saiyajin(true), MonoGigante(1001), todosSaben)
     
-    goku.pelearContra(vegetaMono)(List(DejarseFajar, Genkidama)) shouldBe Ganador(goku disminuiEnergia(20) estas Luchando)
+    goku.pelearContra(vegetaMono)(List(DejarseFajar, Genkidama)) shouldBe Ganador(goku disminuiEnergia(20) resetearTurnosFajados)
   }
   
 }

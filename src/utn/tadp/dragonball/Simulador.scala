@@ -6,7 +6,6 @@ object Simulador {
  
   type Combatientes = (Guerrero, Guerrero)
   
-  
   abstract class Movimiento extends Function[Combatientes , Combatientes ] {
     def movimiento:Combatientes=>Combatientes
     def apply(combatientes: Combatientes) = {
@@ -15,10 +14,8 @@ object Simulador {
         case (Muerto, _) => combatientes
         case (Inconsciente, UsarItem(SemillaDelErmitaño)) => movimiento(combatientes)
         case (Inconsciente, _) => combatientes
-        case (Luchando, _) => movimiento(combatientes)
-        case (Fajado(_), DejarseFajar) => movimiento(combatientes)
-        case (Fajado(_), Genkidama) => movimiento(combatientes) onFst (_ estas Luchando)
-        case (Fajado(_), _) => movimiento(combatientes onFst (_ estas Luchando))
+        case (_, DejarseFajar) => movimiento(combatientes)
+        case (_, _) => movimiento(combatientes) onFst (_ resetearTurnosFajados)
 
       }
     }
@@ -33,19 +30,14 @@ object Simulador {
 
   
   case object DejarseFajar extends AutoMovimiento {
-    def autoMovimiento = guerrero => guerrero.estado match {  
-      case Luchando => guerrero estas Fajado(1)
-      case Fajado(rounds) => guerrero estas Fajado(rounds + 1)
-      case _ => guerrero
-    }
-    
+    def autoMovimiento = _ pasarTurnoFajado    
   }
     
   case object CargarKi extends AutoMovimiento { 
     def autoMovimiento = guerrero => {
-      guerrero.especie match {
-        case Saiyajin(SuperSaiyajin(nivel, _), _) => guerrero aumentaEnergia (150 * nivel) 
-        case Androide => guerrero
+      (guerrero.especie, guerrero.estado) match {
+        case (_, SuperSaiyajin(nivel, _)) => guerrero aumentaEnergia (150 * nivel) 
+        case (Androide, _) => guerrero
         case _ => guerrero aumentaEnergia 100
       }
     }
@@ -60,11 +52,10 @@ object Simulador {
       case _ => identity
     })
     
-    def perderCola(modoSaiyajin: EstadoSaiyajing): Guerrero => Guerrero = modoSaiyajin match{
-      case MonoGigante(energiaNormal) => (_ tuEnergiaMaximaEs energiaNormal
-                                            transformateEn Saiyajin(Normal,false)
-                                            estas Inconsciente)
-      case fase => _ transformateEn Saiyajin(fase,false) 
+    def perderCola(guerrero: Guerrero): Guerrero = guerrero.estado match{
+      case MonoGigante(energiaNormal) => (guerrero tuEnergiaMaximaEs energiaNormal
+                                                   estas Inconsciente)
+      case fase => guerrero
     }
     
     val(atacante, oponente) = combatientes
@@ -72,7 +63,7 @@ object Simulador {
       (item, oponente.especie) match {
         case (Arma(Roma), Androide) => combatientes
         case (Arma(Roma), _) if oponente.energia < 300 => (atacante, oponente estas Inconsciente)
-        case (Arma(Filosa), Saiyajin(modo, true)) => (atacante, perderCola(modo)(oponente tuEnergiaEs 1))
+        case (Arma(Filosa), Saiyajin(true)) => (atacante, perderCola(oponente transformateEn Saiyajin(false) tuEnergiaEs 1))
         case (Arma(Filosa), _) => (atacante, oponente disminuiEnergia (atacante.energia / 100))
         case (Arma(Fuego(tipo)), especieAtacado) if atacante tiene Municion(tipo) =>
           (atacante gastarItems (List(Municion(tipo))), disparado(especieAtacado)(oponente))
@@ -99,13 +90,13 @@ object Simulador {
   case object ConvertirseEnMono extends AutoMovimiento { 
     def autoMovimiento = guerrero => {
   
-      (guerrero.especie, guerrero.energiaMaxima) match {  
-        case (Saiyajin(MonoGigante(_), _), _) => guerrero
-        case (Saiyajin(fase, true), energiaMaxima) if (guerrero tiene FotoDeLaLuna) =>
-                                    val energiaO = fase.energiaOriginal(guerrero)
-                                    (guerrero transformateEn Saiyajin(MonoGigante(energiaO), true)
-                                              tuEnergiaMaximaEs (3 * energiaO)
-                                              cargarAlMaximo)
+      (guerrero.especie, guerrero.estado, guerrero.energiaMaxima) match {  
+        case (_, MonoGigante(_), _) => guerrero
+        case (Saiyajin(true), fase, energiaMaxima) if (guerrero tiene FotoDeLaLuna) =>
+                                                    val energiaO = fase.energiaOriginal(guerrero)
+                                                    (guerrero estas MonoGigante(energiaO)
+                                                              tuEnergiaMaximaEs (3 * energiaO)
+                                                              cargarAlMaximo)
         case _ => guerrero
       }
       
@@ -115,11 +106,15 @@ object Simulador {
   case object ConvertirseEnSuperSaiyajing extends AutoMovimiento {
     def autoMovimiento = guerrero => {
       
-      (guerrero.especie, guerrero.energia, guerrero.energiaMaxima) match {
-        case (Saiyajin(MonoGigante(_), _), _, _) => guerrero
-        case (Saiyajin(fase, cola), ki, kiMaximo) if (ki > kiMaximo/2) => 
+      (guerrero.especie, guerrero.estado, guerrero.energia, guerrero.energiaMaxima) match {
+        case (Saiyajin(_), MonoGigante(_), _, _) => guerrero
+        case (Saiyajin(_), fase: EstadoSaiyajing, ki, kiMaximo) if (ki > kiMaximo/2) => 
                                       val (nivel, energiaOriginal) = (fase.proxNivelSSJ, fase.energiaOriginal(guerrero))
-                                      (guerrero transformateEn Saiyajin(SuperSaiyajin(nivel, energiaOriginal), cola)
+                                      (guerrero estas SuperSaiyajin(nivel, energiaOriginal)
+                                                tuEnergiaMaximaEs (5 * nivel * energiaOriginal))
+        case (Saiyajin(_), fase, ki, kiMaximo) if (ki > kiMaximo/2) => 
+                                      val (nivel, energiaOriginal) = (1, fase.energiaOriginal(guerrero))
+                                      (guerrero estas SuperSaiyajin(nivel, energiaOriginal)
                                                 tuEnergiaMaximaEs (5 * nivel * energiaOriginal))
         case _ => guerrero
         }
@@ -243,9 +238,7 @@ object Simulador {
     
     def funcionDaño = { case(atacante, _) =>
      
-      val poderAcumulado = atacante.estado match {
-                    case Fajado(rounds) => 10 pow rounds
-                    case _ => 1 } 
+      val poderAcumulado = 10 pow atacante.turnosFajado
       
       (0, poderAcumulado)
       

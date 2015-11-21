@@ -22,24 +22,24 @@ class Simulador_Test {
                                                                          else
                                                                            a} }
       
-  val raditz: Guerrero = new Guerrero("Raditz", List(), 250, 0, Saiyajin(Normal, false), Muerto, todosSaben)
-  val yamcha: Guerrero = new Guerrero("Yamcha", List(), 100, 20, Humano, Inconsciente, todosSaben)
+  val raditz: Guerrero = new Guerrero("Raditz", List(), 250, 0, Saiyajin(false), Muerto, todosSaben, 0)
+  val yamcha: Guerrero = new Guerrero("Yamcha", List(), 100, 20, Humano, Inconsciente, todosSaben, 0)
   
   val krilin: Guerrero = new Guerrero("Krilin", List(Arma(Roma))++esferasDelDragon, 100, 50, Humano, Luchando, todosSaben++List(UsarItem(Arma(Roma)), Magia(convertirEnHumano)))
   val numero18: Guerrero = new Guerrero("N18", List(Arma(Fuego(Ak47)), Municion(Ak47)), 300, 100, Androide, Luchando, todosSaben++List(Explotar, UsarItem(Arma(Fuego(Ak47)))))
   val piccolo : Guerrero = new Guerrero("Piccolo", List(), 500, 200, Namekusein, Luchando, todosSaben++List(Fusion(krilin), Magia(dejarInconsciente), Onda(40)))
   val majinBuu: Guerrero = new Guerrero("Majin Buu", List(Arma(Filosa)), 700, 300, Monstruo(digerirMajinBuu), Luchando, todosSaben++List(UsarItem(Arma(Filosa)), ComerseAlOponente))
   val cell: Guerrero = new Guerrero("Cell", List(), 500, 250, Monstruo(digerirCell), Luchando, todosSaben++List(Explotar, ComerseAlOponente))
-  val mono : Guerrero = new Guerrero("Mono", List(), 3000, 3000, Saiyajin(MonoGigante(1000), true), Luchando, todosSaben)
-  val goku : Guerrero = new Guerrero("Goku", List(SemillaDelErmitaño, FotoDeLaLuna), 2500, 1300, Saiyajin(SuperSaiyajin(1, 500), true), Luchando, todosSaben++List(Onda(99), Genkidama))
-  val vegeta : Guerrero = new Guerrero("Vegeta", List(), 1001, 801, Saiyajin(Normal, false), Luchando, todosSaben++List(Onda(100), Fusion(goku)))
+  val mono : Guerrero = new Guerrero("Mono", List(), 3000, 3000, Saiyajin(true), MonoGigante(1000), todosSaben, 0)
+  val goku : Guerrero = new Guerrero("Goku", List(SemillaDelErmitaño, FotoDeLaLuna), 2500, 1300, Saiyajin(true), SuperSaiyajin(1, 500), todosSaben++List(Onda(99), Genkidama))
+  val vegeta : Guerrero = new Guerrero("Vegeta", List(), 1001, 801, Saiyajin(false), Luchando, todosSaben++List(Onda(100), Fusion(goku)))
 
   //Sobre DejarseFajar
   @Test
   def krilinSeDejaFajarTest() = {
     val (k, p) = DejarseFajar(krilin, piccolo)
     
-    assertEquals(krilin estas Fajado(1), k)
+    assertEquals(1, k turnosFajado)
     assertEquals(piccolo, p)
   }
   
@@ -108,7 +108,7 @@ class Simulador_Test {
     assertEquals(majinBuu, buu)
     assertEquals(Inconsciente, m estado)
     assertEquals(1, m energia)
-    assertEquals(Saiyajin(Normal, false), m especie)
+    assertEquals(Saiyajin(false), m especie)
   }
   
   @Test
@@ -117,7 +117,8 @@ class Simulador_Test {
     
     assertEquals(majinBuu, buu)
     assertEquals(1, g energia)
-    assertEquals(Saiyajin(SuperSaiyajin(1, 500), false), g especie)
+    assertEquals(Saiyajin(false), g especie)
+    assertEquals(SuperSaiyajin(1, 500), g estado)
   }
   
   @Test
@@ -126,7 +127,7 @@ class Simulador_Test {
     
     assertEquals(majinBuu, buu)
     assertEquals(798, v energia)
-    assertEquals(Saiyajin(Normal, false), v especie)
+    assertEquals(Saiyajin(false), v especie)
   }
   
   @Test
@@ -248,7 +249,8 @@ class Simulador_Test {
   def gokuSeTransformaEnMonoTest() = {
     val(g, k) = ConvertirseEnMono(goku, krilin)
     
-    assertEquals(Saiyajin(MonoGigante(500),true), g especie)
+    assertEquals(Saiyajin(true), g especie)
+    assertEquals(MonoGigante(500), g estado)
     assertEquals(1500, g energia)
     assertEquals(g energiaMaxima, g energia)
     assertEquals(krilin, k)
@@ -260,7 +262,8 @@ class Simulador_Test {
     val (v, g) = ConvertirseEnSuperSaiyajing(vegeta, goku)
     
     assertEquals(5005, v energiaMaxima)
-    assertEquals(Saiyajin(SuperSaiyajin(1, 1001), false), v especie)
+    assertEquals(Saiyajin(false), v especie)
+    assertEquals(SuperSaiyajin(1, 1001), v estado)
     assertEquals(goku, g)
   }
   
@@ -277,7 +280,8 @@ class Simulador_Test {
     val (g, v) = ConvertirseEnSuperSaiyajing(goku, vegeta)
     
     assertEquals(5000, g energiaMaxima)
-    assertEquals(Saiyajin(SuperSaiyajin(2, 500), true), g especie)
+    assertEquals(Saiyajin(true), g especie)
+    assertEquals(SuperSaiyajin(2, 500), g estado)
     assertEquals(vegeta, v)
   }
   
@@ -302,7 +306,7 @@ class Simulador_Test {
     val (g, v) = (goku estas Inconsciente, vegeta)
     
     assertEquals(500, g energiaMaxima)
-    assertEquals(Saiyajin(Normal, true), g especie)
+    assertEquals(Saiyajin(true), g especie)
     assertEquals(vegeta, v)
   }
   
@@ -431,7 +435,7 @@ class Simulador_Test {
     assertEquals(0, m energia)
     assertEquals(Muerto, m estado)
     assertEquals(mono.energia - majinBuu.energia * 2, mo energia)
-    assertEquals(Luchando, mo estado)
+    assertEquals(MonoGigante(1000), mo estado)
   }
   
   @Test
@@ -441,7 +445,7 @@ class Simulador_Test {
     assertEquals(0, n18 energia)
     assertEquals(Muerto, n18 estado)
     assertEquals(mono.energia - numero18.energia * 3, mo energia)
-    assertEquals(Luchando, mo estado)
+    assertEquals(MonoGigante(1000), mo estado)
   }
   
   @Test
@@ -518,7 +522,7 @@ class Simulador_Test {
   def gokuTiraUnaGenkidamaDejandonseFajar1TurnoTest() = {
     val(gokuFajado, kr) = DejarseFajar(goku, krilin)
     
-    assertEquals(Fajado(1), gokuFajado estado)
+    assertEquals(1, gokuFajado turnosFajado)
     
     val (g, k) = Genkidama(gokuFajado, kr)
     
@@ -530,7 +534,7 @@ class Simulador_Test {
   def gokuTiraUnaGenkidamaDejandonseFajar1TurnoTestYCuraANumero18Test() = {
     val(gokuFajado, n18) = DejarseFajar(goku, numero18)
     
-    assertEquals(Fajado(1), gokuFajado estado)
+    assertEquals(1, gokuFajado turnosFajado)
     
     val (g, nro18) = Genkidama(gokuFajado, n18)
     
@@ -542,7 +546,7 @@ class Simulador_Test {
   def gokuTiraUnaGenkidamaDejandonseFajar2TurnoTest() = {
     val(gokuFajado, kr) = DejarseFajar(DejarseFajar(goku, krilin))
     
-    assertEquals(Fajado(2), gokuFajado estado)
+    assertEquals(2, gokuFajado turnosFajado)
     
     val (g, k) = Genkidama(gokuFajado, kr)
     
@@ -555,7 +559,7 @@ class Simulador_Test {
   def gokuTiraUnaGenkidamaDejandonseFajar3TurnoTest() = {
     val(gokuFajado, mo) = DejarseFajar(DejarseFajar(DejarseFajar(goku, mono)))
     
-    assertEquals(Fajado(3), gokuFajado estado)
+    assertEquals(3, gokuFajado turnosFajado)
     
     val (g, m) = Genkidama(gokuFajado, mo)
     
@@ -590,15 +594,15 @@ class Simulador_Test {
   
   @Test
   def unFajadoSeDejaFajarYAumentanLosRoundsFajadoTest(){
-    val(k, g) = DejarseFajar(krilin estas Fajado(1), goku)
+    val(k, g) = (DejarseFajar andThen DejarseFajar)(krilin, goku)
     
-    assertEquals(krilin estas Fajado(2), k)
+    assertEquals(2, k turnosFajado)
     assertEquals(goku, g)
   }
   
   @Test
   def unFajadoRealizaMovimientoYPasaALuchandoTest(){
-    val(k, g) = CargarKi(krilin estas Fajado(1), goku)
+    val(k, g) = CargarKi(krilin.pasarTurnoFajado.pasarTurnoFajado, goku)
     
     assertEquals(krilin aumentaEnergia 100, k)
     assertEquals(goku, g)
