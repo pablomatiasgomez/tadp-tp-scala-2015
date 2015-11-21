@@ -23,7 +23,7 @@ case class Guerrero(
     val guerreroAfectado = copy(energia = f(energia).max(0).min(energiaMaxima))
     if(guerreroAfectado.energia == 0) guerreroAfectado.estas(Muerto)
     else guerreroAfectado
-    
+   
   }
   
   def tuEnergiaEs(nuevaEnergia: Int) = variarEnergia( _ => nuevaEnergia)
