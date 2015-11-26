@@ -111,8 +111,6 @@ case class Guerrero(
           atacante.movimientoMasEfectivoContra(oponente)(criterio)
             .fold(throw NoSePuedeGenerarPlanException)(mov => (plan :+ mov, atacante.pelearUnRound(mov)(oponente)))  
         })._1  
-
-      
   }                                                                   
    
   def pelearContra(oponente: Guerrero)(plan: List[Movimiento]): ResultadoPelea = {
@@ -122,9 +120,7 @@ case class Guerrero(
     plan.foldLeft(peleaEnCurso){(pelea, movimiento) => for{ (atacante,oponente) <- pelea }
                                                        yield(atacante.pelearUnRound(movimiento)(oponente))
                                                        }
-
-      }
-    
+  }
 }
 
 object NoSePuedeGenerarPlanException extends Exception
@@ -146,13 +142,11 @@ object ResultadoPelea {
       case ( Muerto, _ ) => Ganador(oponente)
       case (_, _) => PeleaEnCurso(atacante, oponente)
     }
-}
+  }
   
   def apply(guerrero:Guerrero):ResultadoPelea = Ganador(guerrero)
   
 }
-
-
 
 trait ResultadoPelea {
     
@@ -163,7 +157,6 @@ trait ResultadoPelea {
     def flatMap(f: Combatientes => ResultadoPelea): ResultadoPelea
     
     def fold[T](seed: T)(f: Combatientes => T) : T
-    
 }
   
 case class Ganador(guerrero: Guerrero) extends ResultadoPelea {
