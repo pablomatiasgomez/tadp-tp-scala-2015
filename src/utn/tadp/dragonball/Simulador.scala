@@ -46,21 +46,20 @@ object Simulador {
   case class UsarItem(item: Item) extends Movimiento {
     def movimiento = combatientes => {
       
-    def disparado: Especie => Guerrero => Guerrero = ({ 
-      case Humano => _ disminuiEnergia 20
-      case Namekusein => _.transformOnTrue( _.estado == Inconsciente)(_ disminuiEnergia 10)
-      case _ => identity
-    })
-    
-    def perderCola(guerrero: Guerrero): Guerrero = guerrero.estado match{
-      case MonoGigante(energiaNormal) => (guerrero tuEnergiaMaximaEs energiaNormal
-                                                   estas Inconsciente)
-      case fase => guerrero
-    }
-    
-    val(atacante, oponente) = combatientes
-    combatientes.becomeOnTrue(atacante tiene item)(
-      (item, oponente.especie) match {
+      def disparado: Especie => Guerrero => Guerrero = ({ 
+        case Humano => _ disminuiEnergia 20
+        case Namekusein => _.transformOnTrue( _.estado == Inconsciente)(_ disminuiEnergia 10)
+        case _ => identity
+      })
+      
+      def perderCola(guerrero: Guerrero): Guerrero = guerrero.estado match{
+        case MonoGigante(energiaNormal) => (guerrero tuEnergiaMaximaEs energiaNormal
+                                                     estas Inconsciente)
+        case fase => guerrero
+      }
+      
+      val(atacante, oponente) = combatientes
+      combatientes.becomeOnTrue(atacante tiene item)((item, oponente.especie) match {
         case (Arma(Roma), Androide) => combatientes
         case (Arma(Roma), _) if oponente.energia < 300 => (atacante, oponente estas Inconsciente)
         case (Arma(Filosa), Saiyajin(true)) => (atacante, perderCola(oponente transformateEn Saiyajin(false) tuEnergiaEs 1))
@@ -69,9 +68,9 @@ object Simulador {
           (atacante gastarItems (List(Municion(tipo))), disparado(especieAtacado)(oponente))
         case (SemillaDelErmitaño, _) => (atacante tuEnergiaEs (atacante.energiaMaxima), oponente)
         case _ => combatientes
-        })   
+      })   
     
-     }
+    }
   }
   
 
@@ -108,14 +107,13 @@ object Simulador {
       
       (guerrero.especie, guerrero.estado, guerrero.energia, guerrero.energiaMaxima) match {
         case (Saiyajin(_), MonoGigante(_), _, _) => guerrero
-        case (Saiyajin(_), fase: EstadoSaiyajing, ki, kiMaximo) if (ki > kiMaximo/2) => 
-                                      val (nivel, energiaOriginal) = (fase.proxNivelSSJ, fase.energiaOriginal(guerrero))
-                                      (guerrero estas SuperSaiyajin(nivel, energiaOriginal)
-                                                tuEnergiaMaximaEs (5 * nivel * energiaOriginal))
+        case (Saiyajin(_), SuperSaiyajin(nivel, energiaOriginal), ki, kiMaximo) if (ki > kiMaximo/2) => 
+                                      (guerrero estas SuperSaiyajin(nivel+1, energiaOriginal)
+                                                tuEnergiaMaximaEs (5 * (nivel+1) * energiaOriginal))
         case (Saiyajin(_), fase, ki, kiMaximo) if (ki > kiMaximo/2) => 
-                                      val (nivel, energiaOriginal) = (1, fase.energiaOriginal(guerrero))
-                                      (guerrero estas SuperSaiyajin(nivel, energiaOriginal)
-                                                tuEnergiaMaximaEs (5 * nivel * energiaOriginal))
+                                      val energiaOriginal = fase.energiaOriginal(guerrero)
+                                      (guerrero estas SuperSaiyajin(1, energiaOriginal)
+                                                tuEnergiaMaximaEs (5 * energiaOriginal))
         case _ => guerrero
         }
       
@@ -136,7 +134,7 @@ object Simulador {
    
     case class Magia(paseDeMagia: Combatientes => Combatientes) extends Movimiento {
     def movimiento = combatientes => {
-      val(atacante, oponente): Combatientes = combatientes
+      val(atacante, oponente) = combatientes
       atacante.especie match {
         case _:Magico => paseDeMagia(combatientes)
         case _ if (atacante tiene (EsferaDelDragon, 7)) =>
@@ -206,8 +204,8 @@ object Simulador {
         }
         
         def esquivaLaMuerte: Int => Int = oponente.especie match {
-          case Namekusein =>  _ min (oponente.energia - 1)
-          case _ => identity _
+          case Namekusein =>  (oponente.energia - 1) min
+          case _ => identity
         }
         
         daño onSnd esquivaLaMuerte

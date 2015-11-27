@@ -35,13 +35,15 @@ object BlackMagic {
 
   implicit class Is[T](any: T) {
 
-    def is = any == _
+    def is : Function1[T,Boolean] = any equals
 
   }
 
   implicit class IntConPotenciaEntera(base: Int) {
 
     def pow(exponente: Int) = List.fill(exponente)(base).foldRight(1)(_ * _)
+    
+    def powFacil(exponente: Int) =  Math.pow(base, exponente).toInt
 
   }
 
