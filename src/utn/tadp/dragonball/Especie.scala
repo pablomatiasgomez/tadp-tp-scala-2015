@@ -15,18 +15,3 @@ case class Monstruo(digerir: Combatientes => Guerrero)extends Especie with Magic
 
 case class Saiyajin(cola:Boolean) extends Especie with Fusionable
 
-abstract class EstadoSaiyajing extends EstadoDeLucha{
-  
-  def energiaOriginal(guerrero: Guerrero): Int
-  def proxNivelSSJ = 1
-
-}
-
-case class SuperSaiyajin(nivel: Int, energiaNormal: Int) extends EstadoSaiyajing{
-  override def proxNivelSSJ = nivel + 1
-  override def energiaOriginal(guerrero: Guerrero) = energiaNormal
-}
-
-case class MonoGigante(energiaNormal: Int) extends EstadoSaiyajing{
-  override def energiaOriginal(guerrero: Guerrero) = energiaNormal
-}

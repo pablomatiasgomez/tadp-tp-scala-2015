@@ -77,7 +77,15 @@ case class Guerrero(
     
     def valorDelMovimiento:Movimiento=>Double = movimiento => criterio(movimiento(combatientes))
     
-    movimientos.filter( 0 < valorDelMovimiento(_) ).optMaxBy( valorDelMovimiento )
+    
+    (for{movimiento <- movimientos
+
+        if valorDelMovimiento(movimiento) > 0
+    } yield(movimiento)).optMaxBy(valorDelMovimiento)
+    
+
+    
+    
     
   }
   
@@ -136,6 +144,24 @@ abstract class EstadoDeLucha{
 case object Luchando extends EstadoDeLucha
 case object Inconsciente extends EstadoDeLucha
 case object Muerto extends EstadoDeLucha
+
+abstract class EstadoSaiyajing extends EstadoDeLucha{
+  
+  def energiaOriginal(guerrero: Guerrero): Int
+  def proxNivelSSJ = 1
+
+}
+
+case class SuperSaiyajin(nivel: Int, energiaNormal: Int) extends EstadoSaiyajing{
+  override def proxNivelSSJ = nivel + 1
+  override def energiaOriginal(guerrero: Guerrero) = energiaNormal
+}
+
+case class MonoGigante(energiaNormal: Int) extends EstadoSaiyajing{
+  override def energiaOriginal(guerrero: Guerrero) = energiaNormal
+}
+
+
 
 object ResultadoPelea {
   
