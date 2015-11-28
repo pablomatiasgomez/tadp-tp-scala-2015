@@ -138,7 +138,7 @@ case object Luchando extends EstadoDeLucha
 case object Inconsciente extends EstadoDeLucha
 case object Muerto extends EstadoDeLucha
 
-abstract class EstadoSaiyajing[+F<:Saiyajin] extends EstadoDeLucha[Saiyajin]{
+abstract class EstadoSaiyajing extends EstadoDeLucha[Saiyajin]{
  
   def energiaOriginal[E<:Especie](guerrero: Guerrero[E]): Int
 }
