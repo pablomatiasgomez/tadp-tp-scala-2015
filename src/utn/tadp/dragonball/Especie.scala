@@ -7,11 +7,10 @@ abstract class Especie
 trait Magico
 trait Fusionable
 
-case object Humano extends Especie with Fusionable
-case object Androide extends Especie
-case object Namekusein extends Especie with Fusionable with Magico
-case class  Fusionado(miembros: Combatientes) extends Especie
-case class Monstruo(digerir: Combatientes => Guerrero)extends Especie with Magico
-
+case class Humano() extends Especie with Fusionable
+case class Androide() extends Especie
+case class Namekusein() extends Especie with Fusionable with Magico
+case class Fusionado(miembros: Combatientes[Especie,Especie]) extends Especie
+case class Monstruo(digerir: Combatientes[Especie,Especie] => Guerrero[Especie])extends Especie with Magico
 case class Saiyajin(cola:Boolean) extends Especie with Fusionable
 

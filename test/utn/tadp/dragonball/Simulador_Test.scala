@@ -2,6 +2,7 @@ package utn.tadp.dragonball
 
 import utn.tadp.dragonball.Simulador._
 import utn.tadp.dragonball.Guerrero._
+import utn.tadp.dragonball.BlackMagic._
 
 import org.junit.Before
 import org.junit.Test
@@ -13,26 +14,23 @@ class Simulador_Test {
   val todosSaben: List[Movimiento] = List(DejarseFajar, CargarKi, MuchosGolpesNinja, Onda(10))
   val esferasDelDragon: List[Item] = List(EsferaDelDragon, EsferaDelDragon, EsferaDelDragon, EsferaDelDragon, EsferaDelDragon, EsferaDelDragon, EsferaDelDragon)
   
-  val dejarInconsciente: Function1[Combatientes, Combatientes] = { case (atacante, oponente) => (atacante, oponente estas Inconsciente) }
-  val convertirEnHumano: Function1[Combatientes, Combatientes] = { case (atacante, oponente) => (atacante, oponente transformateEn Humano) }
+  val dejarInconsciente: Function1[Combatientes[Especie, Especie], Combatientes[Especie, Especie]] = { case (atacante, oponente) => (atacante, oponente estas Inconsciente) }
+  val convertirEnHumano: Function1[Combatientes[Especie, Especie], Combatientes[Especie, Especie]] = { case (atacante, oponente) => (atacante, oponente transformateEn Humano()) }
   
-  val digerirMajinBuu: Function1[Combatientes, Guerrero] = { case (a, o) => {a tusMovimientos(o movimientos)} }
-  val digerirCell: Function1[Combatientes, Guerrero] = { case (a, o) => { if(o.especie == Androide)
-                                                                           a agregaMovimientos(o.movimientos)
-                                                                         else
-                                                                           a} }
+  val digerirMajinBuu: Function1[Combatientes[Especie, Especie], Guerrero[Especie]] = { case (a, o) => {a tusMovimientos (o movimientos)} }
+  val digerirCell: Function1[Combatientes[Especie, Especie], Guerrero[Especie]] = { case (a, o) => a.transformOnTrue(o.especie == Androide())( _ agregaMovimientos (o.movimientos)) }
       
-  val raditz: Guerrero = new Guerrero("Raditz", List(), 250, 0, Saiyajin(false), Muerto, todosSaben, 0)
-  val yamcha: Guerrero = new Guerrero("Yamcha", List(), 100, 20, Humano, Inconsciente, todosSaben, 0)
+  val raditz = new Guerrero[Saiyajin]("Raditz", List(), 250, 0, Saiyajin(false), Muerto, todosSaben, 0)
+  val yamcha = new Guerrero[Humano]("Yamcha", List(), 100, 20, Humano(), Inconsciente, todosSaben, 0)
   
-  val krilin: Guerrero = new Guerrero("Krilin", List(Arma(Roma))++esferasDelDragon, 100, 50, Humano, Luchando, todosSaben++List(UsarItem(Arma(Roma)), Magia(convertirEnHumano)))
-  val numero18: Guerrero = new Guerrero("N18", List(Arma(Fuego(Ak47)), Municion(Ak47)), 300, 100, Androide, Luchando, todosSaben++List(Explotar, UsarItem(Arma(Fuego(Ak47)))))
-  val piccolo : Guerrero = new Guerrero("Piccolo", List(), 500, 200, Namekusein, Luchando, todosSaben++List(Fusion(krilin), Magia(dejarInconsciente), Onda(40)))
-  val majinBuu: Guerrero = new Guerrero("Majin Buu", List(Arma(Filosa)), 700, 300, Monstruo(digerirMajinBuu), Luchando, todosSaben++List(UsarItem(Arma(Filosa)), ComerseAlOponente))
-  val cell: Guerrero = new Guerrero("Cell", List(), 500, 250, Monstruo(digerirCell), Luchando, todosSaben++List(Explotar, ComerseAlOponente))
-  val mono : Guerrero = new Guerrero("Mono", List(), 3000, 3000, Saiyajin(true), MonoGigante(1000), todosSaben, 0)
-  val goku : Guerrero = new Guerrero("Goku", List(SemillaDelErmitaño, FotoDeLaLuna), 2500, 1300, Saiyajin(true), SuperSaiyajin(1, 500), todosSaben++List(Onda(99), Genkidama))
-  val vegeta : Guerrero = new Guerrero("Vegeta", List(), 1001, 801, Saiyajin(false), Luchando, todosSaben++List(Onda(100), Fusion(goku)))
+  val krilin = new Guerrero[Humano]("Krilin", List(Arma(Roma))++esferasDelDragon, 100, 50, Humano(), Luchando, todosSaben++List(UsarItem(Arma(Roma)), Magia(convertirEnHumano)))
+  val numero18 = new Guerrero[Androide]("N18", List(Arma(Fuego(Ak47)), Municion(Ak47)), 300, 100, Androide(), Luchando, todosSaben++List(Explotar, UsarItem(Arma(Fuego(Ak47)))))
+  val piccolo  = new Guerrero[Namekusein]("Piccolo", List(), 500, 200, Namekusein(), Luchando, todosSaben++List(Fusion(krilin), Magia(dejarInconsciente), Onda(40)))
+  val majinBuu = new Guerrero[Monstruo]("Majin Buu", List(Arma(Filosa)), 700, 300, Monstruo(digerirMajinBuu), Luchando, todosSaben++List(UsarItem(Arma(Filosa)), ComerseAlOponente))
+  val cell = new Guerrero[Monstruo]("Cell", List(), 500, 250, Monstruo(digerirCell), Luchando, todosSaben++List(Explotar, ComerseAlOponente))
+  val mono  = new Guerrero[Saiyajin]("Mono", List(), 3000, 3000, Saiyajin(true), MonoGigante(1000), todosSaben, 0)
+  val goku  = new Guerrero[Saiyajin]("Goku", List(SemillaDelErmitaño, FotoDeLaLuna), 2500, 1300, Saiyajin(true), SuperSaiyajin(1, 500), todosSaben++List(Onda(99), Genkidama))
+  val vegeta  = new Guerrero[Saiyajin]("Vegeta", List(), 1001, 801, Saiyajin(false), Luchando, todosSaben++List(Onda(100), Fusion(goku)))
 
   //Sobre DejarseFajar
   @Test
@@ -200,6 +198,7 @@ class Simulador_Test {
     val(c, n18) = ComerseAlOponente(cell, numero18)
     
     assertEquals(numero18 estas Muerto , n18)
+    assertEquals((cell.movimientos++numero18.movimientos).size, (c movimientos).size)
     assertEquals(cell.movimientos++numero18.movimientos, c movimientos)
   }
   
@@ -388,7 +387,7 @@ class Simulador_Test {
     val (k, n18) = Magia(convertirEnHumano)(krilin, numero18)
     
     assertEquals(krilin.inventario diff esferasDelDragon, k.inventario)
-    assertEquals(numero18 transformateEn Humano, n18)
+    assertEquals(numero18 transformateEn Humano(), n18)
   }
   
   //Sobre MuchosGolpesNinja

@@ -4,13 +4,13 @@ import utn.tadp.dragonball.Simulador._
 import utn.tadp.dragonball.BlackMagic._
 import scala.util.Try
 
-case class Guerrero(
+case class Guerrero[+E<:Especie](
       nombre: String,
       inventario: List[Item],
       energiaMaxima: Int,
       energia: Int,
-      especie: Especie,
-      estado: EstadoDeLucha,
+      especie: E,
+      estado: EstadoDeLucha[E],
       movimientos: List[Movimiento],
       turnosFajado: Int = 0
       ) {
@@ -45,11 +45,11 @@ case class Guerrero(
   
   def cargarAlMaximo = tuEnergiaEs(energiaMaxima)
   
-  def estas(nuevoEstado: EstadoDeLucha): Guerrero = {
+  def estas[F<:Especie](nuevoEstado: EstadoDeLucha[F]): Guerrero[Especie] = {
     
     (nuevoEstado, estado, especie) match {
       case (Muerto | Inconsciente, _, Fusionado((original, _))) => original estas nuevoEstado
-      case (_, estadoAnterior: EstadoSaiyajing, _) => copy(estado = nuevoEstado) tuEnergiaMaximaEs estadoAnterior.energiaOriginal(this)
+      case (_, estadoAnterior: EstadoSaiyajing[Saiyajin], _) => copy(estado = nuevoEstado) tuEnergiaMaximaEs estadoAnterior.energiaOriginal(this)
       case _ => copy(estado = nuevoEstado)
     }
     
@@ -67,11 +67,11 @@ case class Guerrero(
   
   def tiene(item: Item, cantidad: Int) = inventario has (cantidad, item)
   
-  type CriterioDeCombate = Combatientes => Option[Double]
+  type CriterioDeCombate = Combatientes[Especie,Especie] => Option[Double]
   
   type PlanDeAtaque = List[Movimiento]
   
-  def movimientoMasEfectivoContra(oponente: Guerrero)(criterio: CriterioDeCombate): Option[Movimiento] = {
+  def movimientoMasEfectivoContra(oponente: Guerrero[Especie])(criterio: CriterioDeCombate): Option[Movimiento] = {
     
     val combatientes = (this, oponente)
     
@@ -83,30 +83,30 @@ case class Guerrero(
     } yield(movimiento)).optMaxBy(valorDelMovimiento)
   }
   
-  def atacarSegun(criterioDeCombate: CriterioDeCombate): (Guerrero => Combatientes) = guerrero => {
+  def atacarSegun(criterioDeCombate: CriterioDeCombate): (Guerrero[Especie] => Combatientes[Especie,Especie]) = guerrero => {
               val combatientes = (this, guerrero)
-              this.movimientoMasEfectivoContra(guerrero)(criterioDeCombate).fold(combatientes)(_(combatientes))
+              this.movimientoMasEfectivoContra(guerrero)(criterioDeCombate).fold(combatientes:Combatientes[Especie,Especie])(_(combatientes))
   }
   
-  def contraAtacarA(guerrero: Guerrero): Combatientes = this.atacarSegun(mayorVentajaDeKi)(guerrero)
+  def contraAtacarA(guerrero: Guerrero[Especie]): Combatientes[Especie, Especie] = this.atacarSegun(mayorVentajaDeKi)(guerrero)
   
-  def mayorVentajaDeKi(combatientes: Combatientes): Option[Double] =  Option((combatientes._1.energia - combatientes._2.energia) match {
+  def mayorVentajaDeKi(combatientes: Combatientes[Especie, Especie]): Option[Double] =  Option((combatientes._1.energia - combatientes._2.energia) match {
                 case diferencia if diferencia > 0 => diferencia 
                 case 0 => 0.99
                 case diferencia if diferencia < 0 => 0.98 / diferencia.abs
   })
 
               
-  def pelearUnRound(movimiento: Movimiento)(oponente: Guerrero): Combatientes = {
+  def pelearUnRound(movimiento: Movimiento)(oponente: Guerrero[Especie]): Combatientes[Especie, Especie] = {
     
     val (thisFajado, oponenteFajado) = movimiento(this, oponente)
     oponenteFajado.contraAtacarA(thisFajado).swap
   
   }
   
-  def planDeAtaque(oponente: Guerrero, rounds: Int)(criterio: CriterioDeCombate): Try[PlanDeAtaque] = Try {
-   
-    val semilla = (List(): PlanDeAtaque, (this, oponente))
+  def planDeAtaque(oponente: Guerrero[Especie], rounds: Int)(criterio: CriterioDeCombate): Try[PlanDeAtaque] = Try {
+    val combatientes:Combatientes[Especie,Especie] = (this,oponente)
+    val semilla = (List(): PlanDeAtaque, combatientes)
 
         (1 to rounds).foldLeft(semilla)(
           { case ((plan, (atacante, oponente)), _ ) => 
@@ -117,7 +117,7 @@ case class Guerrero(
       
   }                                                                   
    
-  def pelearContra(oponente: Guerrero)(plan: List[Movimiento]): ResultadoPelea = {
+  def pelearContra(oponente: Guerrero[Especie])(plan: List[Movimiento]): ResultadoPelea = {
     
     
     plan.foldLeft(ResultadoPelea(this, oponente)){(pelea, movimiento) => for{ (atacante,oponente) <- pelea }
@@ -130,35 +130,32 @@ case class Guerrero(
 
 object NoSePuedeGenerarPlanException extends Exception
 
-abstract class EstadoDeLucha{
-  def energiaOriginal(guerrero: Guerrero) = guerrero.energiaMaxima
+abstract class EstadoDeLucha[+E<:Especie]{
+  def energiaOriginal[F<:Especie](guerrero: Guerrero[F]) = guerrero.energiaMaxima
 }
 
 case object Luchando extends EstadoDeLucha
 case object Inconsciente extends EstadoDeLucha
 case object Muerto extends EstadoDeLucha
 
-abstract class EstadoSaiyajing extends EstadoDeLucha{
-  
-  def energiaOriginal(guerrero: Guerrero): Int
-  def proxNivelSSJ = 1
-
+abstract class EstadoSaiyajing[+F<:Saiyajin] extends EstadoDeLucha[Saiyajin]{
+ 
+  def energiaOriginal[E<:Especie](guerrero: Guerrero[E]): Int
 }
 
 case class SuperSaiyajin(nivel: Int, energiaNormal: Int) extends EstadoSaiyajing{
-  override def proxNivelSSJ = nivel + 1
-  override def energiaOriginal(guerrero: Guerrero) = energiaNormal
+  override def energiaOriginal[E<:Especie](guerrero: Guerrero[E]) = energiaNormal
 }
 
 case class MonoGigante(energiaNormal: Int) extends EstadoSaiyajing{
-  override def energiaOriginal(guerrero: Guerrero) = energiaNormal
+  override def energiaOriginal[E<:Especie](guerrero: Guerrero[E]) = energiaNormal
 }
 
 
 
 object ResultadoPelea {
   
-  def apply(combatientes:Combatientes):ResultadoPelea = {
+  def apply(combatientes:Combatientes[Especie,Especie]):ResultadoPelea = {
     val (atacante, oponente) = combatientes
     combatientes.map(_.estado) match {
       case ( _ , Muerto ) => Ganador(atacante)
@@ -172,35 +169,35 @@ object ResultadoPelea {
 
 trait ResultadoPelea {
     
-    def map(f: Combatientes => Combatientes): ResultadoPelea
+    def map(f: Combatientes[Especie,Especie] => Combatientes[Especie,Especie]): ResultadoPelea
     
-    def filter(f: Combatientes => Boolean): ResultadoPelea
+    def filter(f: Combatientes[Especie,Especie] => Boolean): ResultadoPelea
     
-    def flatMap(f: Combatientes => ResultadoPelea): ResultadoPelea
+    def flatMap(f: Combatientes[Especie,Especie] => ResultadoPelea): ResultadoPelea
     
-    def fold[T](seed: T)(f: Combatientes => T) : T
+    def fold[T](seed: T)(f: Combatientes[Especie,Especie] => T) : T
     
 }
   
-case class Ganador(guerrero: Guerrero) extends ResultadoPelea {
+case class Ganador(guerrero: Guerrero[Especie]) extends ResultadoPelea {
   
-    def map(f: Combatientes => Combatientes) = this
+    def map(f: Combatientes[Especie,Especie] => Combatientes[Especie,Especie]) = this
     
-    def filter(f: Combatientes => Boolean) = this
+    def filter(f: Combatientes[Especie,Especie] => Boolean) = this
     
-    def flatMap(f: Combatientes => ResultadoPelea) = this
+    def flatMap(f: Combatientes[Especie,Especie] => ResultadoPelea) = this
     
-    def fold[T](semilla: T)(f: Combatientes => T) = semilla
+    def fold[T](semilla: T)(f: Combatientes[Especie,Especie] => T) = semilla
 }
   
-case class PeleaEnCurso(combatientes: Combatientes) extends ResultadoPelea {
+case class PeleaEnCurso(combatientes: Combatientes[Especie,Especie]) extends ResultadoPelea {
   
-  def map(luchar: Combatientes => Combatientes) = ResultadoPelea(luchar(combatientes))
+  def map(luchar: Combatientes[Especie,Especie] => Combatientes[Especie,Especie]) = ResultadoPelea(luchar(combatientes))
 
-  def filter(f: Combatientes => Boolean) = ResultadoPelea(combatientes)
+  def filter(f: Combatientes[Especie,Especie] => Boolean) = ResultadoPelea(combatientes)
   
-  def flatMap(f: Combatientes => ResultadoPelea) = for( combatientesResultantes <- f(combatientes)) 
+  def flatMap(f: Combatientes[Especie,Especie] => ResultadoPelea) = for( combatientesResultantes <- f(combatientes)) 
                                                    yield combatientesResultantes
   
-  def fold[T](semilla: T)(f: Combatientes => T) = f(combatientes)
+  def fold[T](semilla: T)(f: Combatientes[Especie,Especie] => T) = f(combatientes)
 }

@@ -4,11 +4,11 @@ import utn.tadp.dragonball.BlackMagic._
 
 object Simulador {
  
-  type Combatientes = (Guerrero, Guerrero)
+  type Combatientes[+E<:Especie,+F<:Especie] = (Guerrero[E], Guerrero[F])
   
-  abstract class Movimiento extends Function[Combatientes , Combatientes ] {
-    def movimiento:Combatientes=>Combatientes
-    def apply(combatientes: Combatientes) = {
+  abstract class Movimiento extends Function[Combatientes[Especie, Especie] , Combatientes[Especie, Especie] ] {
+    def movimiento:Combatientes[Especie, Especie]=>Combatientes[Especie, Especie]
+    def apply(combatientes: Combatientes[Especie, Especie]) = {
       val(atacante, oponente) = combatientes
       (atacante.estado, this) match {
         case (Muerto, _) => combatientes
@@ -23,7 +23,7 @@ object Simulador {
   }
   
   abstract class AutoMovimiento extends Movimiento {
-    def autoMovimiento: Guerrero=>Guerrero
+    def autoMovimiento: Guerrero[Especie]=>Guerrero[Especie]
     def movimiento = ( _ onFst autoMovimiento)
   }
   
@@ -37,7 +37,7 @@ object Simulador {
     def autoMovimiento = guerrero => {
       (guerrero.especie, guerrero.estado) match {
         case (_, SuperSaiyajin(nivel, _)) => guerrero aumentaEnergia (150 * nivel) 
-        case (Androide, _) => guerrero
+        case (Androide(), _) => guerrero
         case _ => guerrero aumentaEnergia 100
       }
     }
@@ -46,13 +46,13 @@ object Simulador {
   case class UsarItem(item: Item) extends Movimiento {
     def movimiento = combatientes => {
       
-      def disparado: Especie => Guerrero => Guerrero = ({ 
-        case Humano => _ disminuiEnergia 20
-        case Namekusein => _.transformOnTrue( _.estado == Inconsciente)(_ disminuiEnergia 10)
+      def disparado: Especie => Guerrero[Especie] => Guerrero[Especie] = ({ 
+        case Humano() => _ disminuiEnergia 20
+        case Namekusein() => _.transformOnTrue( _.estado == Inconsciente)(_ disminuiEnergia 10)
         case _ => identity
       })
       
-      def perderCola(guerrero: Guerrero): Guerrero = guerrero.estado match{
+      def perderCola(guerrero: Guerrero[Especie]): Guerrero[Especie] = guerrero.estado match{
         case MonoGigante(energiaNormal) => (guerrero tuEnergiaMaximaEs energiaNormal
                                                      estas Inconsciente)
         case fase => guerrero
@@ -60,7 +60,7 @@ object Simulador {
       
       val(atacante, oponente) = combatientes
       combatientes.becomeOnTrue(atacante tiene item)((item, oponente.especie) match {
-        case (Arma(Roma), Androide) => combatientes
+        case (Arma(Roma), Androide()) => combatientes
         case (Arma(Roma), _) if oponente.energia < 300 => (atacante, oponente estas Inconsciente)
         case (Arma(Filosa), Saiyajin(true)) => (atacante, perderCola(oponente transformateEn Saiyajin(false) tuEnergiaEs 1))
         case (Arma(Filosa), _) => (atacante, oponente disminuiEnergia (atacante.energia / 100))
@@ -120,7 +120,7 @@ object Simulador {
     }
   }
   
-  case class Fusion(aliado: Guerrero) extends AutoMovimiento  {
+  case class Fusion(aliado: Guerrero[Especie]) extends AutoMovimiento  {
     def autoMovimiento = guerrero => {
         
       (guerrero.especie,aliado.especie) match{
@@ -132,7 +132,7 @@ object Simulador {
       }   
     }}
    
-    case class Magia(paseDeMagia: Combatientes => Combatientes) extends Movimiento {
+    case class Magia(paseDeMagia: Combatientes[Especie, Especie] => Combatientes[Especie, Especie]) extends Movimiento {
     def movimiento = combatientes => {
       val(atacante, oponente) = combatientes
       atacante.especie match {
@@ -155,14 +155,14 @@ object Simulador {
   
   abstract class Ataque(tipoAtaque: TipoAtaque) extends Movimiento {
 
-    def funcionDaño:Combatientes => Daños
+    def funcionDaño:Combatientes[Especie, Especie] => Daños
     
     def movimiento = combatientes => {
       
       val (dañoAtacante, dañoAtacado) = funcionDaño(combatientes)
       
-      def efectoEnAtacado(guerrero:Guerrero) = (this, tipoAtaque, guerrero.especie) match {
-        case (_, Energia, Androide) => guerrero.aumentaEnergia _
+      def efectoEnAtacado(guerrero:Guerrero[Especie]) = (this, tipoAtaque, guerrero.especie) match {
+        case (_, Energia, Androide()) => guerrero.aumentaEnergia _
         case _ => guerrero.disminuiEnergia _
       }
       
@@ -178,7 +178,7 @@ object Simulador {
     def funcionDaño = { case (atacante, oponente) => {
     
          (atacante.especie, oponente.especie) match {
-           case (Humano, Androide) => (10, 0)
+           case (Humano(), Androide()) => (10, 0)
            case _ if atacante.energia < oponente.energia => (20, 0)
            case _  => (0, 20)
          } 
@@ -194,17 +194,17 @@ object Simulador {
         val energiaDeExplosion = atacante.energia
         
         def factorExplosivo: Int = atacante.especie match {
-            case Androide => 3
+            case Androide() => 3
             case Monstruo(_) => 2
         }    
         
         def daño = atacante.especie match {
-          case Androide | Monstruo(_) => (energiaDeExplosion, energiaDeExplosion * factorExplosivo)
+          case Androide() | Monstruo(_) => (energiaDeExplosion, energiaDeExplosion * factorExplosivo)
           case _ => (0, 0)
         }
         
         def esquivaLaMuerte: Int => Int = oponente.especie match {
-          case Namekusein =>  (oponente.energia - 1) min
+          case Namekusein() =>  (oponente.energia - 1) min
           case _ => identity
         }
         

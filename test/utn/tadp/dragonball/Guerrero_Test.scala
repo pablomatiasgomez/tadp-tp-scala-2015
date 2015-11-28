@@ -9,21 +9,21 @@ import scala.util.Success
 class Guerrero_Test extends FlatSpec with Matchers {
 
   val todosSaben: List[Movimiento] = List(DejarseFajar, CargarKi, MuchosGolpesNinja, Onda(10))
-  val goku : Guerrero = new Guerrero("Goku", List(SemillaDelErmitaño, FotoDeLaLuna), 2500, 1300, Saiyajin(true), SuperSaiyajin(1, 500), todosSaben++List(Onda(99), Genkidama), 3)
-  val vegeta : Guerrero = new Guerrero("Vegeta", List(), 1001, 801, Saiyajin(false), Luchando, todosSaben++List(Onda(100), Fusion(goku)), 0)
-  val cell: Guerrero = new Guerrero("Cell", List(), 500, 500, Monstruo({ a => a._1 }), Luchando, List(Onda(45)), 0)
-  val yajirobe : Guerrero = new Guerrero("Yajirobe", List(SemillaDelErmitaño), 100, 100, Humano, Luchando, List(UsarItem(Arma(Filosa)), UsarItem(SemillaDelErmitaño)), 0)
+  val goku : Guerrero[Saiyajin] = new Guerrero("Goku", List(SemillaDelErmitaño, FotoDeLaLuna), 2500, 1300, Saiyajin(true), SuperSaiyajin(1, 500), todosSaben++List(Onda(99), Genkidama), 3)
+  val vegeta : Guerrero[Saiyajin] = new Guerrero("Vegeta", List(), 1001, 801, Saiyajin(false), Luchando, todosSaben++List(Onda(100), Fusion(goku)), 0)
+  val cell: Guerrero[Monstruo] = new Guerrero("Cell", List(), 500, 500, Monstruo({ a => a._1 }), Luchando, List(Onda(45)), 0)
+  val yajirobe : Guerrero[Humano] = new Guerrero("Yajirobe", List(SemillaDelErmitaño), 100, 100, Humano(), Luchando, List(UsarItem(Arma(Filosa)), UsarItem(SemillaDelErmitaño)), 0)
   
-  def quedoConMasKi(combatientes: Combatientes): Option[Double] = Option(combatientes._1.energia)
-  def mayorVentajaDeKi(combatientes: Combatientes): Option[Double] = Option((combatientes._1.energia - combatientes._2.energia) match {
+  def quedoConMasKi(combatientes: Combatientes[Especie, Especie]): Option[Double] = Option(combatientes._1.energia)
+  def mayorVentajaDeKi(combatientes: Combatientes[Especie, Especie]): Option[Double] = Option((combatientes._1.energia - combatientes._2.energia) match {
                 case diferencia if diferencia > 0 => diferencia 
                 case 0 => 0.99
                 case diferencia if diferencia < 0 => 0.98/ diferencia
             })
             
-  def diferenciaDeKi(combatientes: Combatientes): Option[Double] = None
+  def diferenciaDeKi(combatientes: Combatientes[Especie, Especie]): Option[Double] = None
   
-  def quedoMasFajado(combatientes: Combatientes): Option[Double] = Option(combatientes._1.turnosFajado)
+  def quedoMasFajado(combatientes: Combatientes[Especie, Especie]): Option[Double] = Option(combatientes._1.turnosFajado)
   
   "movimientoMasEfectivoContra" should "be None" in {
     goku.movimientoMasEfectivoContra(vegeta)(diferenciaDeKi) shouldBe None
