@@ -49,7 +49,7 @@ case class Guerrero[+E<:Especie](
     
     (nuevoEstado, estado, especie) match {
       case (Muerto | Inconsciente, _, Fusionado((original, _))) => original estas nuevoEstado
-      case (_, estadoAnterior: EstadoSaiyajing[Saiyajin], _) => copy(estado = nuevoEstado) tuEnergiaMaximaEs estadoAnterior.energiaOriginal(this)
+      case (_, estadoAnterior: EstadoSaiyajing, _) => copy(estado = nuevoEstado) tuEnergiaMaximaEs estadoAnterior.energiaOriginal(this)
       case _ => copy(estado = nuevoEstado)
     }
     
