@@ -67,7 +67,7 @@ case class Guerrero(
   
   def tiene(item: Item, cantidad: Int) = inventario has (cantidad, item)
   
-  type CriterioDeCombate = Combatientes => Double
+  type CriterioDeCombate = Combatientes => Option[Double]
   
   type PlanDeAtaque = List[Movimiento]
   
@@ -75,18 +75,12 @@ case class Guerrero(
     
     val combatientes = (this, oponente)
     
-    def valorDelMovimiento:Movimiento=>Double = movimiento => criterio(movimiento(combatientes))
+    def valorDelMovimiento:Movimiento=> Option[Double] = movimiento => criterio(movimiento(combatientes))
     
     
     (for{movimiento <- movimientos
-
-        if valorDelMovimiento(movimiento) > 0
+       valor <- valorDelMovimiento(movimiento)
     } yield(movimiento)).optMaxBy(valorDelMovimiento)
-    
-
-    
-    
-    
   }
   
   def atacarSegun(criterioDeCombate: CriterioDeCombate): (Guerrero => Combatientes) = guerrero => {
@@ -96,11 +90,11 @@ case class Guerrero(
   
   def contraAtacarA(guerrero: Guerrero): Combatientes = this.atacarSegun(mayorVentajaDeKi)(guerrero)
   
-  def mayorVentajaDeKi(combatientes: Combatientes): Double =  (combatientes._1.energia - combatientes._2.energia) match {
+  def mayorVentajaDeKi(combatientes: Combatientes): Option[Double] =  Option((combatientes._1.energia - combatientes._2.energia) match {
                 case diferencia if diferencia > 0 => diferencia 
                 case 0 => 0.99
                 case diferencia if diferencia < 0 => 0.98 / diferencia.abs
-  }
+  })
 
               
   def pelearUnRound(movimiento: Movimiento)(oponente: Guerrero): Combatientes = {
@@ -112,9 +106,9 @@ case class Guerrero(
   
   def planDeAtaque(oponente: Guerrero, rounds: Int)(criterio: CriterioDeCombate): Try[PlanDeAtaque] = Try {
    
-    val (planVacio, combatientes) = (List(): PlanDeAtaque, (this, oponente))
+    val semilla = (List(): PlanDeAtaque, (this, oponente))
 
-        (1 to rounds).foldLeft(planVacio, combatientes)(
+        (1 to rounds).foldLeft(semilla)(
           { case ((plan, (atacante, oponente)), _ ) => 
           atacante.movimientoMasEfectivoContra(oponente)(criterio)
             .fold(throw NoSePuedeGenerarPlanException)(mov => (plan :+ mov, atacante.pelearUnRound(mov)(oponente)))  
@@ -125,9 +119,8 @@ case class Guerrero(
    
   def pelearContra(oponente: Guerrero)(plan: List[Movimiento]): ResultadoPelea = {
     
-    val peleaEnCurso: ResultadoPelea = ResultadoPelea(this, oponente)
     
-    plan.foldLeft(peleaEnCurso){(pelea, movimiento) => for{ (atacante,oponente) <- pelea }
+    plan.foldLeft(ResultadoPelea(this, oponente)){(pelea, movimiento) => for{ (atacante,oponente) <- pelea }
                                                        yield(atacante.pelearUnRound(movimiento)(oponente))
                                                        }
 
@@ -170,12 +163,9 @@ object ResultadoPelea {
     combatientes.map(_.estado) match {
       case ( _ , Muerto ) => Ganador(atacante)
       case ( Muerto, _ ) => Ganador(oponente)
-      case (_, _) => PeleaEnCurso(atacante, oponente)
+      case _ => PeleaEnCurso(atacante, oponente)
     }
-}
-  
-  def apply(guerrero:Guerrero):ResultadoPelea = Ganador(guerrero)
-  
+  }
 }
 
 

@@ -217,20 +217,19 @@ object Simulador {
   
   case class Onda(energiaNecesaria: Int) extends Ataque(Energia){
   
-  def funcionDaño = { case (atacante, oponente) => {
-    
+    def funcionDaño = {
+      case (atacante, oponente) => {
         def poderDeOnda = oponente.especie match {
-                         case Monstruo(_) => energiaNecesaria / 2
-                         case _ => energiaNecesaria * 2 }
+          case Monstruo(_) => energiaNecesaria / 2
+          case _ => energiaNecesaria * 2 
+        }
      
         if (atacante.energia > energiaNecesaria) (energiaNecesaria, poderDeOnda)
         else (0, 0)
       
       } 
     }
-    
-  
-}
+  }
   
   case object Genkidama extends Ataque(Energia){
     

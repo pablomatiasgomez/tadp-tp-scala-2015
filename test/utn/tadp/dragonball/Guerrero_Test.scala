@@ -14,14 +14,20 @@ class Guerrero_Test extends FlatSpec with Matchers {
   val cell: Guerrero = new Guerrero("Cell", List(), 500, 500, Monstruo({ a => a._1 }), Luchando, List(Onda(45)), 0)
   val yajirobe : Guerrero = new Guerrero("Yajirobe", List(SemillaDelErmitaño), 100, 100, Humano, Luchando, List(UsarItem(Arma(Filosa)), UsarItem(SemillaDelErmitaño)), 0)
   
-  def quedoConMasKi(combatientes: Combatientes) = combatientes._1.energia
-  def mayorVentajaDeKi(combatientes: Combatientes) = (combatientes._1.energia - combatientes._2.energia) match {
+  def quedoConMasKi(combatientes: Combatientes): Option[Double] = Option(combatientes._1.energia)
+  def mayorVentajaDeKi(combatientes: Combatientes): Option[Double] = Option((combatientes._1.energia - combatientes._2.energia) match {
                 case diferencia if diferencia > 0 => diferencia 
                 case 0 => 0.99
                 case diferencia if diferencia < 0 => 0.98/ diferencia
-            }
+            })
+            
+  def diferenciaDeKi(combatientes: Combatientes): Option[Double] = None
   
-  def quedoMasFajado(combatientes: Combatientes) = combatientes._1.turnosFajado
+  def quedoMasFajado(combatientes: Combatientes): Option[Double] = Option(combatientes._1.turnosFajado)
+  
+  "movimientoMasEfectivoContra" should "be None" in {
+    goku.movimientoMasEfectivoContra(vegeta)(diferenciaDeKi) shouldBe None
+  }
   
   
   "movimientoMasEfectivoContra" should "goku elige CargarKi porque lo deja con mas ki" in {
